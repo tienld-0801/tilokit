@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 )
 
+// GenerateReact creates a new React project scaffold with the specified project name.
+// It generates the project directory and populates it with a basic package.json, index.html, and main.jsx file.
+// Returns an error if any file or directory creation fails.
 func GenerateReact(projectName string) error {
 	fmt.Println("🚧 Create project React:", projectName)
 
