@@ -11,6 +11,9 @@ type GeneratorFunc func(projectName string) error
 var registry = map[string]GeneratorFunc{
 	"react":   scaffold.GenerateReact,
 	"laravel": scaffold.GenerateLaravel,
+	"next":    scaffold.GenerateNext,
+	"vue":     scaffold.GenerateVue,
+	"nuxt":    scaffold.GenerateNuxt,
 }
 
 // GetSupportedTemplates returns a slice of all registered template names available for project generation.
