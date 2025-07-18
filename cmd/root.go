@@ -49,6 +49,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+// Execute runs the root CLI command and exits the program with an error message if execution fails.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println("❌ CLI Error:", err)
@@ -56,6 +57,7 @@ func Execute() {
 	}
 }
 
+// init sets up command-line flags for specifying the template and project name for the root command.
 func init() {
 	rootCmd.Flags().StringVarP(&templateName, "template", "t", "", "Name template (react, laravel...)")
 	rootCmd.Flags().StringVarP(&projectName, "name", "n", "", "Name project")
