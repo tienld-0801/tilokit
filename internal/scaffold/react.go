@@ -6,16 +6,13 @@ import (
 	"path/filepath"
 )
 
-// GenerateReact tạo cấu trúc project React đơn giản
 func GenerateReact(projectName string) error {
-	fmt.Println("🚧 Đang tạo project React:", projectName)
+	fmt.Println("🚧 Create project React:", projectName)
 
-	// 1. Tạo thư mục gốc
 	if err := os.MkdirAll(projectName, os.ModePerm); err != nil {
-		return fmt.Errorf("không thể tạo thư mục: %w", err)
+		return fmt.Errorf("internal error creating project directory: %w", err)
 	}
 
-	// 2. Tạo file package.json đơn giản
 	packageJSON := `{
   "name": "` + projectName + `",
   "version": "0.1.0",
@@ -39,7 +36,6 @@ func GenerateReact(projectName string) error {
 		return fmt.Errorf("không thể tạo package.json: %w", err)
 	}
 
-	// 3. Tạo file index.html
 	indexHTML := `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,7 +53,6 @@ func GenerateReact(projectName string) error {
 		return fmt.Errorf("không thể tạo index.html: %w", err)
 	}
 
-	// 4. Tạo file main.jsx
 	mainJSX := `import React from "react";
 import ReactDOM from "react-dom/client";
 
@@ -70,8 +65,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App />);`
 		return fmt.Errorf("không thể tạo main.jsx: %w", err)
 	}
 
-	fmt.Println("✅ React project đã tạo xong:", projectName)
-	fmt.Println("👉 Bạn có thể chạy:")
+	fmt.Println("✅ React project done:", projectName)
+	fmt.Println("👉 You are run:")
 	fmt.Println("   cd", projectName)
 	fmt.Println("   npm install && npm run dev")
 	return nil

@@ -16,34 +16,34 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:   "tilokit",
-	Short: "✨ TiLoKit – Khởi tạo project đa framework",
+	Short: "✨ TiLoKit – Init project multiple framework",
 	Run: func(cmd *cobra.Command, args []string) {
 		if projectName == "" {
-			prompt := &survey.Input{Message: "📁 Nhập tên project:"}
+			prompt := &survey.Input{Message: "📁 Input name project:"}
 			survey.AskOne(prompt, &projectName, survey.WithValidator(survey.Required))
 		}
 
 		if templateName == "" {
 			options := template.GetSupportedTemplates()
 			if len(options) == 0 {
-				fmt.Println("⚠️ Không có template nào được cấu hình.")
+				fmt.Println("⚠️ No template config.")
 				os.Exit(1)
 			}
 
 			prompt := &survey.Select{
-				Message: "📦 Chọn framework muốn khởi tạo:",
+				Message: "📦 Choose framework init",
 				Options: options,
 			}
 			survey.AskOne(prompt, &templateName, survey.WithValidator(survey.Required))
 		}
 
 		if !template.Exists(templateName) {
-			fmt.Println("❌ Template không hợp lệ:", templateName)
+			fmt.Println("❌ Template isvalid:", templateName)
 			os.Exit(1)
 		}
 
 		if err := template.Generate(templateName, projectName); err != nil {
-			fmt.Println("❌ Lỗi:", err)
+			fmt.Println("❌ Error:", err)
 			os.Exit(1)
 		}
 	},
@@ -51,12 +51,12 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println("❌ CLI lỗi:", err)
+		fmt.Println("❌ CLI Error:", err)
 		os.Exit(1)
 	}
 }
 
 func init() {
-	rootCmd.Flags().StringVarP(&templateName, "template", "t", "", "Tên template (react, laravel...)")
-	rootCmd.Flags().StringVarP(&projectName, "name", "n", "", "Tên project")
+	rootCmd.Flags().StringVarP(&templateName, "template", "t", "", "Name template (react, laravel...)")
+	rootCmd.Flags().StringVarP(&projectName, "name", "n", "", "Name project")
 }

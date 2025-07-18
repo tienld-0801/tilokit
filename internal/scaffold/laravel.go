@@ -6,10 +6,10 @@ import (
 )
 
 func GenerateLaravel(projectName string) error {
-	fmt.Println("🚧 Đang tạo project React:", projectName)
+	fmt.Println("🚧 Create template Laravel:", projectName)
 
 	if err := os.MkdirAll(projectName, os.ModePerm); err != nil {
-		return fmt.Errorf("không thể tạo thư mục: %w", err)
+		return fmt.Errorf("internal error creating project directory: %w", err)
 	}
 
 	return nil
