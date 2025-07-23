@@ -9,11 +9,11 @@ import (
 type GeneratorFunc func(projectName string) error
 
 var registry = map[string]GeneratorFunc{
-	"react":   scaffold.GenerateReact,
-	"laravel": scaffold.GenerateLaravel,
+	"react":   scaffold.GenerateReactOptions,
+	"laravel": scaffold.GenerateLaravelOptions,
 	"next":    scaffold.GenerateNext,
 	"vue":     scaffold.GenerateVue,
-	"nuxt":    scaffold.GenerateNuxt,
+	"nuxt":    scaffold.GenerateNuxtOptions,
 }
 
 // GetSupportedTemplates returns a slice of all registered template names available for project generation.

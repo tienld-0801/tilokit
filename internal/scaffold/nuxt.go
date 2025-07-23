@@ -5,9 +5,7 @@ import (
 	"os"
 )
 
-// GenerateLaravel creates a new directory for a Laravel project with the specified name.
-// Returns an error if the directory cannot be created.
-func GenerateNuxt(projectName string) error {
+func GenerateNuxtOptions(projectName string) error {
 	fmt.Println("🚧 Create template Nuxt:", projectName)
 
 	if err := os.MkdirAll(projectName, os.ModePerm); err != nil {
