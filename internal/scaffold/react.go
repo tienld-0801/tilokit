@@ -21,6 +21,7 @@ func GenerateReactOptions(projectName string) error {
 	if err != nil {
 		return fmt.Errorf("failed to read React template selection: %w", err)
 	}
+
 	switch templateChoice {
 	case "React + Vite (JavaScript)":
 		return react.GenerateReactJSOptions(projectName)
