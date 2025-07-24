@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/AlecAivazis/survey/v2"
-	react "github.com/ti-lo/tilokit/internal/template/react"
+	react "github.com/ti-lo/tilokit/internal/platform/react"
 )
 
 func GenerateReactOptions(projectName string) error {
