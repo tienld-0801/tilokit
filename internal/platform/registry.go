@@ -1,4 +1,4 @@
-package paltform
+package platform
 
 import (
 	"fmt"

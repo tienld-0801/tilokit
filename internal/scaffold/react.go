@@ -19,7 +19,7 @@ func GenerateReactOptions(projectName string) error {
 	}
 	err := survey.AskOne(prompt, &templateChoice, survey.WithValidator(survey.Required))
 	if err != nil {
-		return fmt.Errorf("không thể đọc lựa chọn React: %w", err)
+		return fmt.Errorf("failed to read React template selection: %w", err)
 	}
 	switch templateChoice {
 	case "React + Vite (JavaScript)":
@@ -29,6 +29,6 @@ func GenerateReactOptions(projectName string) error {
 	case "React + Vite + TailwindCSS":
 		return react.GenerateReactTailwind(projectName)
 	default:
-		return fmt.Errorf("lựa chọn không hợp lệ")
+		return fmt.Errorf("invalid template selection")
 	}
 }

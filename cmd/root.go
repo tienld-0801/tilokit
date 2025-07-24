@@ -5,7 +5,7 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/spf13/cobra"
-	paltform "github.com/ti-lo/tilokit/internal/platform"
+	"github.com/ti-lo/tilokit/internal/platform"
 	"github.com/ti-lo/tilokit/internal/utils"
 )
 
@@ -24,7 +24,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		if templateName == "" && !utils.IsProduction() {
-			options := paltform.GetSupportedTemplates()
+			options := platform.GetSupportedTemplates()
 			if len(options) == 0 {
 				utils.Error("⚠️ No template config.")
 				os.Exit(1)
@@ -37,12 +37,12 @@ var rootCmd = &cobra.Command{
 			survey.AskOne(prompt, &templateName, survey.WithValidator(survey.Required))
 		}
 
-		if !paltform.Exists(templateName) {
+		if !platform.Exists(templateName) {
 			utils.Error("❌ Template invalid: %s", templateName)
 			os.Exit(1)
 		}
 
-		if err := paltform.Generate(templateName, projectName); err != nil {
+		if err := platform.Generate(templateName, projectName); err != nil {
 			utils.Error("❌ Error: %v", err)
 			os.Exit(1)
 		}

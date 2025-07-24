@@ -1,3 +1,7 @@
+.PHONY: all build run run-react run-laravel clean test
+
+all: build
+
 run:
 	go run main.go
 
@@ -9,3 +13,9 @@ run-laravel:
 
 build:
 	go build -o build/tilokit main.go
+
+clean:
+	rm -rf build/
+
+test:
+	go test ./...
