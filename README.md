@@ -7,7 +7,7 @@
 
 [![Go Version](https://img.shields.io/badge/Go-1.24.4-blue)](https://golang.org/dl/)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
-[![Build](https://img.shields.io/badge/build-passing-brightgreen)]()
+[![Build](https://img.shields.io/badge/build-passing-brightgreen)](https://golang.org/dl/)
 
 > ⚠️ **Notice**: TiLoKit is currently under active development. The API and features may change frequently.
 > Contributions are welcome as we move toward a stable release. Stay tuned for updates!
