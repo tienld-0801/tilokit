@@ -7,7 +7,7 @@ import (
 
 // GenerateLaravel creates a new directory for a Laravel project with the specified name.
 // Returns an error if the directory cannot be created.
-func GenerateVue(projectName string) error {
+func GenerateVueOptions(projectName string) error {
 	fmt.Println("🚧 Create template Vue:", projectName)
 
 	if err := os.MkdirAll(projectName, os.ModePerm); err != nil {

@@ -1,7 +1,7 @@
 # ✨ TiLoKit – Lightweight Multi-Framework Project Scaffold Generator
 
 <p align="left">
-  <img src="./assets/banner.png" alt="TiLoKit CLI Banner" width="700"/>
+  <img src="./assets/banner.png" alt="TiLoKit CLI Banner" width="850"/>
 </p>
 
 
