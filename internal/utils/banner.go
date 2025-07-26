@@ -15,11 +15,11 @@ var colors = []string{
 const reset = "\033[0m"
 
 const banner = `
-  _______   _   _                _  __  _   _   
- |__   __| (_) | |              | |/ / (_) | |  
-    | |     _  | |        ___   | ' /   _  | |_ 
+  _______   _   _                _  __  _   _
+ |__   __| (_) | |              | |/ / (_) | |
+    | |     _  | |        ___   | ' /   _  | |_
     | |    | | | |       / _ \  |  <   | | | __|
-    | |    | | | |____  | (_) | | . \  | | | |_ 
+    | |    | | | |____  | (_) | | . \  | | | |_
     |_|    |_| |______|  \___/  |_|\_\ |_|  \__|
 `
 
@@ -33,6 +33,8 @@ func PrintBanner() {
 		fmt.Printf("%s%s%s\n", color, line, reset)
 		time.Sleep(80 * time.Millisecond)
 	}
+
+	fmt.Println()
 }
 
 func splitLines(s string) []string {

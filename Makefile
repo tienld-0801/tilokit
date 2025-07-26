@@ -2,6 +2,9 @@
 
 all: build
 
+install:
+	go mod tidy
+
 run:
 	go run . $(ARGS)
 

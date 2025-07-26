@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// GenerateLaravelOptions creates a new directory for a Laravel project with the specified name.
 func GenerateLaravelOptions(projectName string) error {
 	fmt.Println("🚧 Create template Laravel:", projectName)
 
