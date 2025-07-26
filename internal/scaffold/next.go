@@ -1,1 +1,18 @@
 package scaffold
+
+import (
+	"fmt"
+	"os"
+)
+
+// GenerateLaravel creates a new directory for a Laravel project with the specified name.
+// Returns an error if the directory cannot be created.
+func GenerateNext(projectName string) error {
+	fmt.Println("🚧 Create template Next", projectName)
+
+	if err := os.MkdirAll(projectName, os.ModePerm); err != nil {
+		return fmt.Errorf("internal error creating project directory: %w", err)
+	}
+
+	return nil
+}

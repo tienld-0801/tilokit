@@ -1,32 +1,46 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/spf13/cobra"
-	"github.com/ti-lo/tilokit/internal/template"
+	"github.com/ti-lo/tilokit/internal/platform"
+	"github.com/ti-lo/tilokit/internal/utils"
 )
 
 var (
 	templateName string
 	projectName  string
+	listOnly     bool
+	force        bool
+	quiet        bool
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "tilokit",
-	Short: "✨ TiLoKit – Init project multiple framework",
+	SilenceUsage: true,
+	Use:          "tilokit",
+	Short:        "✨ TiLoKit – Init project multiple framework",
 	Run: func(cmd *cobra.Command, args []string) {
-		if projectName == "" {
+		// Init Banner
+		utils.PrintBanner()
+
+		if listOnly {
+			utils.Log("Supported templates: %v", platform.GetSupportedTemplates())
+			return
+		}
+
+		utils.SetQuiet(quiet)
+
+		if projectName == "" && !utils.IsProduction() {
 			prompt := &survey.Input{Message: "📁 Input name project:"}
 			survey.AskOne(prompt, &projectName, survey.WithValidator(survey.Required))
 		}
 
-		if templateName == "" {
-			options := template.GetSupportedTemplates()
+		if templateName == "" && !utils.IsProduction() {
+			options := platform.GetSupportedTemplates()
 			if len(options) == 0 {
-				fmt.Println("⚠️ No template config.")
+				utils.Error("⚠️ No template config.")
 				os.Exit(1)
 			}
 
@@ -37,28 +51,39 @@ var rootCmd = &cobra.Command{
 			survey.AskOne(prompt, &templateName, survey.WithValidator(survey.Required))
 		}
 
-		if !template.Exists(templateName) {
-			fmt.Println("❌ Template isvalid:", templateName)
+		if utils.IsProduction() && (templateName == "" || projectName == "") {
+			utils.Error("missing --template/-t and/or --name/-n. Run 'tilokit --help' for usage")
+			os.Exit(2)
+		}
+
+		if !platform.Exists(templateName) {
+			utils.Error("❌ Template invalid: %s", templateName)
 			os.Exit(1)
 		}
 
-		if err := template.Generate(templateName, projectName); err != nil {
-			fmt.Println("❌ Error:", err)
+		if utils.PathExists(projectName) && !force {
+			utils.Error("directory %s already exists (use --force to overwrite)", projectName)
+			os.Exit(2)
+		}
+
+		if err := platform.Generate(templateName, projectName); err != nil {
+			utils.Error("❌ Error: %v", err)
 			os.Exit(1)
 		}
 	},
 }
 
-// Execute runs the root CLI command and exits the program with an error message if execution fails.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println("❌ CLI Error:", err)
+		utils.Error("❌ CLI Error: %v", err)
 		os.Exit(1)
 	}
 }
 
-// init sets up command-line flags for specifying the template and project name for the root command.
 func init() {
 	rootCmd.Flags().StringVarP(&templateName, "template", "t", "", "Name template (react, laravel...)")
 	rootCmd.Flags().StringVarP(&projectName, "name", "n", "", "Name project")
+	rootCmd.Flags().BoolVarP(&listOnly, "list", "l", false, "List available templates")
+	rootCmd.Flags().BoolVar(&force, "force", false, "Overwrite existing directory")
+	rootCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "Silence normal output")
 }
