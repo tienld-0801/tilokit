@@ -12,7 +12,7 @@ on:
 
 jobs:
   analyze:
-    name: Analyze (Go)
+    name: Analyze
     runs-on: ubuntu-latest
     permissions:
       actions: read
