@@ -1,4 +1,4 @@
-package scaffold
+package angular
 
 import (
 	"github.com/AlecAivazis/survey/v2"
@@ -8,7 +8,7 @@ import (
 
 // GenerateAngular creates a new directory for an Angular project with the specified name.
 // Returns an error if the directory cannot be created.
-func GenerateAngularOptions(projectName string) error {
+func Generate(projectName string) error {
 	utils.Log("🚧 Generating Angular project: %s", projectName)
 
 	var pkgManager string

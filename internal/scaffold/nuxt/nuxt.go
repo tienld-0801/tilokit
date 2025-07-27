@@ -1,4 +1,4 @@
-package scaffold
+package nuxt
 
 import (
 	"github.com/AlecAivazis/survey/v2"
@@ -7,38 +7,37 @@ import (
 	"github.com/ti-lo/tilokit/internal/constants"
 )
 
-// GenerateVueOptions scaffolds a Vue project using create-vue
-func GenerateVueOptions(projectName string) error {
+func Generate(projectName string) error {
 	var pkgManager string
 	survey.AskOne(&survey.Select{
 		Message: "📦 Choose your package manager:",
 		Options: constants.PackageManagers,
 	}, &pkgManager, survey.WithValidator(survey.Required))
 
-	utils.Log("🚧 Generating Vue project: %s", projectName)
+	utils.Log("🚧 Generating Nuxt project: %s", projectName)
 
 	var cmdName string
 	var args []string
 	switch pkgManager {
 	case "npm":
-		cmdName = "npm"
-		args = []string{"create", "vue@latest", projectName}
+		cmdName = "npx"
+		args = []string{"nuxi@latest", "init", projectName}
 	case "yarn":
 		cmdName = "yarn"
-		args = []string{"create", "vue", projectName}
+		args = []string{"dlx", "nuxi@latest", "init", projectName}
 	case "pnpm":
 		cmdName = "pnpm"
-		args = []string{"create", "vue", projectName}
+		args = []string{"dlx", "nuxi@latest", "init", projectName}
 	case "bun":
 		cmdName = "bunx"
-		args = []string{"create-vue@latest", projectName}
+		args = []string{"nuxi@latest", "init", projectName}
 	}
 
 	if err := utils.RunCommand("", cmdName, args...); err != nil {
 		return err
 	}
 
-	libs := common.ChooseCommonLibs("vue")
+	libs := common.ChooseCommonLibs("vue-vite-tailwind")
 	if len(libs) > 0 {
 		pkgs := utils.MapLibsToPackages(libs)
 		switch pkgManager {
@@ -61,6 +60,6 @@ func GenerateVueOptions(projectName string) error {
 		}
 	}
 
-	utils.Log("🎉 Vue project '%s' successfully created!", projectName)
+	utils.Log("🎉 Nuxt project '%s' successfully created!", projectName)
 	return nil
 }

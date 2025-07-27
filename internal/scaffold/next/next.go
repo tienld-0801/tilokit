@@ -1,43 +1,46 @@
-package scaffold
+package next
 
 import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/ti-lo/tilokit/internal/common"
-	"github.com/ti-lo/tilokit/internal/utils"
 	"github.com/ti-lo/tilokit/internal/constants"
+	"github.com/ti-lo/tilokit/internal/utils"
 )
 
-func GenerateNuxtOptions(projectName string) error {
+// GenerateNextOptions scaffolds a Next.js application using create-next-app
+func Generate(projectName string) error {
 	var pkgManager string
-	survey.AskOne(&survey.Select{
+	if err := survey.AskOne(&survey.Select{
 		Message: "📦 Choose your package manager:",
 		Options: constants.PackageManagers,
-	}, &pkgManager, survey.WithValidator(survey.Required))
+	}, &pkgManager, survey.WithValidator(survey.Required)); err != nil {
+		return err
+	}
 
-	utils.Log("🚧 Generating Nuxt project: %s", projectName)
+	utils.Log("🚧 Generating Next.js project: %s", projectName)
 
 	var cmdName string
 	var args []string
 	switch pkgManager {
 	case "npm":
-		cmdName = "npx"
-		args = []string{"nuxi@latest", "init", projectName}
+		cmdName = "npm"
+		args = []string{"create", "next-app@latest", projectName}
 	case "yarn":
 		cmdName = "yarn"
-		args = []string{"dlx", "nuxi@latest", "init", projectName}
+		args = []string{"create", "next-app", projectName}
 	case "pnpm":
 		cmdName = "pnpm"
-		args = []string{"dlx", "nuxi@latest", "init", projectName}
+		args = []string{"create", "next-app", projectName}
 	case "bun":
 		cmdName = "bunx"
-		args = []string{"nuxi@latest", "init", projectName}
+		args = []string{"create-next-app@latest", projectName}
 	}
 
 	if err := utils.RunCommand("", cmdName, args...); err != nil {
 		return err
 	}
 
-	libs := common.ChooseCommonLibs("vue-vite-tailwind")
+	libs := common.ChooseCommonLibs("react") // share libs with react
 	if len(libs) > 0 {
 		pkgs := utils.MapLibsToPackages(libs)
 		switch pkgManager {
@@ -60,6 +63,6 @@ func GenerateNuxtOptions(projectName string) error {
 		}
 	}
 
-	utils.Log("🎉 Nuxt project '%s' successfully created!", projectName)
+	utils.Log("🎉 Next.js project '%s' successfully created!", projectName)
 	return nil
 }

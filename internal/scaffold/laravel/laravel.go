@@ -1,4 +1,4 @@
-package scaffold
+package laravel
 
 import (
 	"github.com/AlecAivazis/survey/v2"
@@ -6,7 +6,7 @@ import (
 )
 
 // GenerateLaravelOptions scaffolds a Laravel application using the Laravel installer or composer.
-func GenerateLaravelOptions(projectName string) error {
+func Generate(projectName string) error {
 	var toolChoice string
 	survey.AskOne(&survey.Select{
 		Message: "Choose install method:",

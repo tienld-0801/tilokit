@@ -1,4 +1,4 @@
-package scaffold
+package nest
 
 import (
 	"github.com/AlecAivazis/survey/v2"
@@ -7,7 +7,7 @@ import (
 )
 
 // GenerateNestOptions scaffolds a NestJS project using nest CLI
-func GenerateNestOptions(projectName string) error {
+func Generate(projectName string) error {
 	var pkgManager string
 	survey.AskOne(&survey.Select{
 		Message: "📦 Choose your package manager:",
