@@ -4,7 +4,6 @@
   <img src="./assets/banner.png" alt="TiLoKit CLI Banner" width="850"/>
 </p>
 
-
 [![Go Version](https://img.shields.io/badge/Go-1.24.4-blue)](https://golang.org/dl/)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Build](https://img.shields.io/badge/build-passing-brightgreen)](https://golang.org/dl/)
