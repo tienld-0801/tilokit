@@ -3,7 +3,13 @@ package platform
 import (
 	"fmt"
 
-	"github.com/ti-lo/tilokit/internal/scaffold"
+	angular "github.com/ti-lo/tilokit/internal/scaffold/angular"
+	laravel "github.com/ti-lo/tilokit/internal/scaffold/laravel"
+	nest "github.com/ti-lo/tilokit/internal/scaffold/nest"
+	next "github.com/ti-lo/tilokit/internal/scaffold/next"
+	nuxt "github.com/ti-lo/tilokit/internal/scaffold/nuxt"
+	react "github.com/ti-lo/tilokit/internal/scaffold/react"
+	vue "github.com/ti-lo/tilokit/internal/scaffold/vue"
 )
 
 // GeneratorFunc defines the function signature for template generators.
@@ -22,13 +28,13 @@ var orderedTemplates = []string{
 
 // registry maps template names to their generator functions.
 var registry = map[string]GeneratorFunc{
-	"react":   scaffold.GenerateReactOptions,
-	"vue":     scaffold.GenerateVueOptions,
-	"angular": scaffold.GenerateAngularOptions,
-	"next":    scaffold.GenerateNextOptions,
-	"nuxt":    scaffold.GenerateNuxtOptions,
-	"nest":    scaffold.GenerateNestOptions,
-	"laravel": scaffold.GenerateLaravelOptions,
+	"react":   react.Generate,
+	"vue":     vue.Generate,
+	"angular": angular.Generate,
+	"next":    next.Generate,
+	"nuxt":    nuxt.Generate,
+	"nest":    nest.Generate,
+	"laravel": laravel.Generate,
 }
 
 // GetSupportedTemplates returns template names in the order defined in orderedTemplates.
