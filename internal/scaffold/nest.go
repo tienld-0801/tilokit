@@ -1,17 +1,43 @@
 package scaffold
 
 import (
-	"fmt"
-	"os"
+	"github.com/AlecAivazis/survey/v2"
+	"github.com/ti-lo/tilokit/internal/utils"
+	"github.com/ti-lo/tilokit/internal/constants"
 )
 
-// GenerateNestOptions creates a new directory for a Nest project with the specified name.
+// GenerateNestOptions scaffolds a NestJS project using nest CLI
 func GenerateNestOptions(projectName string) error {
-	fmt.Println("🚧 Create template Nest:", projectName)
+	var pkgManager string
+	survey.AskOne(&survey.Select{
+		Message: "📦 Choose your package manager:",
+		Options: constants.PackageManagers,
+	}, &pkgManager, survey.WithValidator(survey.Required))
 
-	if err := os.MkdirAll(projectName, os.ModePerm); err != nil {
-		return fmt.Errorf("internal error creating project directory: %w", err)
+	utils.Log("🚧 Generating NestJS project: %s", projectName)
+
+	var cmdName string
+	var args []string
+	// nest new via npx etc.
+	switch pkgManager {
+	case "npm":
+		cmdName = "npx"
+		args = []string{"-y", "@nestjs/cli", "new", projectName}
+	case "yarn":
+		cmdName = "yarn"
+		args = []string{"dlx", "@nestjs/cli", "new", projectName}
+	case "pnpm":
+		cmdName = "pnpm"
+		args = []string{"dlx", "@nestjs/cli", "new", projectName}
+	case "bun":
+		cmdName = "bunx"
+		args = []string{"@nestjs/cli", "new", projectName}
 	}
 
+	if err := utils.RunCommand("", cmdName, args...); err != nil {
+		return err
+	}
+
+	utils.Log("🎉 NestJS project '%s' successfully created!", projectName)
 	return nil
 }
