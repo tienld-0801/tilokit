@@ -2,11 +2,17 @@ name: 'CodeQL'
 
 on:
   push:
-    branches: [develop]
+    branches:
+      - develop
+      - main
   pull_request:
-    branches: [develop]
-    types: [opened]
-
+    branches:
+      - develop
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
   schedule:
     - cron: '0 1 * * *'
 
