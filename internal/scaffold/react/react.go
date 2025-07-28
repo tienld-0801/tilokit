@@ -6,9 +6,17 @@ import (
 	reactfw "github.com/ti-lo/tilokit/internal/framework/react"
 )
 
-// GenerateReact scaffolds a React + Vite project (JS or TS) via unified Template flow
+// Generate scaffolds a React project with selectable bundler (Vite / Parcel / Razzle) and language (JS/TS) via unified Template flow
 func Generate(projectName string) error {
-	var variant string
+	var bundler string
+    if err := survey.AskOne(&survey.Select{
+        Message: "Choose build tool / framework:",
+        Options: []string{"Vite", "Parcel", "Razzle"},
+    }, &bundler); err != nil {
+        return err
+    }
+
+    var variant string
 	if err := survey.AskOne(&survey.Select{
 		Message: "Choose language for React template:",
 		Options: []string{"JavaScript", "TypeScript"},
@@ -17,18 +25,37 @@ func Generate(projectName string) error {
 	}
 
 	var tmpl templateCore.Template
-	if variant == "TypeScript" {
-		tmpl = templateCore.Template{
-			Base:         reactfw.CreateVite("react-ts"),
-			CommonLibKey: "react-vite-ts",
-			Mixins:       nil,
-		}
-	} else {
-		tmpl = templateCore.Template{
-			Base:         reactfw.CreateVite("react"),
-			CommonLibKey: "react",
-			Mixins:       nil,
-		}
-	}
+
+	switch bundler {
+    case "Vite":
+        if variant == "TypeScript" {
+            tmpl = templateCore.Template{
+                Base:         reactfw.CreateVite("react-ts"),
+                CommonLibKey: "react-vite-ts",
+            }
+        } else {
+            tmpl = templateCore.Template{
+                Base:         reactfw.CreateVite("react"),
+                CommonLibKey: "react",
+            }
+        }
+    case "Parcel":
+        if variant == "TypeScript" {
+            tmpl = templateCore.Template{
+                Base:         reactfw.CreateParcel("react-ts"),
+                CommonLibKey: "react",
+            }
+        } else {
+            tmpl = templateCore.Template{
+                Base:         reactfw.CreateParcel("react"),
+                CommonLibKey: "react",
+            }
+        }
+    case "Razzle":
+        tmpl = templateCore.Template{
+            Base:         reactfw.CreateRazzle(variant == "TypeScript"),
+            CommonLibKey: "react",
+        }
+    }
 	return templateCore.Generate(projectName, tmpl)
 }
