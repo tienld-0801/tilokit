@@ -4,15 +4,14 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	common "github.com/ti-lo/tilokit/internal/common"
 	templateCore "github.com/ti-lo/tilokit/internal/core/template"
-	reactfw "github.com/ti-lo/tilokit/internal/framework/react"
 )
 
-// Generate scaffolds a React project with selectable bundler (Vite / Parcel / Razzle) and language (JS/TS) via unified Template flow
+// Generate scaffolds a React project with selectable bundler (Vite) and language (JS/TS) via unified Template flow
 func Generate(projectName string) error {
 	var bundler string
 	if err := survey.AskOne(&survey.Select{
 		Message: "Choose build tool / framework:",
-		Options: []string{"Vite", "Parcel", "Razzle"},
+		Options: []string{"Vite"},
 	}, &bundler); err != nil {
 		return err
 	}
@@ -39,23 +38,6 @@ func Generate(projectName string) error {
 				Base:         common.CreateVite("react"),
 				CommonLibKey: "react",
 			}
-		}
-	case "Parcel":
-		if variant == "TypeScript" {
-			tmpl = templateCore.Template{
-				Base:         reactfw.CreateParcel("react-ts"),
-				CommonLibKey: "react",
-			}
-		} else {
-			tmpl = templateCore.Template{
-				Base:         reactfw.CreateParcel("react"),
-				CommonLibKey: "react",
-			}
-		}
-	case "Razzle":
-		tmpl = templateCore.Template{
-			Base:         reactfw.CreateRazzle(variant == "TypeScript"),
-			CommonLibKey: "react",
 		}
 	}
 	return templateCore.Generate(projectName, tmpl)
