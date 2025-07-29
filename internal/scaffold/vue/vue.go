@@ -4,7 +4,6 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/ti-lo/tilokit/internal/common"
 	pkgmgr "github.com/ti-lo/tilokit/internal/core/pkgmgr"
-	vuefw "github.com/ti-lo/tilokit/internal/framework/vue"
 	"github.com/ti-lo/tilokit/internal/utils"
 )
 
@@ -32,7 +31,7 @@ func Generate(projectName string) error {
 		return err
 	}
 
-	if err := vuefw.CreateVue(sub)(projectName, pm); err != nil {
+	if err := common.CreateVite(sub)(projectName, pm); err != nil {
 		return err
 	}
 
