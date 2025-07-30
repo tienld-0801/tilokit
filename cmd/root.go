@@ -96,7 +96,7 @@ func runGenerate() error {
 	// Success message
 	utils.Success("%s project '%s' created successfully!", framework, projectName)
 	utils.Info("Project location: %s", outputDir)
-	
+
 	// Provide framework-specific next steps
 	switch framework {
 	case "react", "vue", "angular", "svelte":
@@ -113,7 +113,7 @@ func runGenerate() error {
 	default:
 		utils.Info("Check the README.md for setup instructions")
 	}
-	
+
 	utils.Info("Happy coding!")
 
 	return nil
@@ -133,7 +133,7 @@ func promptForMissingValues(cfg *config.Config) error {
 
 	// Framework
 	if framework == "" {
-		supportedFrameworks := []string{"react", "vue", "svelte", "angular", "next", "nuxt"}
+		supportedFrameworks := []string{"react", "vue", "svelte", "angular", "next", "nuxt", "flask", "fastapi", "quarkus", "spring-boot", "rails"}
 		prompt := &survey.Select{
 			Message: "🚀 Choose framework:",
 			Options: supportedFrameworks,
@@ -196,59 +196,59 @@ func registerPlugins(eng *engine.Engine) error {
 	eng.RegisterPlugin(frameworks.NewReactPlugin())
 	eng.RegisterPlugin(frameworks.NewVuePlugin())
 	// TODO: Add more JS frameworks (Angular, Svelte, Next.js, Nuxt.js)
-	
+
 	// Backend Frameworks
 	// Python
 	eng.RegisterPlugin(frameworks.NewPythonDjangoPlugin())
 	eng.RegisterPlugin(frameworks.NewPythonFlaskPlugin())
 	eng.RegisterPlugin(frameworks.NewPythonFastAPIPlugin())
-	
+
 	// PHP
 	eng.RegisterPlugin(frameworks.NewPHPLaravelPlugin())
 	eng.RegisterPlugin(frameworks.NewPHPSymfonyPlugin())
-	
+
 	// Java
 	eng.RegisterPlugin(frameworks.NewJavaSpringBootPlugin())
 	eng.RegisterPlugin(frameworks.NewJavaQuarkusPlugin())
-	
+
 	// Go
 	eng.RegisterPlugin(frameworks.NewGoGinPlugin())
 	eng.RegisterPlugin(frameworks.NewGoEchoPlugin())
 	eng.RegisterPlugin(frameworks.NewGoFiberPlugin())
-	
+
 	// Rust
 	eng.RegisterPlugin(frameworks.NewRustActixPlugin())
 	eng.RegisterPlugin(frameworks.NewRustRocketPlugin())
 	eng.RegisterPlugin(frameworks.NewRustAxumPlugin())
-	
+
 	// C#
 	eng.RegisterPlugin(frameworks.NewCSharpASPNetCorePlugin())
 	eng.RegisterPlugin(frameworks.NewCSharpBlazorPlugin())
-	
+
 	// Ruby
 	eng.RegisterPlugin(frameworks.NewRubyRailsPlugin())
 	eng.RegisterPlugin(frameworks.NewRubySinatraPlugin())
-	
+
 	// Node.js
 	eng.RegisterPlugin(frameworks.NewNodeExpressPlugin())
 	eng.RegisterPlugin(frameworks.NewNodeNestJSPlugin())
 	eng.RegisterPlugin(frameworks.NewNodeFastifyPlugin())
-	
+
 	// Mobile Frameworks
 	eng.RegisterPlugin(frameworks.NewReactNativePlugin())
 	eng.RegisterPlugin(frameworks.NewFlutterPlugin())
 	eng.RegisterPlugin(frameworks.NewIonicPlugin())
-	
+
 	// Desktop Frameworks
 	eng.RegisterPlugin(frameworks.NewElectronPlugin())
 	eng.RegisterPlugin(frameworks.NewTauriPlugin())
 	eng.RegisterPlugin(frameworks.NewWailsPlugin())
-	
+
 	// Build Tools
 	eng.RegisterPlugin(builders.NewVitePlugin())
 	eng.RegisterPlugin(builders.NewWebpackPlugin())
 	eng.RegisterPlugin(builders.NewRollupPlugin())
-	
+
 	// Tools
 	eng.RegisterPlugin(tools.NewGitPlugin())
 
@@ -295,11 +295,11 @@ func listSupportedBuildTools() error {
 		"npm", "yarn", "pnpm",
 		// Language-specific
 		"pip", "poetry", "pipenv", // Python
-		"composer", // PHP
+		"composer",        // PHP
 		"maven", "gradle", // Java
-		"go-modules", // Go
-		"cargo", // Rust
-		"dotnet", // C#
+		"go-modules",     // Go
+		"cargo",          // Rust
+		"dotnet",         // C#
 		"bundler", "gem", // Ruby
 		// Mobile/Desktop
 		"metro", "expo", "flutter-cli", "electron-builder",
