@@ -1,0 +1,137 @@
+# TiLoKit Configuration File
+# This file contains default settings for project generation
+
+# Default settings
+defaults:
+  output_dir: "."
+  git_init: true
+  install_deps: true
+  create_readme: true
+  create_gitignore: true
+
+# Framework configurations
+frameworks:
+  # JavaScript/TypeScript Frameworks
+  react:
+    default_build_tool: "vite"
+    typescript: true
+    testing: "vitest"
+    linting: true
+    formatting: true
+    
+  vue:
+    default_build_tool: "vite"
+    typescript: true
+    testing: "vitest"
+    linting: true
+    formatting: true
+    
+  angular:
+    default_build_tool: "angular-cli"
+    typescript: true
+    testing: "jasmine"
+    linting: true
+    
+  svelte:
+    default_build_tool: "vite"
+    typescript: true
+    testing: "vitest"
+    
+  # Backend Frameworks
+  django:
+    default_build_tool: "pip"
+    python_version: "3.11"
+    database: "postgresql"
+    testing: "pytest"
+    
+  flask:
+    default_build_tool: "pip"
+    python_version: "3.11"
+    testing: "pytest"
+    
+  fastapi:
+    default_build_tool: "pip"
+    python_version: "3.11"
+    testing: "pytest"
+    async: true
+    
+  laravel:
+    default_build_tool: "composer"
+    php_version: "8.2"
+    testing: "phpunit"
+    
+  spring-boot:
+    default_build_tool: "maven"
+    java_version: "17"
+    testing: "junit"
+    
+  gin:
+    default_build_tool: "go-modules"
+    go_version: "1.21"
+    testing: "go-test"
+    
+  actix:
+    default_build_tool: "cargo"
+    rust_edition: "2021"
+    testing: "cargo-test"
+    
+  rails:
+    default_build_tool: "bundler"
+    ruby_version: "3.2"
+    testing: "rspec"
+
+# Build tool configurations
+build_tools:
+  vite:
+    config_file: "vite.config.js"
+    dev_command: "dev"
+    build_command: "build"
+    
+  webpack:
+    config_file: "webpack.config.js"
+    dev_command: "start"
+    build_command: "build"
+    
+  pip:
+    requirements_file: "requirements.txt"
+    dev_requirements: "requirements-dev.txt"
+    
+  composer:
+    config_file: "composer.json"
+    
+  maven:
+    config_file: "pom.xml"
+    
+  cargo:
+    config_file: "Cargo.toml"
+
+# Plugin settings
+plugins:
+  git:
+    enabled: true
+    initial_commit: true
+    default_branch: "main"
+    
+  docker:
+    enabled: false
+    multi_stage: true
+    
+  ci_cd:
+    enabled: false
+    provider: "github-actions"
+
+# Template settings
+templates:
+  base_path: "templates"
+  file_extension: ".tmpl"
+  
+# Logging
+logging:
+  level: "info"
+  format: "text"
+  
+# Development settings
+development:
+  hot_reload: true
+  source_maps: true
+  debug: false
