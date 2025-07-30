@@ -1,24 +1,111 @@
-.PHONY: all build run run-react run-laravel clean test
+.PHONY: help build test clean install dev lint fmt deps release docker
 
+# Variables
+BINARY_NAME=tilokit
+VERSION=$(shell git describe --tags --always --dirty)
+BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+GIT_COMMIT=$(shell git rev-parse HEAD)
+LDFLAGS=-ldflags "-X github.com/ti-lo/tilokit/cmd.Version=$(VERSION) -X github.com/ti-lo/tilokit/cmd.BuildDate=$(BUILD_DATE) -X github.com/ti-lo/tilokit/cmd.GitCommit=$(GIT_COMMIT)"
+
+# Default target
 all: build
 
-install:
+help: ## Show this help message
+	@echo "TiLoKit - Modern Multi-Framework Project Generator"
+	@echo ""
+	@echo "Available commands:"
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
+##@ Development
+
+dev: ## Run in development mode
+	go run . --help
+
+build: ## Build the binary
+	@echo "Building $(BINARY_NAME)..."
+	go build $(LDFLAGS) -o $(BINARY_NAME) .
+	@echo "✅ Build complete: ./$(BINARY_NAME)"
+
+test: ## Run tests
+	@echo "Running tests..."
+	go test -v ./...
+
+lint: ## Run linter
+	@echo "Running linter..."
+	golangci-lint run
+
+fmt: ## Format code
+	@echo "Formatting code..."
+	go fmt ./...
+
+deps: ## Download dependencies
+	@echo "Downloading dependencies..."
+	go mod download
 	go mod tidy
 
-run:
-	go run . $(ARGS)
+##@ Build & Release
 
-run-react:
-	go run main.go react my-react-app
+release: ## Build release binaries for multiple platforms
+	@echo "Building release binaries..."
+	mkdir -p dist
+	# Linux AMD64
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-linux-amd64 .
+	# Linux ARM64
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-linux-arm64 .
+	# macOS AMD64
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-darwin-amd64 .
+	# macOS ARM64
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-darwin-arm64 .
+	# Windows AMD64
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-windows-amd64.exe .
+	@echo "✅ Release binaries built in ./dist/"
 
-run-laravel:
-	go run main.go laravel my-laravel-app
+##@ Installation
 
-build:
-	go build -o build/tilokit .
+install: build ## Install the binary to /usr/local/bin
+	@echo "Installing $(BINARY_NAME) to /usr/local/bin..."
+	sudo cp $(BINARY_NAME) /usr/local/bin/
+	@echo "✅ $(BINARY_NAME) installed successfully"
 
-clean:
-	rm -rf build/
+uninstall: ## Uninstall the binary
+	@echo "Uninstalling $(BINARY_NAME)..."
+	sudo rm -f /usr/local/bin/$(BINARY_NAME)
+	@echo "✅ $(BINARY_NAME) uninstalled"
 
-test:
-	go test ./...
+##@ Testing & Examples
+
+test-react: build ## Test React project generation
+	@echo "Testing React project generation..."
+	./$(BINARY_NAME) --name example-react --framework react --build-tool vite --output ./examples --force --quiet
+	@echo "✅ React project generated in ./examples/example-react"
+
+test-vue: build ## Test Vue project generation
+	@echo "Testing Vue project generation..."
+	./$(BINARY_NAME) --name example-vue --framework vue --build-tool vite --output ./examples --force --quiet
+	@echo "✅ Vue project generated in ./examples/example-vue"
+
+test-all: test-react test-vue ## Test all framework generations
+	@echo "✅ All framework tests completed"
+
+##@ Cleanup
+
+clean: ## Clean build artifacts
+	@echo "Cleaning build artifacts..."
+	rm -f $(BINARY_NAME)
+	rm -rf dist/
+	rm -rf examples/
+	rm -rf test-*-app/
+	@echo "✅ Cleanup complete"
+
+clean-examples: ## Clean only example projects
+	@echo "Cleaning example projects..."
+	rm -rf examples/
+	rm -rf test-*-app/
+	@echo "✅ Example projects cleaned"
+
+##@ Docker
+
+docker: ## Build Docker image
+	@echo "Building Docker image..."
+	docker build -t tilokit:$(VERSION) .
+	@echo "✅ Docker image built: tilokit:$(VERSION)"
