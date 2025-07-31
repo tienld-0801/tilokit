@@ -1,14 +1,16 @@
-.PHONY: help build test clean install dev lint fmt deps release docker
+.PHONY: help build test clean install dev lint docker
 
-# Variables
-BINARY_NAME=tilokit
-VERSION=$(shell git describe --tags --always --dirty)
-BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-GIT_COMMIT=$(shell git rev-parse HEAD)
-LDFLAGS=-ldflags "-X github.com/ti-lo/tilokit/cmd.Version=$(VERSION) -X github.com/ti-lo/tilokit/cmd.BuildDate=$(BUILD_DATE) -X github.com/ti-lo/tilokit/cmd.GitCommit=$(GIT_COMMIT)"
+# Build configurations  
+VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+LDFLAGS := -X main.Version=$(VERSION) -X main.BuildDate=$(BUILD_DATE) -X main.GitCommit=$(GIT_COMMIT)
+
+# Binary name
+BINARY_NAME := tilokit
 
 # Default target
-all: build
+default: help build
 
 help: ## Show this help message
 	@echo "TiLoKit - Modern Multi-Framework Project Generator"
@@ -28,37 +30,17 @@ build: ## Build the binary
 
 test: ## Run tests
 	@echo "Running tests..."
-	go test -v ./...
-
 lint: ## Run linter
 	@echo "Running linter..."
 	golangci-lint run
 
-fmt: ## Format code
-	@echo "Formatting code..."
-	go fmt ./...
+test: ## Run tests
+	go test -v ./...
 
-deps: ## Download dependencies
-	@echo "Downloading dependencies..."
-	go mod download
-	go mod tidy
-
-##@ Build & Release
-
-release: ## Build release binaries for multiple platforms
-	@echo "Building release binaries..."
-	mkdir -p dist
-	# Linux AMD64
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-linux-amd64 .
-	# Linux ARM64
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-linux-arm64 .
-	# macOS AMD64
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-darwin-amd64 .
-	# macOS ARM64
-	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-darwin-arm64 .
-	# Windows AMD64
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)-windows-amd64.exe .
-	@echo "✅ Release binaries built in ./dist/"
+build: ## Build for current platform
+	@echo "Building $(BINARY_NAME)..."
+	go build -ldflags "$(LDFLAGS)" -o $(BINARY_NAME) .
+	@echo "✅ Build complete: ./$(BINARY_NAME)"
 
 ##@ Installation
 
