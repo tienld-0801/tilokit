@@ -14,7 +14,7 @@ func ReadFile(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	
+
 	// #nosec G304 - Path is validated above
 	data, err := os.ReadFile(cleanPath)
 	if err != nil {
@@ -61,12 +61,12 @@ func CopyFile(src, dst string) error {
 	if err != nil {
 		return fmt.Errorf("invalid source path: %w", err)
 	}
-	
+
 	cleanDst, err := validatePath(dst)
 	if err != nil {
 		return fmt.Errorf("invalid destination path: %w", err)
 	}
-	
+
 	// #nosec G304 - Path is validated above
 	data, err := os.ReadFile(cleanSrc)
 	if err != nil {
@@ -96,15 +96,18 @@ func validatePath(path string) (string, error) {
 	if path == "" {
 		return "", fmt.Errorf("path cannot be empty")
 	}
-	
+
 	// Clean the path to resolve any . or .. components
 	cleanPath := filepath.Clean(path)
-	
+
 	// Check for path traversal attempts
-	if strings.Contains(cleanPath, "..") {
-		return "", fmt.Errorf("path traversal detected: %s", path)
+	parts := strings.Split(cleanPath, string(filepath.Separator))
+	for _, part := range parts {
+		if part == ".." {
+			return "", fmt.Errorf("path traversal detected: %s", path)
+		}
 	}
-	
+
 	// Ensure path is absolute or relative to current directory
 	if !filepath.IsAbs(cleanPath) {
 		absPath, err := filepath.Abs(cleanPath)
@@ -113,6 +116,6 @@ func validatePath(path string) (string, error) {
 		}
 		cleanPath = absPath
 	}
-	
+
 	return cleanPath, nil
 }

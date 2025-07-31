@@ -25,22 +25,16 @@ dev: ## Run in development mode
 
 build: ## Build the binary
 	@echo "Building $(BINARY_NAME)..."
-	go build $(LDFLAGS) -o $(BINARY_NAME) .
+	go build -ldflags "$(LDFLAGS)" -o $(BINARY_NAME) .
 	@echo "✅ Build complete: ./$(BINARY_NAME)"
 
-test: ## Run tests
-	@echo "Running tests..."
 lint: ## Run linter
 	@echo "Running linter..."
 	golangci-lint run
 
 test: ## Run tests
+	@echo "Running tests..."
 	go test -v ./...
-
-build: ## Build for current platform
-	@echo "Building $(BINARY_NAME)..."
-	go build -ldflags "$(LDFLAGS)" -o $(BINARY_NAME) .
-	@echo "✅ Build complete: ./$(BINARY_NAME)"
 
 ##@ Installation
 
