@@ -1,4 +1,4 @@
-name: Release
+name: Release and Deploy
 
 on:
   push:
@@ -7,14 +7,21 @@ on:
   workflow_dispatch:
 
 env:
-  GO_VERSION: '1.24.4'
+  GO_VERSION: '1.24'
 
 jobs:
-  test:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -39,139 +46,107 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: latest
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        goos: [linux, darwin, windows]
-        goarch: [amd64, arm64]
-        exclude:
-          - goos: windows
-            goarch: arm64
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Download dependencies
-        run: go mod download
+          args: --timeout=5m
 
       - name: Set build variables
         run: |
-          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          echo "BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
-          echo "GIT_COMMIT=${GITHUB_SHA}" >> $GITHUB_ENV
-
-      - name: Build binary
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-        run: |
-          BINARY_NAME=tilokit
-          if [ "$GOOS" = "windows" ]; then
-            BINARY_NAME="${BINARY_NAME}.exe"
+          VERSION=${GITHUB_REF#refs/tags/}
+          if [ -z "$VERSION" ] || [ "$VERSION" = "$GITHUB_REF" ]; then
+            VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "dev")
           fi
-          
-          LDFLAGS="-ldflags \"-X github.com/ti-lo/tilokit/cmd.Version=${VERSION} -X github.com/ti-lo/tilokit/cmd.BuildDate=${BUILD_DATE} -X github.com/ti-lo/tilokit/cmd.GitCommit=${GIT_COMMIT}\""
-          
-          CGO_ENABLED=0 go build $LDFLAGS -o dist/${BINARY_NAME}-${GOOS}-${GOARCH}$([ "$GOOS" = "windows" ] && echo ".exe" || echo "") .
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
+          echo "GIT_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: tilokit-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: dist/
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: dist/
-
-      - name: Flatten artifacts
+      - name: Build multi-platform binaries
         run: |
-          mkdir -p release/
-          find dist/ -name "tilokit-*" -type f -exec mv {} release/ \;
-          ls -la release/
+          mkdir -p dist
+          
+          # Build flags
+          LDFLAGS="-X main.Version=$VERSION -X main.BuildDate=$BUILD_DATE -X main.GitCommit=$GIT_COMMIT"
+          
+          # Build for multiple platforms
+          platforms=("linux/amd64" "linux/arm64" "darwin/amd64" "darwin/arm64" "windows/amd64")
+          
+          for platform in "${platforms[@]}"; do
+            GOOS=${platform%/*}
+            GOARCH=${platform#*/}
+            
+            output_name="tilokit-$GOOS-$GOARCH"
+            if [ "$GOOS" = "windows" ]; then
+              output_name="${output_name}.exe"
+            fi
+            
+            echo "Building for $GOOS/$GOARCH..."
+            GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 go build -ldflags "$LDFLAGS" -o "dist/$output_name" .
+            
+            # Generate checksum
+            cd dist
+            sha256sum "$output_name" > "${output_name}.sha256"
+            cd ..
+          done
+          
+          ls -la dist/
 
-      - name: Generate checksums
+      - name: Create GitHub Pages deployment
         run: |
-          cd release/
-          sha256sum * > checksums.txt
-          cat checksums.txt
+          mkdir -p pages
+          cp dist/* pages/
+          cp scripts/install.sh pages/
+          
+          # Create index.html for GitHub Pages
+          cat > pages/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>TiLoKit - Universal CLI Toolkit</title>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 2rem; background: #f5f5f5; }
+                  .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; }
+                  .install-cmd { background: #2d3748; color: #e2e8f0; padding: 1rem; border-radius: 4px; font-family: monospace; margin: 1rem 0; }
+                  .downloads { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
+                  .download-item { background: #f7fafc; padding: 1rem; border-radius: 4px; text-align: center; }
+                  .download-item a { text-decoration: none; color: #4299e1; font-weight: 600; }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <h1>🚀 TiLoKit</h1>
+                  <p>Universal CLI Toolkit for Multi-Framework Project Generation</p>
+                  
+                  <h2>🔧 Quick Install</h2>
+                  <div class="install-cmd">curl -fsSL https://ti-lo.github.io/tilokit/install.sh | bash</div>
+                  
+                  <h2>📦 Direct Downloads</h2>
+                  <div class="downloads">
+                      <div class="download-item"><a href="./tilokit-linux-amd64">Linux (x64)</a></div>
+                      <div class="download-item"><a href="./tilokit-linux-arm64">Linux (ARM64)</a></div>
+                      <div class="download-item"><a href="./tilokit-darwin-amd64">macOS (x64)</a></div>
+                      <div class="download-item"><a href="./tilokit-darwin-arm64">macOS (ARM64)</a></div>
+                      <div class="download-item"><a href="./tilokit-windows-amd64.exe">Windows (x64)</a></div>
+                  </div>
+              </div>
+          </body>
+          </html>
+          EOF
 
-      - name: Create Release
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./pages
+          force_orphan: true
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            release/*
+            dist/*
           generate_release_notes: true
           draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  docker:
-    needs: test
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: tilokit/tilokit
-          tags: |
-            type=ref,event=tag
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max

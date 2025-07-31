@@ -73,6 +73,7 @@ func (p *VuePlugin) createDirectoryStructure(ctx *tilocontext.ExecutionContext) 
 	dirs := []string{
 		"src",
 		"src/components",
+		"src/components/icons",
 		"src/composables",
 		"src/stores",
 		"src/views",
@@ -99,7 +100,7 @@ func (p *VuePlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) error
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "type-check": "vue-tsc --noEmit"
@@ -155,8 +156,6 @@ import HelloWorld from './components/HelloWorld.vue'
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/vue.svg" width="125" height="125" />
-
     <div class="wrapper">
       <HelloWorld msg="Welcome to ` + ctx.Config.ProjectName + `" />
 
@@ -174,11 +173,6 @@ import HelloWorld from './components/HelloWorld.vue'
 header {
   line-height: 1.5;
   max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
 }
 
 nav {
@@ -448,16 +442,203 @@ a,
   }
 }`
 
+	// Generate base.css
+	baseCss := `/* CSS Reset and Base Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* CSS Variables */
+:root {
+  --color-background: #ffffff;
+  --color-background-soft: #f8f8f8;
+  --color-background-mute: #f2f2f2;
+  --color-border: #d1d5db;
+  --color-border-hover: #b1b5bb;
+  --color-heading: #2c3e50;
+  --color-text: #213547;
+  --section-gap: 160px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #1a1a1a;
+    --color-background-soft: #242424;
+    --color-background-mute: #2c2c2c;
+    --color-border: #3c3c3c;
+    --color-border-hover: #5c5c5c;
+    --color-heading: #ffffff;
+    --color-text: #ebebeb;
+  }
+}`
+
+	// Generate WelcomeItem.vue
+	welcomeItemVue := `<template>
+  <div class="item">
+    <i>
+      <slot name="icon"></slot>
+    </i>
+    <div class="details">
+      <h3>
+        <slot name="heading"></slot>
+      </h3>
+      <slot></slot>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.item {
+  margin-top: 2rem;
+  display: flex;
+}
+
+.details {
+  flex: 1;
+  margin-left: 1rem;
+}
+
+i {
+  display: flex;
+  place-items: center;
+  place-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--color-text);
+}
+
+h3 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: var(--color-heading);
+}
+
+@media (min-width: 1024px) {
+  .item {
+    margin-top: 0;
+    padding: 0.4rem 0 1rem calc(var(--section-gap) / 2);
+  }
+
+  i {
+    top: calc(50% - 25px);
+    left: -26px;
+    position: absolute;
+    border: 1px solid var(--color-border);
+    background: var(--color-background);
+    border-radius: 8px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .item:before {
+    content: ' ';
+    border-left: 1px solid var(--color-border);
+    position: absolute;
+    left: 0;
+    bottom: calc(50% + 25px);
+    height: calc(50% - 25px);
+  }
+
+  .item:after {
+    content: ' ';
+    border-left: 1px solid var(--color-border);
+    position: absolute;
+    left: 0;
+    top: calc(50% + 25px);
+    height: calc(50% - 25px);
+  }
+
+  .item:first-of-type:before {
+    display: none;
+  }
+
+  .item:last-of-type:after {
+    display: none;
+  }
+}
+</style>`
+
+	// Generate simple icons (SVG-based)
+	iconDocumentation := `<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" fill="currentColor">
+    <path d="M11 2.253a1 1 0 1 0-2 0h2zm-2 13a1 1 0 1 0 2 0H9zM9 2v13h2V2H9z"/>
+    <path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5zM3 5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5z"/>
+  </svg>
+</template>`
+
+	iconTooling := `<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor">
+    <path d="M8 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4H8V4zM6 8h8v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8z"/>
+  </svg>
+</template>`
+
+	iconEcosystem := `<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" fill="currentColor">
+    <path d="M9 0a9 9 0 1 0 9 9A9 9 0 0 0 9 0zm4.5 7.5h-9v-3h9v3zm0 1.5v3h-9v-3h9z"/>
+  </svg>
+</template>`
+
+	iconCommunity := `<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor">
+    <path d="M15 4a1 1 0 1 0 0 2V4zM2 9a1 1 0 0 0 0 2V9zm13-5a1 1 0 1 0 0 2V4zM5 9a1 1 0 0 0 0 2V9z"/>
+  </svg>
+</template>`
+
+	iconSupport := `<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor">
+    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5zM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2z"/>
+  </svg>
+</template>`
+
 	// Write files
 	files := map[string]string{
 		"src/main.ts":                  mainTs,
 		"src/App.vue":                  appVue,
 		"src/components/HelloWorld.vue": helloWorldVue,
+		"src/components/WelcomeItem.vue": welcomeItemVue,
+		"src/components/icons/IconDocumentation.vue": iconDocumentation,
+		"src/components/icons/IconTooling.vue": iconTooling,
+		"src/components/icons/IconEcosystem.vue": iconEcosystem,
+		"src/components/icons/IconCommunity.vue": iconCommunity,
+		"src/components/icons/IconSupport.vue": iconSupport,
 		"src/router/index.ts":          routerTs,
 		"src/views/HomeView.vue":       homeViewVue,
 		"src/views/AboutView.vue":      aboutViewVue,
 		"src/components/TheWelcome.vue": theWelcomeVue,
 		"src/assets/main.css":          mainCss,
+		"src/assets/base.css":          baseCss,
 	}
 
 	for path, content := range files {
@@ -473,24 +654,15 @@ a,
 func (p *VuePlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error {
 	// Generate tsconfig.json
 	tsConfig := `{
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "./tsconfig.app.json"
-    }
-  ]
-}`
-
-	// Generate tsconfig.app.json
-	tsConfigApp := `{
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
-  "exclude": ["src/**/__tests__/*"],
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue",
+    "vite.config.*",
+    "vitest.config.*"
+  ],
   "compilerOptions": {
-    "composite": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
@@ -498,22 +670,7 @@ func (p *VuePlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error
   }
 }`
 
-	// Generate tsconfig.node.json
-	tsConfigNode := `{
-  "extends": "@tsconfig/node18/tsconfig.json",
-  "include": [
-    "vite.config.*",
-    "vitest.config.*",
-    "cypress.config.*",
-    "nightwatch.conf.*",
-    "playwright.config.*"
-  ],
-  "compilerOptions": {
-    "composite": true,
-    "module": "ESNext",
-    "types": ["node"]
-  }
-}`
+
 
 	// Generate env.d.ts
 	envDts := `/// <reference types="vite/client" />`
@@ -535,11 +692,9 @@ func (p *VuePlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error
 
 	// Write config files
 	configs := map[string]string{
-		"tsconfig.json":      tsConfig,
-		"tsconfig.app.json":  tsConfigApp,
-		"tsconfig.node.json": tsConfigNode,
-		"src/env.d.ts":       envDts,
-		"index.html":         indexHtml,
+		"tsconfig.json": tsConfig,
+		"src/env.d.ts":  envDts,
+		"index.html":    indexHtml,
 	}
 
 	for path, content := range configs {

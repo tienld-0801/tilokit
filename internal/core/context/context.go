@@ -81,7 +81,8 @@ func (ctx *ExecutionContext) GetMetadata(key string) (interface{}, bool) {
 
 // EnsureProjectDir creates the project directory if it doesn't exist
 func (ctx *ExecutionContext) EnsureProjectDir() error {
-	return os.MkdirAll(ctx.ProjectPath, 0755)
+	// Use more restrictive permissions (0750 instead of 0755)
+	return os.MkdirAll(ctx.ProjectPath, 0750)
 }
 
 // CreateTempDir creates a temporary directory for processing

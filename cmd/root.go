@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/ti-lo/tilokit/internal/config"
 	"github.com/ti-lo/tilokit/internal/core/engine"
+	"github.com/ti-lo/tilokit/internal/core/registry"
 	"github.com/ti-lo/tilokit/internal/plugins/builders"
 	"github.com/ti-lo/tilokit/internal/plugins/frameworks"
 	"github.com/ti-lo/tilokit/internal/plugins/tools"
@@ -191,66 +193,75 @@ func validateInputs() error {
 }
 
 func registerPlugins(eng *engine.Engine) error {
-	// Register plugins
-	// JavaScript/TypeScript Frameworks
-	eng.RegisterPlugin(frameworks.NewReactPlugin())
-	eng.RegisterPlugin(frameworks.NewVuePlugin())
-	// TODO: Add more JS frameworks (Angular, Svelte, Next.js, Nuxt.js)
+	// Register plugins with error handling
+	plugins := []registry.Plugin{
+		// JavaScript/TypeScript Frameworks
+		frameworks.NewReactPlugin(),
+		frameworks.NewVuePlugin(),
+		// TODO: Add more JS frameworks (Angular, Svelte, Next.js, Nuxt.js)
 
-	// Backend Frameworks
-	// Python
-	eng.RegisterPlugin(frameworks.NewPythonDjangoPlugin())
-	eng.RegisterPlugin(frameworks.NewPythonFlaskPlugin())
-	eng.RegisterPlugin(frameworks.NewPythonFastAPIPlugin())
+		// Backend Frameworks
+		// Python
+		frameworks.NewPythonDjangoPlugin(),
+		frameworks.NewPythonFlaskPlugin(),
+		frameworks.NewPythonFastAPIPlugin(),
 
-	// PHP
-	eng.RegisterPlugin(frameworks.NewPHPLaravelPlugin())
-	eng.RegisterPlugin(frameworks.NewPHPSymfonyPlugin())
+		// PHP
+		frameworks.NewPHPLaravelPlugin(),
+		frameworks.NewPHPSymfonyPlugin(),
 
-	// Java
-	eng.RegisterPlugin(frameworks.NewJavaSpringBootPlugin())
-	eng.RegisterPlugin(frameworks.NewJavaQuarkusPlugin())
+		// Java
+		frameworks.NewJavaSpringBootPlugin(),
+		frameworks.NewJavaQuarkusPlugin(),
 
-	// Go
-	eng.RegisterPlugin(frameworks.NewGoGinPlugin())
-	eng.RegisterPlugin(frameworks.NewGoEchoPlugin())
-	eng.RegisterPlugin(frameworks.NewGoFiberPlugin())
+		// Go
+		frameworks.NewGoGinPlugin(),
+		frameworks.NewGoEchoPlugin(),
+		frameworks.NewGoFiberPlugin(),
 
-	// Rust
-	eng.RegisterPlugin(frameworks.NewRustActixPlugin())
-	eng.RegisterPlugin(frameworks.NewRustRocketPlugin())
-	eng.RegisterPlugin(frameworks.NewRustAxumPlugin())
+		// Rust
+		frameworks.NewRustActixPlugin(),
+		frameworks.NewRustRocketPlugin(),
+		frameworks.NewRustAxumPlugin(),
 
-	// C#
-	eng.RegisterPlugin(frameworks.NewCSharpASPNetCorePlugin())
-	eng.RegisterPlugin(frameworks.NewCSharpBlazorPlugin())
+		// C#
+		frameworks.NewCSharpASPNetCorePlugin(),
+		frameworks.NewCSharpBlazorPlugin(),
 
-	// Ruby
-	eng.RegisterPlugin(frameworks.NewRubyRailsPlugin())
-	eng.RegisterPlugin(frameworks.NewRubySinatraPlugin())
+		// Ruby
+		frameworks.NewRubyRailsPlugin(),
+		frameworks.NewRubySinatraPlugin(),
 
-	// Node.js
-	eng.RegisterPlugin(frameworks.NewNodeExpressPlugin())
-	eng.RegisterPlugin(frameworks.NewNodeNestJSPlugin())
-	eng.RegisterPlugin(frameworks.NewNodeFastifyPlugin())
+		// Node.js
+		frameworks.NewNodeExpressPlugin(),
+		frameworks.NewNodeNestJSPlugin(),
+		frameworks.NewNodeFastifyPlugin(),
 
-	// Mobile Frameworks
-	eng.RegisterPlugin(frameworks.NewReactNativePlugin())
-	eng.RegisterPlugin(frameworks.NewFlutterPlugin())
-	eng.RegisterPlugin(frameworks.NewIonicPlugin())
+		// Mobile Frameworks
+		frameworks.NewReactNativePlugin(),
+		frameworks.NewFlutterPlugin(),
+		frameworks.NewIonicPlugin(),
 
-	// Desktop Frameworks
-	eng.RegisterPlugin(frameworks.NewElectronPlugin())
-	eng.RegisterPlugin(frameworks.NewTauriPlugin())
-	eng.RegisterPlugin(frameworks.NewWailsPlugin())
+		// Desktop Frameworks
+		frameworks.NewElectronPlugin(),
+		frameworks.NewTauriPlugin(),
+		frameworks.NewWailsPlugin(),
 
-	// Build Tools
-	eng.RegisterPlugin(builders.NewVitePlugin())
-	eng.RegisterPlugin(builders.NewWebpackPlugin())
-	eng.RegisterPlugin(builders.NewRollupPlugin())
+		// Build Tools
+		builders.NewVitePlugin(),
+		builders.NewWebpackPlugin(),
+		builders.NewRollupPlugin(),
 
-	// Tools
-	eng.RegisterPlugin(tools.NewGitPlugin())
+		// Tools
+		tools.NewGitPlugin(),
+	}
+
+	// Register all plugins with error handling
+	for _, plugin := range plugins {
+		if err := eng.RegisterPlugin(plugin); err != nil {
+			return fmt.Errorf("failed to register plugin %s: %w", plugin.Name(), err)
+		}
+	}
 
 	return nil
 }

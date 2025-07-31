@@ -4,8 +4,9 @@
 set -e
 
 REPO="ti-lo/tilokit"
-INSTALL_DIR="/usr/local/bin"
+INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 BINARY_NAME="tilokit"
+BASE_URL="${TILOKIT_BASE_URL:-https://ti-lo.github.io/tilokit}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -35,19 +36,9 @@ esac
 
 echo -e "${BLUE}📋 Detected platform: ${OS}-${ARCH}${NC}"
 
-# Get latest release
-echo -e "${YELLOW}🔍 Fetching latest release...${NC}"
-LATEST_RELEASE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-
-if [ -z "$LATEST_RELEASE" ]; then
-    echo -e "${RED}❌ Failed to fetch latest release${NC}"
-    exit 1
-fi
-
-echo -e "${GREEN}📦 Latest version: $LATEST_RELEASE${NC}"
-
-# Download binary
-BINARY_URL="https://github.com/$REPO/releases/download/$LATEST_RELEASE/tilokit-$OS-$ARCH"
+# Download binary from GitHub Pages or custom URL
+echo -e "${YELLOW}⬇️  Preparing download...${NC}"
+BINARY_URL="$BASE_URL/tilokit-$OS-$ARCH"
 if [ "$OS" = "windows" ]; then
     BINARY_URL="${BINARY_URL}.exe"
 fi
