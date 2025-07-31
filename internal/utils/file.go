@@ -29,7 +29,8 @@ func WriteFile(path, content string) error {
 	if err := EnsureDir(dir); err != nil {
 		return err
 	}
-	return os.WriteFile(path, []byte(content), 0644)
+	// Use more restrictive permissions (0600 instead of 0644)
+	return os.WriteFile(path, []byte(content), 0600)
 }
 
 // EnsureDir creates a directory and all parent directories if they don't exist

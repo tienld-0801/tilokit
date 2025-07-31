@@ -224,5 +224,6 @@ func (p *VitePlugin) updatePackageJsonScripts(ctx *tilocontext.ExecutionContext)
 		return err
 	}
 
-	return os.WriteFile(packageJsonPath, data, 0644)
+	// Use more restrictive permissions (0600 instead of 0644)
+	return os.WriteFile(packageJsonPath, data, 0600)
 }
