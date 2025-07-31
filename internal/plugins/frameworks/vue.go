@@ -73,6 +73,7 @@ func (p *VuePlugin) createDirectoryStructure(ctx *tilocontext.ExecutionContext) 
 	dirs := []string{
 		"src",
 		"src/components",
+		"src/components/icons",
 		"src/composables",
 		"src/stores",
 		"src/views",
@@ -502,11 +503,136 @@ body {
   }
 }`
 
+	// Generate WelcomeItem.vue
+	welcomeItemVue := `<template>
+  <div class="item">
+    <i>
+      <slot name="icon"></slot>
+    </i>
+    <div class="details">
+      <h3>
+        <slot name="heading"></slot>
+      </h3>
+      <slot></slot>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.item {
+  margin-top: 2rem;
+  display: flex;
+}
+
+.details {
+  flex: 1;
+  margin-left: 1rem;
+}
+
+i {
+  display: flex;
+  place-items: center;
+  place-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--color-text);
+}
+
+h3 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: var(--color-heading);
+}
+
+@media (min-width: 1024px) {
+  .item {
+    margin-top: 0;
+    padding: 0.4rem 0 1rem calc(var(--section-gap) / 2);
+  }
+
+  i {
+    top: calc(50% - 25px);
+    left: -26px;
+    position: absolute;
+    border: 1px solid var(--color-border);
+    background: var(--color-background);
+    border-radius: 8px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .item:before {
+    content: ' ';
+    border-left: 1px solid var(--color-border);
+    position: absolute;
+    left: 0;
+    bottom: calc(50% + 25px);
+    height: calc(50% - 25px);
+  }
+
+  .item:after {
+    content: ' ';
+    border-left: 1px solid var(--color-border);
+    position: absolute;
+    left: 0;
+    top: calc(50% + 25px);
+    height: calc(50% - 25px);
+  }
+
+  .item:first-of-type:before {
+    display: none;
+  }
+
+  .item:last-of-type:after {
+    display: none;
+  }
+}
+</style>`
+
+	// Generate simple icons (SVG-based)
+	iconDocumentation := `<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" fill="currentColor">
+    <path d="M11 2.253a1 1 0 1 0-2 0h2zm-2 13a1 1 0 1 0 2 0H9zM9 2v13h2V2H9z"/>
+    <path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5zM3 5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5z"/>
+  </svg>
+</template>`
+
+	iconTooling := `<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor">
+    <path d="M8 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4H8V4zM6 8h8v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8z"/>
+  </svg>
+</template>`
+
+	iconEcosystem := `<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" fill="currentColor">
+    <path d="M9 0a9 9 0 1 0 9 9A9 9 0 0 0 9 0zm4.5 7.5h-9v-3h9v3zm0 1.5v3h-9v-3h9z"/>
+  </svg>
+</template>`
+
+	iconCommunity := `<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor">
+    <path d="M15 4a1 1 0 1 0 0 2V4zM2 9a1 1 0 0 0 0 2V9zm13-5a1 1 0 1 0 0 2V4zM5 9a1 1 0 0 0 0 2V9z"/>
+  </svg>
+</template>`
+
+	iconSupport := `<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor">
+    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5zM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2z"/>
+  </svg>
+</template>`
+
 	// Write files
 	files := map[string]string{
 		"src/main.ts":                  mainTs,
 		"src/App.vue":                  appVue,
 		"src/components/HelloWorld.vue": helloWorldVue,
+		"src/components/WelcomeItem.vue": welcomeItemVue,
+		"src/components/icons/IconDocumentation.vue": iconDocumentation,
+		"src/components/icons/IconTooling.vue": iconTooling,
+		"src/components/icons/IconEcosystem.vue": iconEcosystem,
+		"src/components/icons/IconCommunity.vue": iconCommunity,
+		"src/components/icons/IconSupport.vue": iconSupport,
 		"src/router/index.ts":          routerTs,
 		"src/views/HomeView.vue":       homeViewVue,
 		"src/views/AboutView.vue":      aboutViewVue,
