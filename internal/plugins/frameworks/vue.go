@@ -654,48 +654,23 @@ h3 {
 func (p *VuePlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error {
 	// Generate tsconfig.json
 	tsConfig := `{
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "./tsconfig.app.json"
-    }
-  ]
-}`
-
-	// Generate tsconfig.app.json
-	tsConfigApp := `{
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
-  "exclude": ["src/**/__tests__/*"],
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue",
+    "vite.config.*",
+    "vitest.config.*"
+  ],
   "compilerOptions": {
-    "composite": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "noEmit": true
+    }
   }
 }`
 
-	// Generate tsconfig.node.json
-	tsConfigNode := `{
-  "extends": "@tsconfig/node18/tsconfig.json",
-  "include": [
-    "vite.config.*",
-    "vitest.config.*",
-    "cypress.config.*",
-    "nightwatch.conf.*",
-    "playwright.config.*"
-  ],
-  "compilerOptions": {
-    "composite": true,
-    "module": "ESNext",
-    "types": ["node"]
-  }
-}`
+
 
 	// Generate env.d.ts
 	envDts := `/// <reference types="vite/client" />`
@@ -717,11 +692,9 @@ func (p *VuePlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error
 
 	// Write config files
 	configs := map[string]string{
-		"tsconfig.json":      tsConfig,
-		"tsconfig.app.json":  tsConfigApp,
-		"tsconfig.node.json": tsConfigNode,
-		"src/env.d.ts":       envDts,
-		"index.html":         indexHtml,
+		"tsconfig.json": tsConfig,
+		"src/env.d.ts":  envDts,
+		"index.html":    indexHtml,
 	}
 
 	for path, content := range configs {
