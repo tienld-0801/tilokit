@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Development continues...
+
+## [0.1.0-dev] - Development Phase
+
 ### Added
 - 🚀 **Multi-Framework Support**: Complete plugin architecture supporting 25+ frameworks
 - 🔧 **Universal Build Tools**: Support for language-specific build tools and package managers
@@ -43,11 +48,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Template engine for dynamic file generation
 - Git integration with smart .gitignore generation
 
-## [0.1.0] - Development Phase
-
-### Added
+### Development Features
 - Initial project structure
 - Core engine implementation
+- Basic CLI framework setup
 - Basic React and Vue support
 - Vite build tool integration
 - CLI foundation with Cobra

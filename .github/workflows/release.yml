@@ -5,6 +5,16 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v0.1.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        default: false
+        type: boolean
 
 env:
   GO_VERSION: '1.24'
@@ -50,13 +60,32 @@ jobs:
 
       - name: Set build variables
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          if [ -z "$VERSION" ] || [ "$VERSION" = "$GITHUB_REF" ]; then
-            VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "dev")
+          # Determine version from tag or manual input
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
           fi
+          
+          # Fallback to git describe if version is empty
+          if [ -z "$VERSION" ] || [ "$VERSION" = "$GITHUB_REF" ]; then
+            VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "v0.1.0-dev")
+          fi
+          
+          # Set environment variables
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
           echo "GIT_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          
+          # Determine if this is a prerelease
+          if [[ "$VERSION" =~ (alpha|beta|rc|dev) ]] || [ "${{ inputs.prerelease }}" = "true" ]; then
+            echo "IS_PRERELEASE=true" >> $GITHUB_ENV
+          else
+            echo "IS_PRERELEASE=false" >> $GITHUB_ENV
+          fi
+          
+          echo "Release version: $VERSION"
+          echo "Is prerelease: ${IS_PRERELEASE:-false}"
 
       - name: Build multi-platform binaries
         run: |
@@ -140,13 +169,49 @@ jobs:
           publish_dir: ./pages
           force_orphan: true
 
+      - name: Extract release notes from CHANGELOG
+        id: release_notes
+        run: |
+          # Extract release notes for current version from CHANGELOG.md
+          VERSION_NUM=$(echo "$VERSION" | sed 's/^v//')
+          
+          # Extract content between current version and next version/end of file
+          RELEASE_NOTES=$(awk '/^## \['"$VERSION_NUM"'\]/, /^## \[/ {
+            if (/^## \['"$VERSION_NUM"'\]/) {
+              next
+            }
+            if (/^## \[/ && !/^## \['"$VERSION_NUM"'\]/) {
+              exit
+            }
+            if (!/^$/ && !/^## / && !/^### / && length($0) > 0) {
+              print
+            }
+          }' CHANGELOG.md | head -20)
+          
+          # Fallback to generic release notes if extraction fails
+          if [ -z "$RELEASE_NOTES" ]; then
+            RELEASE_NOTES="Release $VERSION of TiLoKit CLI toolkit."
+          fi
+          
+          # Save release notes to output and file
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "$RELEASE_NOTES" > release_notes.txt
+          echo "Release notes extracted for $VERSION"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         with:
+          tag_name: ${{ env.VERSION }}
+          name: TiLoKit ${{ env.VERSION }}
+          body_path: release_notes.txt
           files: |
             dist/*
-          generate_release_notes: true
+          prerelease: ${{ env.IS_PRERELEASE == 'true' }}
           draft: false
+          generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

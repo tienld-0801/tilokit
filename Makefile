@@ -85,3 +85,51 @@ docker: ## Build Docker image
 	@echo "Building Docker image..."
 	docker build -t tilokit:$(VERSION) .
 	@echo "✅ Docker image built: tilokit:$(VERSION)"
+
+##@ Release Management
+
+init-branches: ## Initialize Git branch structure
+	@echo "Initializing branch structure..."
+	@chmod +x scripts/init-branches.sh
+	./scripts/init-branches.sh
+
+release: ## Create a new release (usage: make release VERSION=v0.1.0)
+	@if [ -z "$(VERSION)" ]; then \
+		echo "❌ VERSION is required. Usage: make release VERSION=v0.1.0"; \
+		exit 1; \
+	fi
+	@echo "Starting release process for $(VERSION)..."
+	@chmod +x scripts/release.sh
+	./scripts/release.sh $(VERSION)
+
+hotfix: ## Create a hotfix release (usage: make hotfix VERSION=v0.1.1)
+	@if [ -z "$(VERSION)" ]; then \
+		echo "❌ VERSION is required. Usage: make hotfix VERSION=v0.1.1"; \
+		exit 1; \
+	fi
+	@echo "Starting hotfix process for $(VERSION)..."
+	@chmod +x scripts/hotfix.sh
+	./scripts/hotfix.sh $(VERSION)
+
+check-release: ## Check if ready for release
+	@echo "🔍 Checking release readiness..."
+	@echo "Current branch: $$(git branch --show-current)"
+	@echo "Working directory status:"
+	@git status --porcelain || echo "✅ Working directory is clean"
+	@echo "Latest tags:"
+	@git tag --sort=-version:refname | head -5
+	@echo "Unreleased commits:"
+	@git log --oneline $$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")..HEAD | head -10
+
+version-info: ## Show current version information
+	@echo "📋 Version Information"
+	@echo "Current Version: $(VERSION)"
+	@echo "Build Date: $(BUILD_DATE)"
+	@echo "Git Commit: $(GIT_COMMIT)"
+	@echo "Binary: ./$(BINARY_NAME)"
+	@if [ -f "./$(BINARY_NAME)" ]; then \
+		echo "Binary version:"; \
+		./$(BINARY_NAME) version; \
+	else \
+		echo "Binary not built (run 'make build' first)"; \
+	fi
