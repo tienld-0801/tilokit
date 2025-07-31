@@ -99,7 +99,7 @@ func (p *VuePlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) error
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "type-check": "vue-tsc --noEmit"
@@ -494,7 +494,8 @@ func (p *VuePlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "noEmit": true
   }
 }`
 

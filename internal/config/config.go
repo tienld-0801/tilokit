@@ -82,7 +82,8 @@ func CreateProjectConfig(projectName, framework, buildTool, outputDir string) *t
 // SaveConfig saves the current configuration to file
 func SaveConfig(config *Config) error {
 	configDir := filepath.Join(os.Getenv("HOME"), ".tilokit")
-	if err := os.MkdirAll(configDir, 0755); err != nil {
+	// Use more restrictive permissions (0750 instead of 0755)
+	if err := os.MkdirAll(configDir, 0750); err != nil {
 		return errors.Wrap(err, "failed to create config directory")
 	}
 

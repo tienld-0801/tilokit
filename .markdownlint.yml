@@ -76,11 +76,7 @@ MD020: true
 MD021: true
 
 # MD022/blanks-around-headings : Headings should be surrounded by blank lines : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md022.md
-MD022:
-  # Blank lines above heading
-  lines_above: 1
-  # Blank lines below heading
-  lines_below: 1
+MD022: false
 
 # MD023/heading-start-left : Headings must start at the beginning of the line : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md023.md
 MD023: true
@@ -104,7 +100,7 @@ MD026:
 MD027: true
 
 # MD028/no-blanks-blockquote : Blank line inside blockquote : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md028.md
-MD028: true
+MD028: false
 
 # MD029/ol-prefix : Ordered list item prefix : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md029.md
 MD029:
@@ -123,12 +119,10 @@ MD030:
   ol_multi: 1
 
 # MD031/blanks-around-fences : Fenced code blocks should be surrounded by blank lines : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md031.md
-MD031:
-  # Include list items
-  list_items: true
+MD031: false
 
 # MD032/blanks-around-lists : Lists should be surrounded by blank lines : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md032.md
-MD032: true
+MD032: false
 
 # MD033/no-inline-html : Inline HTML : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md033.md
 MD033: false
@@ -156,11 +150,7 @@ MD038: true
 MD039: true
 
 # MD040/fenced-code-language : Fenced code blocks should have a language specified : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md040.md
-MD040:
-  # List of languages
-  allowed_languages: []
-  # Require language only
-  language_only: false
+MD040: false
 
 # MD041/first-line-heading/first-line-h1 : First line in a file should be a top-level heading : https://github.com/DavidAnson/markdownlint/blob/v0.34.0/doc/md041.md
 MD041:

@@ -194,11 +194,11 @@ func (p *VitePlugin) updatePackageJsonScripts(ctx *tilocontext.ExecutionContext)
 	// Read existing package.json if it exists
 	var packageJson map[string]interface{}
 	if utils.FileExists(packageJsonPath) {
-		data, err := os.ReadFile(packageJsonPath)
+		dataStr, err := utils.ReadFile(packageJsonPath)
 		if err != nil {
 			return err
 		}
-		if err := json.Unmarshal(data, &packageJson); err != nil {
+		if err := json.Unmarshal([]byte(dataStr), &packageJson); err != nil {
 			return err
 		}
 	} else {
