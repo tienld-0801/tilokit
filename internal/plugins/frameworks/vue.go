@@ -441,6 +441,67 @@ a,
   }
 }`
 
+	// Generate base.css
+	baseCss := `/* CSS Reset and Base Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* CSS Variables */
+:root {
+  --color-background: #ffffff;
+  --color-background-soft: #f8f8f8;
+  --color-background-mute: #f2f2f2;
+  --color-border: #d1d5db;
+  --color-border-hover: #b1b5bb;
+  --color-heading: #2c3e50;
+  --color-text: #213547;
+  --section-gap: 160px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #1a1a1a;
+    --color-background-soft: #242424;
+    --color-background-mute: #2c2c2c;
+    --color-border: #3c3c3c;
+    --color-border-hover: #5c5c5c;
+    --color-heading: #ffffff;
+    --color-text: #ebebeb;
+  }
+}`
+
 	// Write files
 	files := map[string]string{
 		"src/main.ts":                  mainTs,
@@ -451,6 +512,7 @@ a,
 		"src/views/AboutView.vue":      aboutViewVue,
 		"src/components/TheWelcome.vue": theWelcomeVue,
 		"src/assets/main.css":          mainCss,
+		"src/assets/base.css":          baseCss,
 	}
 
 	for path, content := range files {
