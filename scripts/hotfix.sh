@@ -43,6 +43,12 @@ validate_version() {
         print_info "Expected format: v1.0.1 (patch version only)"
         exit 1
     fi
+    
+    # Check if tag already exists
+    if git rev-parse "$version" >/dev/null 2>&1; then
+        print_error "Tag $version already exists"
+        exit 1
+    fi
 }
 
 # Function to check if working directory is clean
@@ -119,8 +125,11 @@ update_changelog_hotfix() {
     awk -v version="$version" -v date="$date" '
     /^## \[Unreleased\]$/ {
         print $0
+        print ""
+        print "### Fixed"
+        print "- Critical bug fixes"
+        print ""
         getline
-        print $1
         while ((getline) && !/^## \[/) {
             print
         }
@@ -174,9 +183,10 @@ commit_hotfix_changes() {
     print_info "Committing hotfix changes..."
     
     git add CHANGELOG.md cmd/version.go
-    git commit -m "hotfix: release $version
+    git commit -m "chore(release): $version
 
-- Critical bug fixes
+Prepare hotfix release $version
+
 - Update CHANGELOG.md
 - Bump version to $version"
     
@@ -190,10 +200,16 @@ create_and_push_tag() {
     
     print_info "Creating and pushing tag $version..."
     
-    # Create annotated tag
-    git tag -a "$version" -m "Hotfix $version
+    # Create annotated tag following conventional commits
+    git tag -a "$version" -m "chore(release): $version
 
-Critical bug fixes and patches."
+Hotfix release $version
+
+$(awk '/^## \['"${version#v}"'\]/, /^## \[/ {
+    if (/^## \['"${version#v}"'\]/) next
+    if (/^## \[/ && !/^## \['"${version#v}"'\]/) exit
+    print
+}' CHANGELOG.md | sed '/^$/d')"
     
     # Push branch and tag
     git push origin "$hotfix_branch"
@@ -212,7 +228,7 @@ merge_hotfix() {
     # Switch to main and merge
     git checkout "$MAIN_BRANCH"
     git pull origin "$MAIN_BRANCH"
-    git merge --no-ff "$hotfix_branch" -m "Merge hotfix $version"
+    git merge --no-ff "$hotfix_branch" -m "chore(merge): merge hotfix $version into $MAIN_BRANCH"
     git push origin "$MAIN_BRANCH"
     
     print_success "Merged to $MAIN_BRANCH"
@@ -221,7 +237,7 @@ merge_hotfix() {
     print_info "Merging hotfix back to develop..."
     git checkout "$DEVELOP_BRANCH"
     git pull origin "$DEVELOP_BRANCH"
-    git merge --no-ff "$hotfix_branch" -m "Merge hotfix $version back to develop"
+    git merge --no-ff "$hotfix_branch" -m "chore(merge): merge hotfix $version into $DEVELOP_BRANCH"
     git push origin "$DEVELOP_BRANCH"
     
     print_success "Merged back to $DEVELOP_BRANCH"
@@ -240,6 +256,21 @@ main() {
     
     print_info "🔧 Starting TiLoKit Hotfix Process"
     print_info "=================================="
+    
+    # Confirm before proceeding
+    print_warning "You are about to create a hotfix for version $version"
+    print_info "This will:"
+    print_info "  - Create a hotfix branch from main"
+    print_info "  - Update CHANGELOG.md"
+    print_info "  - Update version in cmd/version.go"
+    print_info "  - Create and push tag $version"
+    print_info "  - Merge changes to main and develop branches"
+    print_warning "Continue? (y/N)"
+    read -r confirm
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        print_info "Hotfix process cancelled"
+        exit 0
+    fi
     
     # Validate input
     if [[ -z "$version" ]]; then
@@ -266,6 +297,8 @@ main() {
     hotfix_branch=$(create_hotfix_branch "$version")
     
     print_warning "Please make your hotfix changes now and commit them."
+    print_warning "Use conventional commits with 'fix:' prefix for bug fixes."
+    print_warning "Example: git commit -m \"fix(core): resolve critical issue in project generation\""
     print_warning "Press Enter when ready to continue with the release process..."
     read -r
     
@@ -284,7 +317,14 @@ main() {
     
     print_success "🎉 Hotfix $version completed successfully!"
     print_info "Release workflow will now build and deploy automatically."
-    print_info "Monitor the progress at: https://github.com/ti-lo/tilokit/actions"
+    print_info "Monitor the progress at: https://github.com/tienld-0801/tilokit/actions"
+    
+    # Show next steps
+    print_info ""
+    print_info "Next steps:"
+    print_info "  1. Verify the release at: https://github.com/tienld-0801/tilokit/releases/tag/$version"
+    print_info "  2. Test the released binaries"
+    print_info "  3. Announce the hotfix if necessary"
 }
 
 # Run main function
