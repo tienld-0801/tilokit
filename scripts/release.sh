@@ -252,7 +252,7 @@ main() {
     
     print_success "🎉 Release $version completed successfully!"
     print_info "Release workflow will now build and deploy automatically."
-    print_info "Monitor the progress at: https://github.com/ti-lo/tilokit/actions"
+    print_info "Monitor the progress at: https://github.com/tienld-0801/tilokit/actions"
 }
 
 # Run main function

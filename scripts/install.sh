@@ -3,10 +3,10 @@
 # TiLoKit Installation Script
 set -e
 
-REPO="ti-lo/tilokit"
+REPO="tienld-0801/tilokit"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 BINARY_NAME="tilokit"
-BASE_URL="${TILOKIT_BASE_URL:-https://ti-lo.github.io/tilokit}"
+BASE_URL="${TILOKIT_BASE_URL:-https://tienld-0801.github.io/tilokit}"
 
 # Colors for output
 RED='\033[0;31m'
