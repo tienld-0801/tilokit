@@ -146,7 +146,7 @@ jobs:
                   <p>Universal CLI Toolkit for Multi-Framework Project Generation</p>
                   
                   <h2>🔧 Quick Install</h2>
-                  <div class="install-cmd">curl -fsSL https://ti-lo.github.io/tilokit/install.sh | bash</div>
+                  <div class="install-cmd">curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash</div>
                   
                   <h2>📦 Direct Downloads</h2>
                   <div class="downloads">
@@ -175,27 +175,113 @@ jobs:
           # Extract release notes for current version from CHANGELOG.md
           VERSION_NUM=$(echo "$VERSION" | sed 's/^v//')
           
-          # Extract content between current version and next version/end of file
-          RELEASE_NOTES=$(awk '/^## \['"$VERSION_NUM"'\]/, /^## \[/ {
-            if (/^## \['"$VERSION_NUM"'\]/) {
+          # Create comprehensive release notes
+          cat > release_notes.md << 'NOTES_EOF'
+          ## 🚀 What's New in TiLoKit $VERSION
+          
+          NOTES_EOF
+          
+          # Extract and format changelog sections
+          awk '/^## \['\'"$VERSION_NUM"'\'\]/, /^## \[/ {
+            if (/^## \['\'"$VERSION_NUM"'\'\]/) {
               next
             }
-            if (/^## \[/ && !/^## \['"$VERSION_NUM"'\]/) {
+            if (/^## \[/ && !/^## \['\'"$VERSION_NUM"'\'\]/) {
               exit
             }
-            if (!/^$/ && !/^## / && !/^### / && length($0) > 0) {
-              print
-            }
-          }' CHANGELOG.md | head -20)
+            print
+          }' CHANGELOG.md | while IFS= read -r line; do
+            case "$line" in
+              "### Added")
+                echo "## ✨ New Features" >> release_notes.md
+                ;;
+              "### Fixed")
+                echo "" >> release_notes.md
+                echo "## 🐛 Bug Fixes" >> release_notes.md
+                ;;
+              "### Changed")
+                echo "" >> release_notes.md
+                echo "## ♻️ Improvements" >> release_notes.md
+                ;;
+              "### Removed")
+                echo "" >> release_notes.md
+                echo "## 🗑️ Removed" >> release_notes.md
+                ;;
+              "### Security")
+                echo "" >> release_notes.md
+                echo "## 🔒 Security" >> release_notes.md
+                ;;
+              "### Deprecated")
+                echo "" >> release_notes.md
+                echo "## ⚠️ Deprecated" >> release_notes.md
+                ;;
+              "")
+                # Skip empty lines after headers
+                ;;
+              *)
+                if [[ "$line" =~ ^- ]]; then
+                  echo "$line" >> release_notes.md
+                fi
+                ;;
+            esac
+          done
+          
+          # Add installation and upgrade instructions
+          cat >> release_notes.md << 'INSTALL_EOF'
+          
+          ## 📦 Installation & Upgrade
+          
+          ### Fresh Installation
+          ```bash
+          curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
+          ```
+          
+          ### Upgrade from Previous Version
+          ```bash
+          # Download and replace existing binary
+          curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
+          
+          # Verify installation
+          tilokit version
+          ```
+          
+          ### Manual Download
+          Download the appropriate binary for your platform from the assets below.
+          
+          ## 🔗 Links
+          - 📚 [Documentation](https://github.com/tienld-0801/tilokit#readme)
+          - 🐛 [Report Issues](https://github.com/tienld-0801/tilokit/issues)
+          - 💬 [Discussions](https://github.com/tienld-0801/tilokit/discussions)
+          
+          ---
+          
+          **Full Changelog**: https://github.com/tienld-0801/tilokit/compare/v0.1.0-dev...$VERSION
+          INSTALL_EOF
           
           # Fallback to generic release notes if extraction fails
-          if [ -z "$RELEASE_NOTES" ]; then
-            RELEASE_NOTES="Release $VERSION of TiLoKit CLI toolkit."
+          if [ ! -s release_notes.md ] || [ $(wc -l < release_notes.md) -lt 5 ]; then
+            cat > release_notes.md << 'FALLBACK_EOF'
+          ## 🚀 TiLoKit $VERSION
+          
+          This release includes various improvements and bug fixes to enhance your development experience.
+          
+          ## 📦 Installation
+          
+          ```bash
+          curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
+          ```
+          
+          ## 🔗 Links
+          - 📚 [Documentation](https://github.com/tienld-0801/tilokit#readme)
+          - 🐛 [Report Issues](https://github.com/tienld-0801/tilokit/issues)
+          
+          **Full Changelog**: https://github.com/tienld-0801/tilokit/compare/v0.1.0-dev...$VERSION
+          FALLBACK_EOF
           fi
           
-          # Save release notes to output and file
+          # Save release notes to output
           echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
-          echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+          cat release_notes.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           
           echo "$RELEASE_NOTES" > release_notes.txt

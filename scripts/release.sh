@@ -66,31 +66,38 @@ check_develop_branch() {
 # Function to update changelog
 update_changelog() {
     local version=$1
-    local date=$(date +%Y-%m-%d)
     
-    print_info "Updating CHANGELOG.md..."
+    print_info "Generating changelog from conventional commits..."
     
-    # Create temporary file
-    local temp_file=$(mktemp)
-    
-    # Read the current changelog and update it
-    awk -v version="$version" -v date="$date" '
-    /^## \[Unreleased\]$/ {
-        print $0
-        print ""
-        print "### Changed"
-        print "- Development continues..."
-        print ""
-        print "## [" substr(version, 2) "] - " date
-        next
-    }
-    1
-    ' CHANGELOG.md > "$temp_file"
-    
-    # Replace the original file
-    mv "$temp_file" CHANGELOG.md
-    
-    print_success "CHANGELOG.md updated for version $version"
+    # Use the new changelog generator
+    if [ -f "scripts/generate-changelog.sh" ]; then
+        chmod +x scripts/generate-changelog.sh
+        ./scripts/generate-changelog.sh "$version"
+    else
+        # Fallback to simple update
+        local date=$(date +%Y-%m-%d)
+        local temp_file=$(mktemp)
+        
+        awk -v version="$version" -v date="$date" '
+        /^## \[Unreleased\]$/ {
+            print $0
+            print ""
+            print "### Changed"
+            print "- Development continues..."
+            print ""
+            print "## [" substr(version, 2) "] - " date
+            print ""
+            print "### Added"
+            print "- New features and improvements"
+            print ""
+            next
+        }
+        1
+        ' CHANGELOG.md > "$temp_file"
+        
+        mv "$temp_file" CHANGELOG.md
+        print_success "CHANGELOG.md updated for version $version"
+    fi
 }
 
 # Function to update version in code

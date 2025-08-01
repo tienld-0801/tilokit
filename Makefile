@@ -111,6 +111,15 @@ hotfix: ## Create a hotfix release (usage: make hotfix VERSION=v0.1.1)
 	@chmod +x scripts/hotfix.sh
 	./scripts/hotfix.sh $(VERSION)
 
+generate-changelog: ## Generate changelog from conventional commits (usage: make generate-changelog VERSION=v0.1.1)
+	@if [ -z "$(VERSION)" ]; then \
+		echo "❌ VERSION is required. Usage: make generate-changelog VERSION=v0.1.1"; \
+		exit 1; \
+	fi
+	@echo "Generating changelog for $(VERSION)..."
+	@chmod +x scripts/generate-changelog.sh
+	./scripts/generate-changelog.sh $(VERSION)
+
 check-release: ## Check if ready for release
 	@echo "🔍 Checking release readiness..."
 	@echo "Current branch: $$(git branch --show-current)"

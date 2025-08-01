@@ -1,20 +1,27 @@
-# Pull Request
+# 🚀 Description
 
-## 📋 Description
-
-<!-- Provide a clear and concise description of the changes -->
+<!-- Provide a clear and concise description of what this PR does -->
 
 ## 🔄 Type of Change
 
-- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
-- [ ] ✨ New feature (non-breaking change which adds functionality)
-- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] 📚 Documentation update
-- [ ] 🎨 Code style/formatting changes
-- [ ] ♻️ Refactoring (no functional changes)
-- [ ] ⚡ Performance improvements
-- [ ] 🔧 Build/CI changes
-- [ ] 🧪 Test additions or modifications
+- [ ] ✨ **feat**: A new feature
+- [ ] 🐛 **fix**: A bug fix
+- [ ] 📚 **docs**: Documentation only changes
+- [ ] 🎨 **style**: Changes that do not affect the meaning of the code
+- [ ] ♻️ **refactor**: A code change that neither fixes a bug nor adds a feature
+- [ ] ⚡ **perf**: A code change that improves performance
+- [ ] 🧪 **test**: Adding missing tests or correcting existing tests
+- [ ] 🔧 **build**: Changes that affect the build system or external dependencies
+- [ ] 🔄 **ci**: Changes to our CI configuration files and scripts
+- [ ] 🏠 **chore**: Other changes that don't modify src or test files
+
+### 📝 Changes Made
+
+<!-- List the specific changes made in this PR -->
+
+-
+-
+-
 
 ## 🧪 Testing
 
@@ -67,4 +74,4 @@ Related to #
 <!-- Any additional information that reviewers should know -->
 
 ---
-*Please ensure all checks pass before requesting review*
+### Please ensure all checks pass before requesting review

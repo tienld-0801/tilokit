@@ -1,0 +1,34 @@
+# <type>(<scope>): <subject>
+#
+# <body>
+#
+# <footer>
+
+# Type should be one of the following:
+# * feat: A new feature
+# * fix: A bug fix
+# * docs: Documentation only changes
+# * style: Changes that do not affect the meaning of the code
+# * refactor: A code change that neither fixes a bug nor adds a feature
+# * perf: A code change that improves performance
+# * test: Adding missing tests or correcting existing tests
+# * build: Changes that affect the build system or external dependencies
+# * ci: Changes to our CI configuration files and scripts
+# * chore: Other changes that don't modify src or test files
+# * revert: Reverts a previous commit
+
+# Scope is optional and should be the name of the package affected
+# Examples: core, cli, plugins, scripts, docs
+
+# Subject should use imperative mood and not end with period
+# No more than 50 characters
+
+# Body should include the motivation for the change and contrast with previous behavior
+# Wrap at 72 characters
+
+# Footer should contain any information about Breaking Changes
+# and is also the place to reference GitHub issues that this commit closes
+# Examples:
+# BREAKING CHANGE: `extends` key in config file is now used for extending other config files
+# Closes #123
+# Fixes #456
