@@ -38,21 +38,53 @@ jobs:
               'revert': 'revert'
             };
             
+            // Emoji mapping for title updates
+            const emojiMap = {
+              'feat': '✨',
+              'fix': '🐛',
+              'perf': '⚡',
+              'refactor': '♻️',
+              'docs': '📚',
+              'test': '🧪',
+              'build': '🔧',
+              'ci': '🔄',
+              'chore': '🏠',
+              'style': '💄',
+              'revert': '⏪'
+            };
+            
+            // Check if title already has emoji
+            const hasEmoji = /^[\u{1F300}-\u{1F9FF}]|^[\u{2600}-\u{26FF}]|^[\u{2700}-\u{27BF}]/u.test(title);
+            
             // Extract type from conventional commit format
             const match = title.match(/^([a-z]+)(\([^)]+\))?:/);
             
             if (match) {
               const type = match[1];
               const label = labelMap[type];
+              const emoji = emojiMap[type];
               
-              console.log(`🔍 Detected type: "${type}", Label: "${label}"`);
+              console.log(`🔍 Detected type: "${type}", Label: "${label}", Emoji: "${emoji}"`);
               
-              if (label) {
-                // Get current labels
+              if (label && emoji) {
+                // 1. Update PR title with emoji if needed
+                if (!hasEmoji) {
+                  const newTitle = `${emoji} ${title}`;
+                  
+                  await github.rest.pulls.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: context.payload.pull_request.number,
+                    title: newTitle
+                  });
+                  
+                  console.log(`✨ Updated title: "${newTitle}"`);
+                }
+                
+                // 2. Add label if not already present
                 const currentLabels = context.payload.pull_request.labels.map(l => l.name);
                 console.log(`🔍 Current labels:`, currentLabels);
                 
-                // Add label if not already present
                 if (!currentLabels.includes(label)) {
                   await github.rest.issues.addLabels({
                     owner: context.repo.owner,
@@ -62,21 +94,29 @@ jobs:
                   });
                   
                   console.log(`✅ Added label: ${label}`);
-                  
-                  // Comment about the auto-labeling
+                } else {
+                  console.log(`🔄 Label "${label}" already exists`);
+                }
+                
+                // 3. Comment about the auto-formatting
+                const actions = [];
+                if (!hasEmoji) actions.push('added emoji to title');
+                if (!currentLabels.includes(label)) actions.push('added label');
+                
+                if (actions.length > 0) {
                   await github.rest.issues.createComment({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     issue_number: context.payload.pull_request.number,
-                    body: `🏷️ **Auto-labeled as \`${label}\`**\n\n` +
-                          `Based on conventional commit type: \`${type}\`\n\n` +
-                          `This helps categorize your contribution. Thank you! 🚀`
+                    body: `🤖 **Auto-formatted PR**\n\n` +
+                          `**Type:** \`${type}\` ${emoji}\n` +
+                          `**Label:** \`${label}\`\n` +
+                          `**Actions:** ${actions.join(', ')}\n\n` +
+                          `Thank you for following conventional commit standards! 🚀`
                   });
-                } else {
-                  console.log(`🔄 Label "${label}" already exists`);
                 }
               } else {
-                console.log(`❓ No label mapping found for type: ${type}`);
+                console.log(`❓ No label/emoji mapping found for type: ${type}`);
               }
             } else {
               console.log(`❌ Title doesn't follow conventional commit format`);
