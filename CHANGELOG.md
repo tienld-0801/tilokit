@@ -10,6 +10,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Development continues...
 
+## [0.1.1-dev] - 2025-08-01
+
+### Added
+- ✨ Improved hotfix script with conventional commits support
+- 🔧 Enhanced release automation with better validation
+- 📋 Comprehensive pre-flight checks for releases
+- 🎯 Interactive prompts with confirmation dialogs
+- 🛡️ Tag existence validation to prevent duplicates
+
+### Fixed
+- 🐛 Fixed commit message formatting in hotfix script
+- 🔧 Corrected merge process for hotfix branches
+- 📝 Improved CHANGELOG.md update mechanism
+
+### Changed
+- ♻️ Refactored release scripts to follow conventional commits
+- 🔄 Enhanced GitFlow integration with better branch management
+- 📚 Updated documentation and inline help messages
+
 ## [0.1.0-dev] - Development Phase
 
 ### Added
