@@ -1,11 +1,11 @@
-## 🚀 Description
+# 🚀 Description
 
 <!-- Provide a clear and concise description of what this PR does -->
 
 ### 🔄 Type of Change
 
 - [ ] ✨ **feat**: A new feature
-- [ ] 🐛 **fix**: A bug fix  
+- [ ] 🐛 **fix**: A bug fix
 - [ ] 📚 **docs**: Documentation only changes
 - [ ] 🎨 **style**: Changes that do not affect the meaning of the code
 - [ ] ♻️ **refactor**: A code change that neither fixes a bug nor adds a feature
@@ -22,13 +22,6 @@
 - 
 - 
 - 
-
-### 🔗 Related Issues
-
-<!-- Link any related issues -->
-Closes #
-Fixes #
-Resolves #
 
 ## 🧪 Testing
 
