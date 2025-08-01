@@ -178,4 +178,4 @@ For questions about the release process:
 - Check workflow logs for CI/CD issues
 
 ---
-*Last updated: 2024-01-31*
+### Last updated: 2024-01-31
