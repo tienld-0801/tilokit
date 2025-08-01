@@ -7,6 +7,11 @@ on:
     types: [closed]
     branches: [develop]
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
 jobs:
   generate-changelog:
     runs-on: ubuntu-latest

@@ -14,6 +14,12 @@ on:
           - major
           - prerelease
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: write
+
 jobs:
   auto-release:
     runs-on: ubuntu-latest
