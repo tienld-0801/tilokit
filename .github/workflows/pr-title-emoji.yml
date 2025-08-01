@@ -1,0 +1,108 @@
+name: 🎨 Auto Format PR Title with Emoji
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  format-pr-title:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.ref != 'main' && github.event.pull_request.head.ref != 'develop'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Format PR title with emoji
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = context.payload.pull_request.title;
+            
+            // Emoji mapping based on .versionrc
+            const emojiMap = {
+              'feat': '✨',
+              'fix': '🐛', 
+              'perf': '⚡',
+              'refactor': '♻️',
+              'docs': '📚',
+              'test': '🧪',
+              'build': '🔧',
+              'ci': '🔄',
+              'chore': '🏠',
+              'style': '💄',
+              'revert': '⏪'
+            };
+            
+            // Check if title already has emoji
+            const hasEmoji = /^[\u{1F300}-\u{1F9FF}]|^[\u{2600}-\u{26FF}]|^[\u{2700}-\u{27BF}]/u.test(title);
+            
+            if (!hasEmoji) {
+              // Extract type from conventional commit format
+              const match = title.match(/^([a-z]+)(\([^)]+\))?:/);
+              
+              if (match) {
+                const type = match[1];
+                const emoji = emojiMap[type];
+                
+                if (emoji) {
+                  const newTitle = `${emoji} ${title}`;
+                  
+                  // Update PR title
+                  await github.rest.pulls.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: context.payload.pull_request.number,
+                    title: newTitle
+                  });
+                  
+                  console.log(`Updated PR title: ${newTitle}`);
+                  
+                  // Add comment to explain the change
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.payload.pull_request.number,
+                    body: `🤖 **Auto-formatted PR title with emoji**\n\n` +
+                          `**Before:** \`${title}\`\n` +
+                          `**After:** \`${newTitle}\`\n\n` +
+                          `This follows our conventional commit standards defined in \`.versionrc\`.`
+                  });
+                }
+              }
+            }
+
+      - name: Validate PR title format
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = context.payload.pull_request.title;
+            
+            // Remove emoji for validation
+            const cleanTitle = title.replace(/^[\u{1F300}-\u{1F9FF}]|^[\u{2600}-\u{26FF}]|^[\u{2700}-\u{27BF}]/u, '').trim();
+            
+            // Validate conventional commit format
+            const conventionalCommitRegex = /^([a-z]+)(\([^)]+\))?:\s(.+)/;
+            
+            if (!conventionalCommitRegex.test(cleanTitle)) {
+              const validTypes = ['feat', 'fix', 'docs', 'style', 'refactor', 'perf', 'test', 'build', 'ci', 'chore', 'revert'];
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `❌ **Invalid PR title format**\n\n` +
+                      `Your PR title should follow conventional commit format:\n` +
+                      `\`type(scope): description\`\n\n` +
+                      `**Valid types:** ${validTypes.join(', ')}\n\n` +
+                      `**Examples:**\n` +
+                      `- \`feat: add new feature\`\n` +
+                      `- \`fix(core): resolve critical bug\`\n` +
+                      `- \`docs: update README\`\n\n` +
+                      `Please update your PR title to follow this format.`
+              });
+              
+              core.setFailed('PR title does not follow conventional commit format');
+            }
