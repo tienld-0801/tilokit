@@ -1,0 +1,99 @@
+name: 🏷️ Auto Label PR
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.ref != 'main' && github.event.pull_request.head.ref != 'develop'
+    
+    steps:
+      - name: Auto-label PR based on conventional commits
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = context.payload.pull_request.title;
+            console.log(`🔍 PR Title: "${title}"`);
+            
+            // Label mapping based on conventional commit types
+            const labelMap = {
+              'feat': 'enhancement',
+              'fix': 'bug', 
+              'perf': 'performance',
+              'refactor': 'refactoring',
+              'docs': 'documentation',
+              'test': 'testing',
+              'build': 'build',
+              'ci': 'ci/cd',
+              'chore': 'maintenance',
+              'style': 'style',
+              'revert': 'revert'
+            };
+            
+            // Extract type from conventional commit format
+            const match = title.match(/^([a-z]+)(\([^)]+\))?:/);
+            
+            if (match) {
+              const type = match[1];
+              const label = labelMap[type];
+              
+              console.log(`🔍 Detected type: "${type}", Label: "${label}"`);
+              
+              if (label) {
+                // Get current labels
+                const currentLabels = context.payload.pull_request.labels.map(l => l.name);
+                console.log(`🔍 Current labels:`, currentLabels);
+                
+                // Add label if not already present
+                if (!currentLabels.includes(label)) {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.payload.pull_request.number,
+                    labels: [label]
+                  });
+                  
+                  console.log(`✅ Added label: ${label}`);
+                  
+                  // Comment about the auto-labeling
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.payload.pull_request.number,
+                    body: `🏷️ **Auto-labeled as \`${label}\`**\n\n` +
+                          `Based on conventional commit type: \`${type}\`\n\n` +
+                          `This helps categorize your contribution. Thank you! 🚀`
+                  });
+                } else {
+                  console.log(`🔄 Label "${label}" already exists`);
+                }
+              } else {
+                console.log(`❓ No label mapping found for type: ${type}`);
+              }
+            } else {
+              console.log(`❌ Title doesn't follow conventional commit format`);
+              
+              // Comment with guidance
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `❌ **Invalid PR Title Format**\n\n` +
+                      `Your PR title should follow conventional commit format:\n` +
+                      `\`type(scope): description\`\n\n` +
+                      `**Valid types:** feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\n\n` +
+                      `**Examples:**\n` +
+                      `- \`feat: add new feature\`\n` +
+                      `- \`fix(core): resolve critical bug\`\n` +
+                      `- \`docs: update README\`\n\n` +
+                      `Please update your PR title to follow this format for automatic labeling.`
+              });
+            }
