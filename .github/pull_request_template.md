@@ -74,4 +74,4 @@ Related to #
 <!-- Any additional information that reviewers should know -->
 
 ---
-*Please ensure all checks pass before requesting review*
+### Please ensure all checks pass before requesting review

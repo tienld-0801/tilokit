@@ -64,7 +64,7 @@ categorize_commits() {
         fi
         
         # Extract type and description
-        if [[ $commit =~ ^([a-z]+)(\([^)]+\))?:\ (.+)$ ]]; then
+        if [[ "$commit" =~ ^([a-zA-Z]+)(\([^)]+\))?:[[:space:]]+(.+)$ ]]; then
             local type="${BASH_REMATCH[1]}"
             local scope="${BASH_REMATCH[2]}"
             local description="${BASH_REMATCH[3]}"
