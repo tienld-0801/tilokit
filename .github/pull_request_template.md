@@ -2,7 +2,7 @@
 
 <!-- Provide a clear and concise description of what this PR does -->
 
-### 🔄 Type of Change
+## 🔄 Type of Change
 
 - [ ] ✨ **feat**: A new feature
 - [ ] 🐛 **fix**: A bug fix
