@@ -224,11 +224,15 @@ update_changelog() {
         changelog_content="### Changed\n- Various improvements and bug fixes\n"
     fi
     
-    # Create temporary file
+    # Create temporary files
     local temp_file=$(mktemp)
+    local content_file=$(mktemp)
+    
+    # Write changelog content to temporary file
+    echo "$changelog_content" > "$content_file"
     
     # Add new version entry
-    awk -v version="$version" -v date="$date" -v content="$changelog_content" '
+    awk -v version="$version" -v date="$date" -v content_file="$content_file" '
     /^## \[Unreleased\]$/ {
         print $0
         print ""
@@ -237,7 +241,11 @@ update_changelog() {
         print ""
         print "## [" substr(version, 2) "] - " date
         print ""
-        printf "%s", content
+        # Read content from file
+        while ((getline line < content_file) > 0) {
+            print line
+        }
+        close(content_file)
         next
     }
     1
@@ -245,6 +253,9 @@ update_changelog() {
     
     # Replace the original file
     mv "$temp_file" CHANGELOG.md
+    
+    # Cleanup temporary file
+    rm -f "$content_file"
     
     print_success "CHANGELOG.md updated for version $version"
 }
