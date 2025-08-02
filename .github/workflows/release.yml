@@ -452,12 +452,13 @@ jobs:
           FALLBACK_EOF
           fi
 
-          # Save release notes to output
+          # Save release notes to output and file
           echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
           cat release_notes.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-          echo "$RELEASE_NOTES" > release_notes.txt
+          # Copy release notes to file for GitHub Release
+          cp release_notes.md release_notes.txt
           echo "Release notes extracted for $VERSION"
 
       - name: Create GitHub Release
