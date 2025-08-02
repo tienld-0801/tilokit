@@ -33,13 +33,13 @@ echo ""
 # Check for required tools
 check_dependencies() {
     local missing_deps=()
-    
+
     for cmd in curl uname; do
         if ! command -v "$cmd" &> /dev/null; then
             missing_deps+=("$cmd")
         fi
     done
-    
+
     if [ ${#missing_deps[@]} -ne 0 ]; then
         log_error "Missing required dependencies: ${missing_deps[*]}"
         log_info "Please install these tools and try again"
@@ -50,10 +50,10 @@ check_dependencies() {
 # Enhanced OS and architecture detection
 detect_platform() {
     local os arch
-    
+
     os=$(uname -s | tr '[:upper:]' '[:lower:]')
     arch=$(uname -m)
-    
+
     # Architecture mapping
     case $arch in
         x86_64|amd64) arch="amd64" ;;
@@ -62,16 +62,16 @@ detect_platform() {
         i386|i686) arch="386" ;;
         *) log_error "Unsupported architecture: $arch"; exit 1 ;;
     esac
-    
+
     # OS detection with Windows support
     case $os in
-        linux*) 
+        linux*)
             os="linux"
             if grep -q Microsoft /proc/version 2>/dev/null; then
                 log_info "Detected WSL environment"
             fi
             ;;
-        darwin*) 
+        darwin*)
             os="darwin"
             # Check for Apple Silicon specifically
             if [ "$arch" = "arm64" ]; then
@@ -83,16 +83,16 @@ detect_platform() {
             log_info "Detected Windows environment (Git Bash/MSYS2)"
             INSTALL_DIR="${INSTALL_DIR:-$HOME/bin}"
             ;;
-        *) 
+        *)
             log_error "Unsupported OS: $os"
             log_info "Supported platforms: Linux, macOS, Windows (Git Bash/WSL)"
-            exit 1 
+            exit 1
             ;;
     esac
-    
+
     export DETECTED_OS="$os"
     export DETECTED_ARCH="$arch"
-    
+
     log_info "Platform: $os-$arch"
 }
 
@@ -102,22 +102,22 @@ detect_platform
 # Download and install binary
 download_and_install() {
     local binary_url temp_file binary_name
-    
+
     # Construct download URL
     binary_name="tilokit-$DETECTED_OS-$DETECTED_ARCH"
     if [ "$DETECTED_OS" = "windows" ]; then
         binary_name="${binary_name}.exe"
     fi
-    
+
     binary_url="$BASE_URL/$binary_name"
     temp_file=$(mktemp)
-    
+
     log_info "Downloading from: $binary_url"
-    
+
     # Download with retry logic
     local max_retries=3
     local retry_count=0
-    
+
     while [ $retry_count -lt $max_retries ]; do
         if curl -fsSL --connect-timeout 10 --max-time 60 -o "$temp_file" "$binary_url"; then
             break
@@ -134,18 +134,23 @@ download_and_install() {
             fi
         fi
     done
-    
-    # Verify download
-    if [ ! -f "$temp_file" ] || [ ! -s "$temp_file" ]; then
-        log_error "Downloaded file is empty or corrupted"
-        exit 1
+
+    # Verify download integrity
+    checksum_url="${binary_url}.sha256"
+    if curl -fsSL "$checksum_url" -o "${temp_file}.sha256"; then
+        if ! sha256sum -c "${temp_file}.sha256" --status; then
+            log_error "Checksum verification failed"
+            exit 1
+        fi
+    else
+        log_warning "Checksum file unavailable – skipping integrity check"
     fi
-    
+
     log_success "Download completed ($(du -h "$temp_file" | cut -f1))"
-    
+
     # Make executable (not needed for Windows but harmless)
     chmod +x "$temp_file"
-    
+
     # Prepare installation directory
     if [ "$DETECTED_OS" = "windows" ]; then
         # For Windows, ensure ~/bin exists and is in PATH
@@ -155,10 +160,10 @@ download_and_install() {
         fi
         INSTALL_DIR="$HOME/bin"
     fi
-    
+
     # Install binary
     log_info "Installing TiLoKit to $INSTALL_DIR..."
-    
+
     if [ -w "$INSTALL_DIR" ] || [ "$DETECTED_OS" = "windows" ]; then
         if ! mv "$temp_file" "$INSTALL_DIR/$BINARY_NAME"; then
             log_error "Failed to move binary to $INSTALL_DIR"
@@ -171,23 +176,23 @@ download_and_install() {
             exit 1
         fi
     fi
-    
+
     log_success "TiLoKit installed to $INSTALL_DIR/$BINARY_NAME"
 }
 
 # Verify installation and provide usage info
 verify_installation() {
     local install_path="$INSTALL_DIR/$BINARY_NAME"
-    
+
     # For Windows, add .exe extension if not present
     if [ "$DETECTED_OS" = "windows" ] && [[ ! "$install_path" =~ \.exe$ ]]; then
         install_path="${install_path}.exe"
     fi
-    
+
     if [ -f "$install_path" ] && [ -x "$install_path" ]; then
         log_success "TiLoKit installed successfully!"
         echo ""
-        
+
         # Check if it's in PATH
         if command -v tilokit &> /dev/null; then
             log_success "TiLoKit is available in your PATH"
@@ -196,7 +201,7 @@ verify_installation() {
             echo -e "   ${CYAN}tilokit list${NC}         # List available templates"
             echo -e "   ${CYAN}tilokit create app${NC}   # Create new project"
             echo ""
-            
+
             # Show version
             if tilokit version 2>/dev/null; then
                 echo ""

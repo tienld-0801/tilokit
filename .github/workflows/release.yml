@@ -26,7 +26,7 @@ jobs:
       contents: write
       pages: write
       id-token: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -66,34 +66,34 @@ jobs:
           else
             VERSION=${GITHUB_REF#refs/tags/}
           fi
-          
+
           # Fallback to git describe if version is empty
           if [ -z "$VERSION" ] || [ "$VERSION" = "$GITHUB_REF" ]; then
             VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "v0.1.0-dev")
           fi
-          
+
           # Set environment variables
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
           echo "GIT_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          
+
           # Determine if this is a prerelease
           if [[ "$VERSION" =~ (alpha|beta|rc|dev) ]] || [ "${{ inputs.prerelease }}" = "true" ]; then
             echo "IS_PRERELEASE=true" >> $GITHUB_ENV
           else
             echo "IS_PRERELEASE=false" >> $GITHUB_ENV
           fi
-          
+
           echo "Release version: $VERSION"
           echo "Is prerelease: ${IS_PRERELEASE:-false}"
 
       - name: Build multi-platform binaries
         run: |
           mkdir -p dist
-          
+
           # Enhanced build flags with optimization
           LDFLAGS="-w -s -X main.Version=$VERSION -X main.BuildDate=$BUILD_DATE -X main.GitCommit=$GIT_COMMIT"
-          
+
           # Build for multiple platforms with platform-specific optimizations
           declare -A platforms=(
             ["linux/amd64"]="CGO_ENABLED=0"
@@ -103,19 +103,19 @@ jobs:
             ["windows/amd64"]="CGO_ENABLED=0"
             ["windows/arm64"]="CGO_ENABLED=0"
           )
-          
+
           for platform in "${!platforms[@]}"; do
             GOOS=${platform%/*}
             GOARCH=${platform#*/}
             BUILD_ENV=${platforms[$platform]}
-            
+
             output_name="tilokit-$GOOS-$GOARCH"
             if [ "$GOOS" = "windows" ]; then
               output_name="${output_name}.exe"
             fi
-            
+
             echo "🔨 Building for $GOOS/$GOARCH with optimizations..."
-            
+
             # Platform-specific build with optimizations
             if [ "$GOOS" = "darwin" ] && [ "$GOARCH" = "arm64" ]; then
               # Apple Silicon specific optimizations
@@ -132,13 +132,13 @@ jobs:
                 -trimpath \
                 -o "dist/$output_name" .
             fi
-            
+
             # Verify binary was created
             if [ ! -f "dist/$output_name" ]; then
               echo "❌ Failed to build $output_name"
               exit 1
             fi
-            
+
             # Generate checksums
             cd dist
             if command -v sha256sum >/dev/null 2>&1; then
@@ -147,10 +147,10 @@ jobs:
               shasum -a 256 "$output_name" > "${output_name}.sha256"
             fi
             cd ..
-            
+
             echo "  ✅ Built $output_name ($(du -h dist/$output_name | cut -f1))"
           done
-          
+
           echo ""
           echo "📦 Build Summary:"
           ls -la dist/ | grep -E '\.(exe)?$' || true
@@ -163,9 +163,9 @@ jobs:
           mkdir -p pages
           cp dist/* pages/
           cp scripts/install.sh pages/
-          
+
           # Create enhanced index.html for GitHub Pages with clear URLs
-          cat > pages/index.html << 'EOF'
+          cat > pages/index.html << EOF
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -206,7 +206,7 @@ jobs:
                       <p>Universal CLI Toolkit for Multi-Framework Project Generation</p>
                       <p><strong>Version:</strong> $VERSION | <strong>Build:</strong> $BUILD_DATE</p>
                   </div>
-                  
+
                   <div class="install-section">
                       <h2>⚡ Quick Installation</h2>
                       <p>The easiest way to install TiLoKit on macOS and Linux:</p>
@@ -219,7 +219,7 @@ jobs:
                   <div class="platform-section">
                       <h2>💾 Platform-Specific Downloads</h2>
                       <p>Choose your platform for direct binary download:</p>
-                      
+
                       <div class="platform-grid">
                           <div class="platform-card">
                               <div class="platform-icon">🐧</div>
@@ -229,7 +229,7 @@ jobs:
                               <div class="command-line">wget https://tienld-0801.github.io/tilokit/tilokit-linux-amd64</div>
                               <div class="command-line">chmod +x tilokit-linux-amd64 && sudo mv tilokit-linux-amd64 /usr/local/bin/tilokit</div>
                           </div>
-                          
+
                           <div class="platform-card">
                               <div class="platform-icon">🍎</div>
                               <h3>macOS</h3>
@@ -238,7 +238,7 @@ jobs:
                               <div class="command-line">curl -LO https://tienld-0801.github.io/tilokit/tilokit-darwin-arm64</div>
                               <div class="command-line">chmod +x tilokit-darwin-arm64 && sudo mv tilokit-darwin-arm64 /usr/local/bin/tilokit</div>
                           </div>
-                          
+
                           <div class="platform-card">
                               <div class="platform-icon">🪟</div>
                               <h3>Windows</h3>
@@ -260,7 +260,7 @@ jobs:
                       <p>Made with ❤️ by TienLD | Licensed under MIT</p>
                   </div>
               </div>
-              
+
               <script>
                   function copyToClipboard(text) {
                       navigator.clipboard.writeText(text).then(() => {
@@ -292,20 +292,20 @@ jobs:
         run: |
           # Extract release notes for current version from CHANGELOG.md
           VERSION_NUM=$(echo "$VERSION" | sed 's/^v//')
-          
+
           echo "📝 Extracting release notes for version $VERSION_NUM"
-          
+
           # Initialize counters for features and fixes
           FEATURE_COUNT=0
           BUGFIX_COUNT=0
           IMPROVEMENT_COUNT=0
-          
+
           # Create comprehensive release notes with enhanced formatting
           cat > release_notes.md << NOTES_EOF
           ## 🚀 TiLoKit $VERSION - Release Highlights
-          
+
           NOTES_EOF
-          
+
           # Extract changelog content for this version
           CHANGELOG_CONTENT=$(awk '/^## \['"$VERSION_NUM"'\]/, /^## \[/ {
             if (/^## \['"$VERSION_NUM"'\]/) {
@@ -316,7 +316,7 @@ jobs:
             }
             print
           }' CHANGELOG.md)
-          
+
           # Check if we have content
           if [ -z "$CHANGELOG_CONTENT" ]; then
             echo "⚠️  No changelog entries found for version $VERSION_NUM"
@@ -326,9 +326,9 @@ jobs:
             echo "" >> release_notes.md
           else
             echo "✅ Found changelog entries for version $VERSION_NUM"
-            
+
             # Process changelog content with enhanced categorization
-            echo "$CHANGELOG_CONTENT" | while IFS= read -r line; do
+            while IFS= read -r line; do
               case "$line" in
                 "### Added")
                   echo "" >> release_notes.md
@@ -375,7 +375,7 @@ jobs:
                     # Clean up and enhance bullet points
                     clean_line=$(echo "$line" | sed 's/^- //')
                     echo "- **$clean_line**" >> release_notes.md
-                    
+
                     # Count different types of changes
                     case "$SECTION" in
                       "features") FEATURE_COUNT=$((FEATURE_COUNT + 1)) ;;
@@ -385,9 +385,9 @@ jobs:
                   fi
                   ;;
               esac
-            done
+            done <<< "$CHANGELOG_CONTENT"
           fi
-          
+
           # Add release statistics
           if [ $FEATURE_COUNT -gt 0 ] || [ $BUGFIX_COUNT -gt 0 ] || [ $IMPROVEMENT_COUNT -gt 0 ]; then
             echo "" >> release_notes.md
@@ -398,65 +398,65 @@ jobs:
             [ $IMPROVEMENT_COUNT -gt 0 ] && echo "- ♾️ **$IMPROVEMENT_COUNT** improvements" >> release_notes.md
             echo "" >> release_notes.md
           fi
-          
+
           # Add installation and upgrade instructions
           cat >> release_notes.md << 'INSTALL_EOF'
-          
+
           ## 📦 Installation & Upgrade
-          
+
           ### Fresh Installation
           ```bash
           curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
           ```
-          
+
           ### Upgrade from Previous Version
           ```bash
           # Download and replace existing binary
           curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
-          
+
           # Verify installation
           tilokit version
           ```
-          
+
           ### Manual Download
           Download the appropriate binary for your platform from the assets below.
-          
+
           ## 🔗 Links
           - 📚 [Documentation](https://github.com/tienld-0801/tilokit#readme)
           - 🐛 [Report Issues](https://github.com/tienld-0801/tilokit/issues)
           - 💬 [Discussions](https://github.com/tienld-0801/tilokit/discussions)
-          
+
           ---
-          
+
           **Full Changelog**: https://github.com/tienld-0801/tilokit/compare/v0.1.0-dev...$VERSION
           INSTALL_EOF
-          
+
           # Fallback to generic release notes if extraction fails
           if [ ! -s release_notes.md ] || [ $(wc -l < release_notes.md) -lt 5 ]; then
             cat > release_notes.md << 'FALLBACK_EOF'
           ## 🚀 TiLoKit $VERSION
-          
+
           This release includes various improvements and bug fixes to enhance your development experience.
-          
+
           ## 📦 Installation
-          
+
           ```bash
           curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
           ```
-          
+
           ## 🔗 Links
           - 📚 [Documentation](https://github.com/tienld-0801/tilokit#readme)
           - 🐛 [Report Issues](https://github.com/tienld-0801/tilokit/issues)
-          
+
           **Full Changelog**: https://github.com/tienld-0801/tilokit/compare/v0.1.0-dev...$VERSION
           FALLBACK_EOF
           fi
-          
+
           # Save release notes to output
           echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
           cat release_notes.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-          
+
           echo "$RELEASE_NOTES" > release_notes.txt
           echo "Release notes extracted for $VERSION"
 
