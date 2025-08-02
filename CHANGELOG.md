@@ -10,6 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Development continues...
 
+## [0.1.6-dev] - 2025-08-03
+
+### Fixed
+- 🐛 improve GitHub release notes extraction with working awk pattern
+
+### Maintenance
+- 🏠 bump version to v0.1.6-dev for development
+
+### Changed
+- Development continues...
+
 ## [0.1.5-dev] - 2025-08-03
 
 ### Added
