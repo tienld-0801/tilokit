@@ -10,6 +10,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Development continues...
 
+## [0.1.4-dev] - 2025-08-03
+
+### Added
+- ✨ simplify release workflow and remove main branch dependency
+
+### Fixed
+- 🐛 use actual release notes content for GitHub releases
+- 🐛 improve GitHub release notes extraction with working awk pattern
+- 🐛 simplify GitHub release notes to pure changelog extraction
+
+### Maintenance
+- 🏠 bump version to v0.1.4-dev for development
+- 🏠 prepare release v0.1.4-dev
+- 🏠 bump version to v0.1.5-dev for development
+- 🏠 prepare release v0.1.5-dev
+- 🏠 bump version to v0.1.6-dev for development
+- 🏠 prepare release v0.1.6-dev
+- 🏠 bump version to v0.1.7-dev for development
+
+### Changed
+- Development continues...
+
 ## [0.1.6-dev] - 2025-08-03
 
 ### Fixed
