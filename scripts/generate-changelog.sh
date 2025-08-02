@@ -117,10 +117,6 @@ categorize_commits() {
                     categories[revert]+="- ⏪ $description\n"
                     ;;
             esac
-        else
-            # Non-conventional commit
-            categories[chore]+="- 🏠 $commit\n"
-        fi
     done <<< "$commits"
     
     # Generate changelog sections
