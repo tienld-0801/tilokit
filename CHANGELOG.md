@@ -7,8 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- ✨ Enhanced multi-platform build system with Apple Silicon optimizations
+- 🚀 Comprehensive GitHub Pages deployment with interactive download interface
+- 📱 Universal install script supporting Linux, macOS, and Windows (Git Bash/WSL)
+- 🔍 Advanced platform detection with WSL and Apple Silicon recognition
+- 📊 Release statistics tracking for features, bugs, and improvements
+- 🔄 Retry logic for downloads with timeout and connection handling
+- 🎨 Modern web interface with copy-to-clipboard functionality
+- 💾 Platform-specific download cards with command-line examples
+
+### Fixed
+- 🐛 Corrected Go version in workflow to match go.mod (1.24.4)
+- 🚀 Fixed Apple Silicon binary builds with proper optimization flags
+- 🔧 Enhanced checksum generation compatibility across platforms
+- 📝 Improved release notes extraction with proper feature/bugfix categorization
+- 🔐 Fixed Windows binary installation and PATH detection
+- ⚙️ Better error handling in installation script with detailed feedback
+- 📱 Resolved download URL consistency across all platforms
+
 ### Changed
-- Development continues...
+- ♾️ Enhanced build flags with size optimization (-w -s)
+- 📦 Improved binary naming convention and file extension handling
+- 🎨 Modern gradient design for GitHub Pages with responsive layout
+- 📄 Better structured release notes with emoji categorization
+- 🔍 Enhanced logging system with colored output and progress indicators
+- 🚀 Streamlined installation process with better user feedback
 
 ## [0.1.1-dev] - 2025-08-01
 
