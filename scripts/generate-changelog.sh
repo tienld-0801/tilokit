@@ -63,11 +63,22 @@ categorize_commits() {
             continue
         fi
         
-        # Extract type and description
-        if [[ "$commit" =~ ^([a-zA-Z]+)(\([^)]+\))?:[[:space:]]+(.+)$ ]]; then
-            local type="${BASH_REMATCH[1]}"
-            local scope="${BASH_REMATCH[2]}"
-            local description="${BASH_REMATCH[3]}"
+        # Extract type and description  
+        local type scope description
+        
+        # Try to match with scope first: feat(scope): message
+        if [[ "$commit" == *"("* ]] && [[ "$commit" =~ ^([a-zA-Z]+)\(([^)]*)\): ]]; then
+            type="${BASH_REMATCH[1]}"
+            scope="(${BASH_REMATCH[2]})"
+            description="${commit#*: }"
+        # Then try without scope: feat: message
+        elif [[ "$commit" =~ ^([a-zA-Z]+):[[:space:]]*(.+)$ ]]; then
+            type="${BASH_REMATCH[1]}"
+            scope=""
+            description="${BASH_REMATCH[2]}"
+        else
+            continue
+        fi
             
             # Add to appropriate category
             case "$type" in
