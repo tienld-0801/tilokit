@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.5-dev] - 2025-08-03
 
 ### Added
+- ✨ add auto-update functionality
+
+### Changed
+- Development continues...
+
+## [0.1.5-dev] - 2025-08-03
+
+### Added
 - ✨ **New `tilokit update` command** - Auto-update to latest version from GitHub releases
 - ✨ **Global `--update` flag** - Quick update option: `tilokit --update`
 - 🔄 **Cross-platform update support** - Works on macOS, Linux, and Windows
