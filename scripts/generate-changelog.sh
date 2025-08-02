@@ -43,19 +43,20 @@ get_commits_since_last_tag() {
 categorize_commits() {
     local commits="$1"
     
-    # Initialize arrays
-    declare -A categories
-    categories[feat]=""
-    categories[fix]=""
-    categories[perf]=""
-    categories[refactor]=""
-    categories[docs]=""
-    categories[test]=""
-    categories[build]=""
-    categories[ci]=""
-    categories[chore]=""
-    categories[style]=""
-    categories[revert]=""
+    # Initialize category variables
+    local feat_items fix_items perf_items refactor_items docs_items
+    local test_items build_items ci_items chore_items style_items revert_items
+    feat_items=""
+    fix_items=""
+    perf_items=""
+    refactor_items=""
+    docs_items=""
+    test_items=""
+    build_items=""
+    ci_items=""
+    chore_items=""
+    style_items=""
+    revert_items=""
     
     # Process each commit
     while IFS= read -r commit; do
@@ -84,37 +85,37 @@ categorize_commits() {
             # Add to appropriate category
             case "$type" in
                 feat)
-                    categories[feat]+="- ✨ $description\n"
+                    feat_items="${feat_items}- ✨ $description\n"
                     ;;
                 fix)
-                    categories[fix]+="- 🐛 $description\n"
+                    fix_items="${fix_items}- 🐛 $description\n"
                     ;;
                 perf)
-                    categories[perf]+="- ⚡ $description\n"
+                    perf_items="${perf_items}- ⚡ $description\n"
                     ;;
                 refactor)
-                    categories[refactor]+="- ♻️ $description\n"
+                    refactor_items="${refactor_items}- ♾️ $description\n"
                     ;;
                 docs)
-                    categories[docs]+="- 📚 $description\n"
+                    docs_items="${docs_items}- 📚 $description\n"
                     ;;
                 test)
-                    categories[test]+="- 🧪 $description\n"
+                    test_items="${test_items}- 🧪 $description\n"
                     ;;
                 build)
-                    categories[build]+="- 🔧 $description\n"
+                    build_items="${build_items}- 🔧 $description\n"
                     ;;
                 ci)
-                    categories[ci]+="- 🔄 $description\n"
+                    ci_items="${ci_items}- 🔄 $description\n"
                     ;;
                 chore)
-                    categories[chore]+="- 🏠 $description\n"
+                    chore_items="${chore_items}- 🏠 $description\n"
                     ;;
                 style)
-                    categories[style]+="- 💄 $description\n"
+                    style_items="${style_items}- 💄 $description\n"
                     ;;
                 revert)
-                    categories[revert]+="- ⏪ $description\n"
+                    revert_items="${revert_items}- ⏪ $description\n"
                     ;;
             esac
     done <<< "$commits"
@@ -122,40 +123,48 @@ categorize_commits() {
     # Generate changelog sections
     local changelog=""
     
-    if [ -n "${categories[feat]}" ]; then
-        changelog+="### Added\n${categories[feat]}\n"
+    if [ -n "$feat_items" ]; then
+        changelog+="### Added\n$feat_items\n"
     fi
     
-    if [ -n "${categories[fix]}" ]; then
-        changelog+="### Fixed\n${categories[fix]}\n"
+    if [ -n "$fix_items" ]; then
+        changelog+="### Fixed\n$fix_items\n"
     fi
     
-    if [ -n "${categories[perf]}" ]; then
-        changelog+="### Performance\n${categories[perf]}\n"
+    if [ -n "$perf_items" ]; then
+        changelog+="### Performance\n$perf_items\n"
     fi
     
-    if [ -n "${categories[refactor]}" ]; then
-        changelog+="### Changed\n${categories[refactor]}\n"
+    if [ -n "$refactor_items" ]; then
+        changelog+="### Changed\n$refactor_items\n"
     fi
     
-    if [ -n "${categories[docs]}" ]; then
-        changelog+="### Documentation\n${categories[docs]}\n"
+    if [ -n "$docs_items" ]; then
+        changelog+="### Documentation\n$docs_items\n"
     fi
     
-    if [ -n "${categories[test]}" ]; then
-        changelog+="### Tests\n${categories[test]}\n"
+    if [ -n "$test_items" ]; then
+        changelog+="### Tests\n$test_items\n"
     fi
     
-    if [ -n "${categories[build]}" ]; then
-        changelog+="### Build System\n${categories[build]}\n"
+    if [ -n "$build_items" ]; then
+        changelog+="### Build System\n$build_items\n"
     fi
     
-    if [ -n "${categories[ci]}" ]; then
-        changelog+="### CI/CD\n${categories[ci]}\n"
+    if [ -n "$ci_items" ]; then
+        changelog+="### CI/CD\n$ci_items\n"
     fi
     
-    if [ -n "${categories[revert]}" ]; then
-        changelog+="### Reverted\n${categories[revert]}\n"
+    if [ -n "$style_items" ]; then
+        changelog+="### Style\n$style_items\n"
+    fi
+    
+    if [ -n "$chore_items" ]; then
+        changelog+="### Maintenance\n$chore_items\n"
+    fi
+    
+    if [ -n "$revert_items" ]; then
+        changelog+="### Reverted\n$revert_items\n"
     fi
     
     echo -e "$changelog"
