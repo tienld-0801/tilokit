@@ -107,7 +107,7 @@ update_version_in_code() {
     print_info "Updating version in cmd/version.go..."
     
     # Update version.go
-    sed -i "s/Version = \".*\"/Version = \"$version\"/" cmd/version.go
+    sed -i "" "s/Version = \".*\"/Version = \"$version\"/" cmd/version.go
     
     print_success "Version updated to $version in code"
 }
@@ -197,7 +197,7 @@ merge_release() {
     
     if [[ -n "$next_dev_version" ]]; then
         print_info "Updating version to $next_dev_version for continued development..."
-        sed -i "s/Version = \".*\"/Version = \"$next_dev_version\"/" cmd/version.go
+        sed -i "" "s/Version = \".*\"/Version = \"$next_dev_version\"/" cmd/version.go
         git add cmd/version.go
         git commit -m "chore: bump version to $next_dev_version for development"
     fi
