@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Development continues...
+
+## [0.1.2-dev] - 2025-08-03
+
+### Added
+- ✨ enhance release notes and changelog generation
+- ✨ add auto-update PR title with emoji functionality
+- ✨ refactor pull request template
+- ✨ plus heading pull request template
+- ✨ plus heading pull request template with space remove
+- ✨ check clean header for file .md
+- ✨ enhance release workflow with multi-platform optimizations
+- ✨ enhance GitHub workflows with improved labels and PR automation
+- ✨ enhance GitHub workflows with improved labels and automation
+
+### Fixed
+- 🐛 resolve permissions issues in GitHub Actions
+- 🐛 correct PR auto-label workflow condition
+- 🐛 resolve install.sh issues identified by CodeRabbit
+- 🐛 resolve regex syntax errors in generate-changelog.sh
+- 🐛 replace regex with sed for conventional commit parsing
+- 🐛 remove dangling else statement in generate-changelog.sh
+- 🐛 replace associative arrays with simple variables
+- 🐛 use literal newlines instead of 
+ escapes
+- 🐛 use temporary file for awk changelog content
+
+### Changed
+- ♻️ replace emoji workflows with auto-labeling system
+
+### CI/CD
+- 🔄 add automated workflows for PR formatting and changelog generation
+
 ### Added
 - ✨ Enhanced multi-platform build system with Apple Silicon optimizations
 - 🚀 Comprehensive GitHub Pages deployment with interactive download interface
