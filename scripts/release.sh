@@ -117,12 +117,12 @@ create_release_branch() {
     local version=$1
     local release_branch="release/$version"
     
-    print_info "Creating release branch: $release_branch"
+    print_info "Creating release branch: $release_branch" >&2
     
     # Create and checkout release branch
     git checkout -b "$release_branch"
     
-    print_success "Release branch $release_branch created"
+    print_success "Release branch $release_branch created" >&2
     echo "$release_branch"
 }
 
