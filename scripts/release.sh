@@ -149,14 +149,19 @@ create_and_push_tag() {
     
     print_info "Creating and pushing tag $version..."
     
+    # Extract release notes to temporary file
+    local tag_msg_file=$(mktemp)
+    echo "Release $version" > "$tag_msg_file"
+    echo "" >> "$tag_msg_file"
+    awk '/^## \['"${version#v}"'\]/, /^## \[/ {
+        if (/^## \['"${version#v}"'\]/) next
+        if (/^## \[/ && !/^## \['"${version#v}"'\]/) exit
+        print
+    }' CHANGELOG.md | sed '/^$/d' >> "$tag_msg_file"
+    
     # Create annotated tag
-    git tag -a "$version" -m "Release $version
-
-$(awk '/^## \['"${version#v}"'\]/, /^## \[/ {
-    if (/^## \['"${version#v}"'\]/) next
-    if (/^## \[/ && !/^## \['"${version#v}"'\]/) exit
-    print
-}' CHANGELOG.md | sed '/^$/d')"
+    git tag -a "$version" -F "$tag_msg_file"
+    rm -f "$tag_msg_file"
     
     # Push branch and tag
     git push origin "$release_branch"
