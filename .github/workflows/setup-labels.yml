@@ -1,7 +1,7 @@
 name: 🏷️ Setup Repository Labels
 
 on:
-  workflow_dispatch: # Manual trigger only
+  workflow_dispatch:
   push:
     branches: [main, develop]
     paths: ['.github/workflows/setup-labels.yml']
@@ -12,7 +12,7 @@ permissions:
 jobs:
   setup-labels:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Create or update labels
         uses: actions/github-script@v7
@@ -20,29 +20,32 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const labels = [
-              { name: 'enhancement', color: '0075ca', description: '✨ New feature or request' },
-              { name: 'bug', color: 'd73a4a', description: '🐛 Something isn\'t working' },
-              { name: 'performance', color: 'f9d71c', description: '⚡ Performance improvements' },
-              { name: 'refactoring', color: '7057ff', description: '♻️ Code refactoring' },
-              { name: 'documentation', color: '0052cc', description: '📚 Improvements or additions to documentation' },
-              { name: 'testing', color: 'ffffff', description: '🧪 Adding missing tests or correcting existing tests' },
-              { name: 'build', color: 'fef2c0', description: '🔧 Changes that affect the build system' },
-              { name: 'ci/cd', color: '006b75', description: '🔄 Changes to CI configuration files and scripts' },
-              { name: 'maintenance', color: 'fbca04', description: '🏠 Other changes that don\'t modify src or test files' },
-              { name: 'style', color: 'c2e0c6', description: '💄 Changes that do not affect the meaning of the code' },
-              { name: 'revert', color: 'b60205', description: '⏪ Reverts a previous commit' }
+              { name: '✨ Enhancement', color: '0075ca', description: 'New feature or request' },
+              { name: '🐛 Bug', color: 'd73a4a', description: 'Something isn\'t working' },
+              { name: '⚡ Performance', color: 'f9d71c', description: 'Performance improvements' },
+              { name: '♻️ Refactor', color: 'cfd3d7', description: 'Code refactoring' },
+              { name: '📚 Documentation', color: '0052cc', description: 'Improvements or additions to documentation' },
+              { name: '🧪 Test', color: '0e8a16', description: 'Adding missing tests or correcting existing tests' },
+              { name: '🛠️ Build', color: 'fef2c0', description: 'Changes that affect the build system' },
+              { name: '🔄 CI/CD', color: '006b75', description: 'Changes to CI configuration files and scripts' },
+              { name: '🧹 Maintenance', color: 'fbca04', description: 'Other changes that don\'t modify src or test files' },
+              { name: '🎨 Style', color: 'c2e0c6', description: 'Changes that do not affect the meaning of the code' },
+              { name: '⏪ Revert', color: 'b60205', description: 'Reverts a previous commit' },
+              { name: '❓ Question', color: 'd876e3', description: 'Further information is requested' },
+              { name: '🚫 Wontfix', color: 'ffffff', description: 'This will not be worked on' },
+              { name: '📎 Duplicate', color: 'cccccc', description: 'This issue or pull request already exists' },
+              { name: '🙋 Help Wanted', color: '33aa3f', description: 'Extra attention is needed' },
+              { name: '🧱 Chore', color: '1d76db', description: 'Routine task not tied to a feature or bug' }
             ];
-            
+
             for (const label of labels) {
               try {
-                // Try to get existing label
                 await github.rest.issues.getLabel({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   name: label.name
                 });
-                
-                // Update existing label
+
                 await github.rest.issues.updateLabel({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -50,11 +53,10 @@ jobs:
                   color: label.color,
                   description: label.description
                 });
-                
+
                 console.log(`✅ Updated label: ${label.name}`);
               } catch (error) {
                 if (error.status === 404) {
-                  // Create new label
                   await github.rest.issues.createLabel({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
@@ -62,7 +64,7 @@ jobs:
                     color: label.color,
                     description: label.description
                   });
-                  
+
                   console.log(`🆕 Created label: ${label.name}`);
                 } else {
                   console.error(`❌ Error with label ${label.name}:`, error.message);
