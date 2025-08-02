@@ -78,7 +78,7 @@ jobs:
           echo "GIT_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
           # Determine if this is a prerelease
-          if [[ "$VERSION" =~ (alpha|beta|rc|dev) ]] || [ "${{ inputs.prerelease }}" = "true" ]; then
+          if echo "$VERSION" | grep -E "(alpha|beta|rc|dev)" > /dev/null || [ "${{ inputs.prerelease }}" = "true" ]; then
             echo "IS_PRERELEASE=true" >> $GITHUB_ENV
           else
             echo "IS_PRERELEASE=false" >> $GITHUB_ENV
@@ -300,136 +300,46 @@ jobs:
           BUGFIX_COUNT=0
           IMPROVEMENT_COUNT=0
 
-          # Create comprehensive release notes with enhanced formatting
-          cat > release_notes.md << NOTES_EOF
-          ## 🚀 TiLoKit $VERSION - Release Highlights
-
-          NOTES_EOF
-
-          # Extract changelog content for this version
-          CHANGELOG_CONTENT=$(awk '/^## \['"$VERSION_NUM"'\]/, /^## \[/ {
-            if (/^## \['"$VERSION_NUM"'\]/) {
-              next
-            }
-            if (/^## \[/ && !/^## \['"$VERSION_NUM"'\]/) {
-              exit
-            }
+          # Extract actual changelog content for this version from CHANGELOG.md
+          echo "📝 Extracting release notes for version $VERSION_NUM"
+          
+          # Create release notes file
+          echo "# TiLoKit $VERSION" > release_notes.md
+          echo "" >> release_notes.md
+          
+          # Extract changelog content using simpler approach
+          awk '/^## \['"$VERSION_NUM"'\]/, /^## \[/ {
+            if (/^## \['"$VERSION_NUM"'\]/) next
+            if (/^## \[/ && !/^## \['"$VERSION_NUM"'\]/) exit
             print
-          }' CHANGELOG.md)
-
-          # Check if we have content
-          if [ -z "$CHANGELOG_CONTENT" ]; then
-            echo "⚠️  No changelog entries found for version $VERSION_NUM"
-            echo "## ✨ What's New" >> release_notes.md
-            echo "" >> release_notes.md
-            echo "This release includes various improvements and enhancements to TiLoKit." >> release_notes.md
-            echo "" >> release_notes.md
-          else
-            echo "✅ Found changelog entries for version $VERSION_NUM"
-
-            # Process changelog content with enhanced categorization
-            while IFS= read -r line; do
-              case "$line" in
-                "### Added")
-                  echo "" >> release_notes.md
-                  echo "## ✨ New Features & Enhancements" >> release_notes.md
-                  echo "" >> release_notes.md
-                  SECTION="features"
-                  ;;
-                "### Fixed")
-                  echo "" >> release_notes.md
-                  echo "## 🐛 Bug Fixes & Stability" >> release_notes.md
-                  echo "" >> release_notes.md
-                  SECTION="bugfixes"
-                  ;;
-                "### Changed")
-                  echo "" >> release_notes.md
-                  echo "## ♾️ Improvements & Changes" >> release_notes.md
-                  echo "" >> release_notes.md
-                  SECTION="improvements"
-                  ;;
-                "### Security")
-                  echo "" >> release_notes.md
-                  echo "## 🔒 Security Updates" >> release_notes.md
-                  echo "" >> release_notes.md
-                  SECTION="security"
-                  ;;
-                "### Deprecated")
-                  echo "" >> release_notes.md
-                  echo "## ⚠️ Deprecated Features" >> release_notes.md
-                  echo "" >> release_notes.md
-                  SECTION="deprecated"
-                  ;;
-                "### Removed")
-                  echo "" >> release_notes.md
-                  echo "## 🗑️ Removed Features" >> release_notes.md
-                  echo "" >> release_notes.md
-                  SECTION="removed"
-                  ;;
-                "")
-                  # Skip empty lines after headers
-                  ;;
-                -*)
-                  # Process bullet points with enhanced formatting
-                  if [[ "$line" =~ ^-\ ]]; then
-                    # Clean up and enhance bullet points
-                    clean_line=$(echo "$line" | sed 's/^- //')
-                    echo "- **$clean_line**" >> release_notes.md
-
-                    # Count different types of changes
-                    case "$SECTION" in
-                      "features") FEATURE_COUNT=$((FEATURE_COUNT + 1)) ;;
-                      "bugfixes") BUGFIX_COUNT=$((BUGFIX_COUNT + 1)) ;;
-                      "improvements") IMPROVEMENT_COUNT=$((IMPROVEMENT_COUNT + 1)) ;;
-                    esac
-                  fi
-                  ;;
-              esac
-            done <<< "$CHANGELOG_CONTENT"
-          fi
-
-          # Add release statistics
-          if [ $FEATURE_COUNT -gt 0 ] || [ $BUGFIX_COUNT -gt 0 ] || [ $IMPROVEMENT_COUNT -gt 0 ]; then
-            echo "" >> release_notes.md
-            echo "## 📊 Release Statistics" >> release_notes.md
-            echo "" >> release_notes.md
-            [ $FEATURE_COUNT -gt 0 ] && echo "- ✨ **$FEATURE_COUNT** new features" >> release_notes.md
-            [ $BUGFIX_COUNT -gt 0 ] && echo "- 🐛 **$BUGFIX_COUNT** bug fixes" >> release_notes.md
-            [ $IMPROVEMENT_COUNT -gt 0 ] && echo "- ♾️ **$IMPROVEMENT_COUNT** improvements" >> release_notes.md
-            echo "" >> release_notes.md
-          fi
-
-          # Add installation and upgrade instructions
+          }' CHANGELOG.md >> release_notes.md
+          
+          # Add installation section
           cat >> release_notes.md << 'INSTALL_EOF'
-
-          ## 📦 Installation & Upgrade
-
-          ### Fresh Installation
+          
+          ## Installation
+          
+          ### Quick Install
+          
           ```bash
           curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
           ```
-
-          ### Upgrade from Previous Version
-          ```bash
-          # Download and replace existing binary
-          curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
-
-          # Verify installation
-          tilokit version
-          ```
-
+          
           ### Manual Download
+          
           Download the appropriate binary for your platform from the assets below.
-
-          ## 🔗 Links
-          - 📚 [Documentation](https://github.com/tienld-0801/tilokit#readme)
-          - 🐛 [Report Issues](https://github.com/tienld-0801/tilokit/issues)
-          - 💬 [Discussions](https://github.com/tienld-0801/tilokit/discussions)
-
-          ---
-
-          **Full Changelog**: https://github.com/tienld-0801/tilokit/compare/v0.1.0-dev...$VERSION
+          
+          ## Links
+          
+          - [Documentation](https://github.com/tienld-0801/tilokit#readme)
+          - [Report Issues](https://github.com/tienld-0801/tilokit/issues)
+          - [View Full Changelog](https://github.com/tienld-0801/tilokit/blob/main/CHANGELOG.md)
           INSTALL_EOF
+
+          # Show content of release notes for debugging
+          echo "Release notes content:"
+          cat release_notes.md
+          echo "--- End of release notes ---"
 
           # Fallback to generic release notes if extraction fails
           if [ ! -s release_notes.md ] || [ $(wc -l < release_notes.md) -lt 5 ]; then

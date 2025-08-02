@@ -170,22 +170,11 @@ create_and_push_tag() {
     print_success "Tag $version created and pushed"
 }
 
-# Function to merge to main and develop
+# Function to merge back to develop
 merge_release() {
     local version=$1
     local release_branch=$2
     
-    print_info "Merging release to main branch..."
-    
-    # Switch to main and merge
-    git checkout "$MAIN_BRANCH"
-    git pull origin "$MAIN_BRANCH"
-    git merge --no-ff "$release_branch" -m "Merge release $version"
-    git push origin "$MAIN_BRANCH"
-    
-    print_success "Merged to $MAIN_BRANCH"
-    
-    # Switch to develop and merge
     print_info "Merging release back to develop..."
     git checkout "$DEVELOP_BRANCH"
     git pull origin "$DEVELOP_BRANCH"
