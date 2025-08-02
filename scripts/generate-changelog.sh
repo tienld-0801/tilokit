@@ -63,19 +63,20 @@ categorize_commits() {
             continue
         fi
         
-        # Extract type and description  
+        # Extract type and description using sed
         local type scope description
         
-        # Try to match with scope first: feat(scope): message
-        if [[ "$commit" == *"("* ]] && [[ "$commit" =~ ^([a-zA-Z]+)\(([^)]*)\): ]]; then
-            type="${BASH_REMATCH[1]}"
-            scope="(${BASH_REMATCH[2]})"
-            description="${commit#*: }"
-        # Then try without scope: feat: message
-        elif [[ "$commit" =~ ^([a-zA-Z]+):[[:space:]]*(.+)$ ]]; then
-            type="${BASH_REMATCH[1]}"
+        # Check if commit has scope: feat(scope): message
+        if [[ "$commit" == *"("* ]] && [[ "$commit" == *"): "* ]]; then
+            type=$(echo "$commit" | sed 's/^\([a-zA-Z]*\)(.*/\1/')
+            scope=$(echo "$commit" | sed 's/^[a-zA-Z]*(//' | sed 's/).*//')
+            description=$(echo "$commit" | sed 's/^[^:]*: *//')
+            scope="($scope)"
+        # Check if commit is simple: feat: message
+        elif [[ "$commit" == *": "* ]]; then
+            type=$(echo "$commit" | sed 's/^\([a-zA-Z]*\):.*/\1/')
             scope=""
-            description="${BASH_REMATCH[2]}"
+            description=$(echo "$commit" | sed 's/^[^:]*: *//')
         else
             continue
         fi
