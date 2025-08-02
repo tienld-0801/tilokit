@@ -10,6 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Development continues...
 
+## [0.1.5-dev] - 2025-08-03
+
+### Added
+- ✨ **New `tilokit update` command** - Auto-update to latest version from GitHub releases
+- ✨ **Global `--update` flag** - Quick update option: `tilokit --update`
+- 🔄 **Cross-platform update support** - Works on macOS, Linux, and Windows
+- 🎯 **Smart binary detection** - Automatically detects correct platform binary
+- 💬 **Interactive confirmation** - Ask user before updating
+- 📋 **Release notes display** - Shows what's new before updating
+
+### Enhanced
+- 🚀 **Improved CLI experience** with self-updating capabilities
+- 🔒 **Secure downloads** from GitHub releases with timeout handling
+- 🎯 **Better user experience** with clear update process feedback
+
 ## [0.1.4-dev] - 2025-08-03
 
 ### Added

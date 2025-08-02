@@ -26,6 +26,7 @@ var (
 	listBuildTools bool
 	quiet          bool
 	force          bool
+	update         bool
 )
 
 var rootCmd = &cobra.Command{
@@ -44,6 +45,10 @@ Features:
   • Dependency management`,
 	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		// Handle update flag
+		if update {
+			return updateCmd.RunE(cmd, args)
+		}
 		return runGenerate()
 	},
 }
@@ -355,4 +360,5 @@ func init() {
 	rootCmd.Flags().BoolVar(&listBuildTools, "list-build-tools", false, "List supported build tools")
 	rootCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "Quiet mode")
 	rootCmd.Flags().BoolVar(&force, "force", false, "Force overwrite existing directory")
+	rootCmd.Flags().BoolVar(&update, "update", false, "Update TiLoKit to the latest version")
 }
