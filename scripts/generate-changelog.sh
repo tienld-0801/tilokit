@@ -117,8 +117,8 @@ categorize_commits() {
 "
                     ;;
                 chore)
-                    chore_items="${chore_items}- 🏠 $description
-"
+                    # Skip chore commits (maintenance tasks) from release notes
+                    continue
                     ;;
                 style)
                     style_items="${style_items}- 💄 $description
@@ -188,11 +188,7 @@ $style_items
 "
     fi
     
-    if [ -n "$chore_items" ]; then
-        changelog+="### Maintenance
-$chore_items
-"
-    fi
+    # Maintenance section removed - chore commits are excluded
     
     if [ -n "$revert_items" ]; then
         changelog+="### Reverted

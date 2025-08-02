@@ -13,24 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.4-dev] - 2025-08-03
 
 ### Added
-- ✨ simplify release workflow and remove main branch dependency
+- ✨ Enhanced release workflow automation with better branch management
+- ✨ Pure changelog extraction for GitHub releases
 
 ### Fixed
-- 🐛 use actual release notes content for GitHub releases
-- 🐛 improve GitHub release notes extraction with working awk pattern
-- 🐛 simplify GitHub release notes to pure changelog extraction
-
-### Maintenance
-- 🏠 bump version to v0.1.4-dev for development
-- 🏠 prepare release v0.1.4-dev
-- 🏠 bump version to v0.1.5-dev for development
-- 🏠 prepare release v0.1.5-dev
-- 🏠 bump version to v0.1.6-dev for development
-- 🏠 prepare release v0.1.6-dev
-- 🏠 bump version to v0.1.7-dev for development
+- 🐛 GitHub release notes now display full changelog content
+- 🐛 Improved awk pattern matching for version extraction
+- 🐛 Resolved Go module dependency issues with version 1.24.5
 
 ### Changed
-- Development continues...
+- 🔄 Simplified release workflow by removing complex processing
+- 🔄 Updated Go version to 1.24.5 for better compatibility
 
 ## [0.1.6-dev] - 2025-08-03
 
