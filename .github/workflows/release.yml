@@ -319,6 +319,15 @@ jobs:
 
           # Copy release notes for GitHub Release
           cp release_notes.md release_notes.txt
+          
+          # Debug: Show final release notes content
+          echo "🔍 Final release notes content for GitHub Release:"
+          echo "=====================================" 
+          cat release_notes.txt
+          echo "=====================================" 
+          echo "File size: $(wc -c < release_notes.txt) bytes"
+          echo "Line count: $(wc -l < release_notes.txt) lines"
+          
           echo "Release notes extracted for $VERSION"
 
       - name: Create GitHub Release
