@@ -303,16 +303,15 @@ jobs:
           # Extract actual changelog content for this version from CHANGELOG.md
           echo "📝 Extracting release notes for version $VERSION_NUM"
           
-          # Create release notes file
+          # Create release notes file with proper title
           echo "# TiLoKit $VERSION" > release_notes.md
           echo "" >> release_notes.md
           
-          # Extract changelog content using simpler approach
-          awk '/^## \['"$VERSION_NUM"'\]/, /^## \[/ {
-            if (/^## \['"$VERSION_NUM"'\]/) next
-            if (/^## \[/ && !/^## \['"$VERSION_NUM"'\]/) exit
-            print
-          }' CHANGELOG.md >> release_notes.md
+          # Extract changelog content using awk with improved pattern matching
+          awk 'BEGIN {found=0} 
+               /^## \['"$VERSION_NUM"'\]/ {found=1; next} 
+               /^## \[/ && found {exit} 
+               found && NF > 0 {print}' CHANGELOG.md >> release_notes.md
           
           # Add installation section
           cat >> release_notes.md << 'INSTALL_EOF'
