@@ -33,13 +33,19 @@ echo ""
 # Check for required tools
 check_dependencies() {
     local missing_deps=()
-
+    
+    # Essential tools
     for cmd in curl uname; do
         if ! command -v "$cmd" &> /dev/null; then
             missing_deps+=("$cmd")
         fi
     done
-
+    
+    # Hash utilities (at least one must be available)
+    if ! command -v sha256sum &> /dev/null && ! command -v shasum &> /dev/null; then
+        missing_deps+=("sha256sum or shasum")
+    fi
+    
     if [ ${#missing_deps[@]} -ne 0 ]; then
         log_error "Missing required dependencies: ${missing_deps[*]}"
         log_info "Please install these tools and try again"
@@ -138,10 +144,21 @@ download_and_install() {
     # Verify download integrity
     checksum_url="${binary_url}.sha256"
     if curl -fsSL "$checksum_url" -o "${temp_file}.sha256"; then
-        if ! sha256sum -c "${temp_file}.sha256" --status; then
+        # Extract expected hash and compare with actual
+        expected=$(cut -d' ' -f1 "${temp_file}.sha256")
+        if command -v sha256sum >/dev/null 2>&1; then
+            actual=$(sha256sum "$temp_file" | cut -d' ' -f1)
+        elif command -v shasum >/dev/null 2>&1; then
+            actual=$(shasum -a 256 "$temp_file" | cut -d' ' -f1)
+        fi
+        
+        if [ "$expected" != "$actual" ]; then
             log_error "Checksum verification failed"
+            log_error "Expected: $expected"
+            log_error "Actual: $actual"
             exit 1
         fi
+        log_success "Checksum verification passed"
     else
         log_warning "Checksum file unavailable – skipping integrity check"
     fi
@@ -161,32 +178,37 @@ download_and_install() {
         INSTALL_DIR="$HOME/bin"
     fi
 
-    # Install binary
+    # Install binary with proper naming
     log_info "Installing TiLoKit to $INSTALL_DIR..."
-
+    
+    # Set correct install target name
+    local install_target="$INSTALL_DIR/$BINARY_NAME"
+    if [ "$DETECTED_OS" = "windows" ]; then
+        install_target="$INSTALL_DIR/${BINARY_NAME}.exe"
+    fi
+    
     if [ -w "$INSTALL_DIR" ] || [ "$DETECTED_OS" = "windows" ]; then
-        if ! mv "$temp_file" "$INSTALL_DIR/$BINARY_NAME"; then
-            log_error "Failed to move binary to $INSTALL_DIR"
+        if ! mv "$temp_file" "$install_target"; then
+            log_error "Failed to move binary to $install_target"
             exit 1
         fi
     else
         log_warning "Requesting sudo access to install to $INSTALL_DIR..."
-        if ! sudo mv "$temp_file" "$INSTALL_DIR/$BINARY_NAME"; then
+        if ! sudo mv "$temp_file" "$install_target"; then
             log_error "Failed to install with sudo"
             exit 1
         fi
     fi
 
-    log_success "TiLoKit installed to $INSTALL_DIR/$BINARY_NAME"
+    log_success "TiLoKit installed to $install_target"
 }
 
 # Verify installation and provide usage info
 verify_installation() {
+    # Use consistent install path logic
     local install_path="$INSTALL_DIR/$BINARY_NAME"
-
-    # For Windows, add .exe extension if not present
-    if [ "$DETECTED_OS" = "windows" ] && [[ ! "$install_path" =~ \.exe$ ]]; then
-        install_path="${install_path}.exe"
+    if [ "$DETECTED_OS" = "windows" ]; then
+        install_path="$INSTALL_DIR/${BINARY_NAME}.exe"
     fi
 
     if [ -f "$install_path" ] && [ -x "$install_path" ]; then
