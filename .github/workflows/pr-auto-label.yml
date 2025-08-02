@@ -12,7 +12,6 @@ permissions:
 jobs:
   auto-label:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.base.ref != 'main' && github.event.pull_request.base.ref != 'develop'
     
     steps:
       - name: Auto-label PR based on conventional commits
