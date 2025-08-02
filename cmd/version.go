@@ -26,7 +26,7 @@ var versionCmd = &cobra.Command{
 		fmt.Printf("TiLoKit Version: %s\n", Version)
 		fmt.Printf("Build Date: %s\n", BuildDate)
 		fmt.Printf("Git Commit: %s\n", GitCommit)
-		fmt.Printf("Go Version: %s\n", "1.24.4")
+		fmt.Printf("Go Version: %s\n", "1.24.5")
 
 		utils.Info("Visit https://github.com/tienld-0801/tilokit for more information")
 	},
