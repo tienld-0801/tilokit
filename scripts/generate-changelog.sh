@@ -85,37 +85,48 @@ categorize_commits() {
             # Add to appropriate category
             case "$type" in
                 feat)
-                    feat_items="${feat_items}- ✨ $description\n"
+                    feat_items="${feat_items}- ✨ $description
+"
                     ;;
                 fix)
-                    fix_items="${fix_items}- 🐛 $description\n"
+                    fix_items="${fix_items}- 🐛 $description
+"
                     ;;
                 perf)
-                    perf_items="${perf_items}- ⚡ $description\n"
+                    perf_items="${perf_items}- ⚡ $description
+"
                     ;;
                 refactor)
-                    refactor_items="${refactor_items}- ♾️ $description\n"
+                    refactor_items="${refactor_items}- ♻️ $description
+"
                     ;;
                 docs)
-                    docs_items="${docs_items}- 📚 $description\n"
+                    docs_items="${docs_items}- 📚 $description
+"
                     ;;
                 test)
-                    test_items="${test_items}- 🧪 $description\n"
+                    test_items="${test_items}- 🧪 $description
+"
                     ;;
                 build)
-                    build_items="${build_items}- 🔧 $description\n"
+                    build_items="${build_items}- 🔧 $description
+"
                     ;;
                 ci)
-                    ci_items="${ci_items}- 🔄 $description\n"
+                    ci_items="${ci_items}- 🔄 $description
+"
                     ;;
                 chore)
-                    chore_items="${chore_items}- 🏠 $description\n"
+                    chore_items="${chore_items}- 🏠 $description
+"
                     ;;
                 style)
-                    style_items="${style_items}- 💄 $description\n"
+                    style_items="${style_items}- 💄 $description
+"
                     ;;
                 revert)
-                    revert_items="${revert_items}- ⏪ $description\n"
+                    revert_items="${revert_items}- ⏪ $description
+"
                     ;;
             esac
     done <<< "$commits"
@@ -124,47 +135,69 @@ categorize_commits() {
     local changelog=""
     
     if [ -n "$feat_items" ]; then
-        changelog+="### Added\n$feat_items\n"
+        changelog+="### Added
+$feat_items
+"
     fi
     
     if [ -n "$fix_items" ]; then
-        changelog+="### Fixed\n$fix_items\n"
+        changelog+="### Fixed
+$fix_items
+"
     fi
     
     if [ -n "$perf_items" ]; then
-        changelog+="### Performance\n$perf_items\n"
+        changelog+="### Performance
+$perf_items
+"
     fi
     
     if [ -n "$refactor_items" ]; then
-        changelog+="### Changed\n$refactor_items\n"
+        changelog+="### Changed
+$refactor_items
+"
     fi
     
     if [ -n "$docs_items" ]; then
-        changelog+="### Documentation\n$docs_items\n"
+        changelog+="### Documentation
+$docs_items
+"
     fi
     
     if [ -n "$test_items" ]; then
-        changelog+="### Tests\n$test_items\n"
+        changelog+="### Tests
+$test_items
+"
     fi
     
     if [ -n "$build_items" ]; then
-        changelog+="### Build System\n$build_items\n"
+        changelog+="### Build System
+$build_items
+"
     fi
     
     if [ -n "$ci_items" ]; then
-        changelog+="### CI/CD\n$ci_items\n"
+        changelog+="### CI/CD
+$ci_items
+"
     fi
     
     if [ -n "$style_items" ]; then
-        changelog+="### Style\n$style_items\n"
+        changelog+="### Style
+$style_items
+"
     fi
     
     if [ -n "$chore_items" ]; then
-        changelog+="### Maintenance\n$chore_items\n"
+        changelog+="### Maintenance
+$chore_items
+"
     fi
     
     if [ -n "$revert_items" ]; then
-        changelog+="### Reverted\n$revert_items\n"
+        changelog+="### Reverted
+$revert_items
+"
     fi
     
     echo -e "$changelog"
