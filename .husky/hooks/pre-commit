@@ -56,8 +56,11 @@ if [[ -n "$GO_FILES" ]]; then
     else
         for file in $GO_FILES; do
             if [[ -f "$file" ]]; then
-                if ! go syntax "$file" > /dev/null 2>&1; then
+                # Check syntax using gofmt
+                if ! gofmt -l "$file" > /dev/null 2>&1; then
                     echo -e "${RED}❌ Go syntax error in: $file${NC}"
+                    # Try to get more detailed error
+                    go fmt "$file" 2>&1 || true
                     exit 1
                 fi
             fi
