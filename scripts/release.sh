@@ -133,7 +133,7 @@ commit_release_changes() {
     print_info "Committing release changes..."
 
     git add CHANGELOG.md internal/cli/constants.go
-    git commit -m "release: $version
+    git commit -m "🚀 release: $version
 
 - Update version to $version
 - Update CHANGELOG.md with release notes
