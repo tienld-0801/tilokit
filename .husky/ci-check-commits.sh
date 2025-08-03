@@ -10,34 +10,66 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Valid conventional commit types
+# Valid conventional commit types with required emojis
 VALID_TYPES=(
     "feat" "fix" "docs" "refactor" "perf" "test"
-    "build" "ci" "chore" "style" "revert"
+    "build" "ci" "chore" "style" "revert" "release"
 )
+
+# Emoji mapping function for each commit type
+get_emoji_for_type() {
+    case "$1" in
+        "feat") echo "✨" ;;
+        "fix") echo "🐛" ;;
+        "docs") echo "📚" ;;
+        "refactor") echo "♻️" ;;
+        "perf") echo "⚡" ;;
+        "test") echo "🧪" ;;
+        "build") echo "🛠️" ;;
+        "ci") echo "🔄" ;;
+        "chore") echo "🧹" ;;
+        "style") echo "🎨" ;;
+        "revert") echo "⏪" ;;
+        "release") echo "🚀" ;;
+        *) echo "" ;;
+    esac
+}
 
 # Function to validate commit message
 validate_commit() {
     local commit_msg="$1"
     local commit_sha="$2"
 
-    # Skip merge commits
-    if [[ $commit_msg =~ ^Merge\ .*|^Revert\ .* ]]; then
-        echo -e "${BLUE}ℹ️  Skipping merge/revert commit: ${commit_sha:0:8}${NC}"
+    # Skip GitHub auto-generated merge commits in CI (they start with "Merge")
+    # But still validate manual commits that happen to be merges
+    if [[ $commit_msg =~ ^Merge\ [a-f0-9]{7,40}\ into\ .* ]]; then
+        echo -e "${BLUE}ℹ️  Skipping GitHub auto-merge commit: ${commit_sha:0:8}${NC}"
         return 0
     fi
 
-    # Check conventional commit format
-    local commit_pattern='^[a-z]+(\([^)]+\))?:[ ].+'
-    if [[ ! $commit_msg =~ $commit_pattern ]]; then
+    # ALL other commits must have emoji format
+    # Including manual merge and revert commits
+
+    # Check if commit has emoji format
+    local emoji_pattern='^[^[:space:]] [a-z]+: .+'
+    local no_emoji_pattern='^[a-z]+: .+'
+
+    if [[ $commit_msg =~ $emoji_pattern ]]; then
+        # Extract type and emoji from: emoji type: description
+        local commit_type=$(echo "$commit_msg" | sed -E 's/^[^[:space:]]+ ([a-z]+): .*/\1/')
+        local commit_emoji=$(echo "$commit_msg" | sed -E 's/^([^[:space:]]+) [a-z]+: .*/\1/')
+    elif [[ $commit_msg =~ $no_emoji_pattern ]]; then
+        echo -e "${RED}❌ Missing emoji: ${commit_sha:0:8}${NC}"
+        echo -e "${RED}   Message: $commit_msg${NC}"
+        echo -e "${RED}   Required: emoji type: description${NC}"
+        echo -e "${RED}   Example: ✨ feat: add new feature${NC}"
+        return 1
+    else
         echo -e "${RED}❌ Invalid format: ${commit_sha:0:8}${NC}"
         echo -e "${RED}   Message: $commit_msg${NC}"
-        echo -e "${RED}   Required: type(scope): description${NC}"
+        echo -e "${RED}   Required: emoji type: description${NC}"
         return 1
     fi
-
-    # Extract type
-    local commit_type=$(echo "$commit_msg" | sed -E 's/^([a-z]+)(\([^)]*\))?: .*/\1/')
 
     # Check if type is valid
     local valid_type=false
@@ -55,13 +87,24 @@ validate_commit() {
         return 1
     fi
 
-    echo -e "${GREEN}✅ Valid: ${commit_sha:0:8} ($commit_type)${NC}"
+    # Check if emoji matches the commit type
+    local expected_emoji=$(get_emoji_for_type "$commit_type")
+    if [[ "$commit_emoji" != "$expected_emoji" ]]; then
+        echo -e "${RED}❌ Wrong emoji for type '$commit_type': ${commit_sha:0:8}${NC}"
+        echo -e "${RED}   Message: $commit_msg${NC}"
+        echo -e "${RED}   Found emoji: $commit_emoji${NC}"
+        echo -e "${RED}   Expected emoji: $expected_emoji${NC}"
+        echo -e "${RED}   Correct format: $expected_emoji $commit_type: description${NC}"
+        return 1
+    fi
+
+    echo -e "${GREEN}✅ Valid: ${commit_sha:0:8} ($expected_emoji $commit_type)${NC}"
     return 0
 }
 
 # Main function
 main() {
-    echo -e "${BLUE}🔍 Checking commit messages in CI/CD...${NC}"
+    echo -e "${BLUE}🔍 Checking commit messages for MANDATORY EMOJI format in CI/CD...${NC}"
 
     # Get the range of commits to check
     local base_ref="${GITHUB_BASE_REF:-main}"
@@ -114,17 +157,22 @@ main() {
     if [[ $invalid_commits -gt 0 ]]; then
         echo
         echo -e "${RED}❌ Commit validation failed!${NC}"
-        echo -e "${YELLOW}💡 Please fix commit messages to follow conventional commits:${NC}"
-        echo -e "${YELLOW}   type(scope): description${NC}"
+        echo -e "${YELLOW}💡 Please fix commit messages to follow MANDATORY EMOJI format:${NC}"
+        echo -e "${YELLOW}   emoji type: description${NC}"
         echo -e "${YELLOW}   Valid types: ${VALID_TYPES[*]}${NC}"
         echo
-        echo -e "${YELLOW}📋 Examples:${NC}"
-        echo -e "${GREEN}   ✅ feat: add user authentication${NC}"
-        echo -e "${GREEN}   ✅ fix(core): resolve memory leak${NC}"
-        echo -e "${GREEN}   ✅ docs: update README${NC}"
+        echo -e "${YELLOW}📋 Examples with REQUIRED emojis:${NC}"
+        echo -e "${GREEN}   ✅ ✨ feat: add user authentication${NC}"
+        echo -e "${GREEN}   ✅ 🐛 fix: resolve memory leak${NC}"
+        echo -e "${GREEN}   ✅ 📚 docs: update README${NC}"
+        echo -e "${GREEN}   ✅ 🧹 chore: upgrade dependencies${NC}"
+        echo
+        echo -e "${RED}❌ Invalid examples:${NC}"
+        echo -e "${RED}   ❌ feat: add feature (missing emoji)${NC}"
+        echo -e "${RED}   ❌ 🐛 docs: update (wrong emoji for docs)${NC}"
         exit 1
     else
-        echo -e "${GREEN}🎉 All commits follow conventional commit format!${NC}"
+        echo -e "${GREEN}🎉 All commits follow MANDATORY EMOJI commit format!${NC}"
         exit 0
     fi
 }

@@ -33,7 +33,8 @@ jobs:
               ci: '🔄 CI/CD',
               chore: '🧹 Maintenance',
               style: '🎨 Style',
-              revert: '⏪ Revert'
+              revert: '⏪ Revert',
+              release: '🚀 Release'
             };
 
             const emojiMap = {
@@ -47,7 +48,8 @@ jobs:
               ci: '🔄',
               chore: '🧹',
               style: '🎨',
-              revert: '⏪'
+              revert: '⏪',
+              release: '🚀'
             };
 
             const hasEmoji = /^[\u{1F300}-\u{1F9FF}]|^[\u{2600}-\u{26FF}]|^[\u{2700}-\u{27BF}]/u.test(title);

@@ -2,9 +2,6 @@ name: 🏷️ Setup Repository Labels
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main, develop]
-    paths: ['.github/workflows/setup-labels.yml']
 
 permissions:
   issues: write
@@ -31,6 +28,7 @@ jobs:
               { name: '🧹 Maintenance', color: 'fbca04', description: 'Other changes that don\'t modify src or test files' },
               { name: '🎨 Style', color: 'c2e0c6', description: 'Changes that do not affect the meaning of the code' },
               { name: '⏪ Revert', color: 'b60205', description: 'Reverts a previous commit' },
+              { name: '🚀 Release', color: 'ff6b35', description: 'Version releases and deployments' },
               { name: '❓ Question', color: 'd876e3', description: 'Further information is requested' },
               { name: '🚫 Wontfix', color: 'ffffff', description: 'This will not be worked on' },
               { name: '📎 Duplicate', color: 'cccccc', description: 'This issue or pull request already exists' },
