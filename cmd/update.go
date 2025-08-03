@@ -164,6 +164,7 @@ func downloadAndInstall(release *GitHubRelease) error {
 	}
 
 	// Make executable with more restrictive permissions
+	// #nosec G302 - executable files need execute permission (0700 is appropriate)
 	if err := os.Chmod(tmpFile, 0700); err != nil {
 		// #nosec G104 - we're returning the primary error, removing temp file is cleanup
 		_ = os.Remove(tmpFile)
