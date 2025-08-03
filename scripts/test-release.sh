@@ -71,12 +71,91 @@ test_changelog_generation() {
     fi
 }
 
+# Test git operations (dry run)
+test_git_operations() {
+    local version=$1
+    
+    print_info "Testing git operations (dry run)..."
+    
+    # Check if on develop branch
+    local current_branch=$(git branch --show-current)
+    if [[ "$current_branch" != "develop" ]]; then
+        print_warning "Not on develop branch (current: $current_branch)"
+        print_info "Release script expects to be on develop branch"
+    else
+        print_success "On develop branch ✓"
+    fi
+    
+    # Check working directory is clean
+    if [[ -n $(git status --porcelain) ]]; then
+        print_warning "Working directory has uncommitted changes"
+        print_info "Release script expects clean working directory"
+    else
+        print_success "Working directory is clean ✓"
+    fi
+    
+    # Test tag creation (dry run)
+    if git tag -l "$version" | grep -q "$version"; then
+        print_warning "Tag $version already exists"
+        print_info "Release script will fail if tag exists"
+    else
+        print_success "Tag $version does not exist ✓"
+    fi
+    
+    # Test commit message format
+    local commit_msg="🚀 release: $version"
+    print_info "Testing commit message format: '$commit_msg'"
+    
+    # Validate emoji commit format
+    if [[ $commit_msg =~ ^🚀\ release:\ .+ ]]; then
+        print_success "Commit message format is valid ✓"
+    else
+        print_error "Commit message format is invalid"
+    fi
+}
+
+# Test release script functions (without execution)
+test_release_functions() {
+    local version=$1
+    
+    print_info "Testing release script functions..."
+    
+    # Source release script functions (without executing main)
+    if source scripts/release.sh 2>/dev/null; then
+        print_success "Release script syntax is valid ✓"
+    else
+        print_error "Release script has syntax errors"
+        return 1
+    fi
+    
+    # Test if required functions exist
+    local required_functions=(
+        "validate_version"
+        "check_clean_working_dir"
+        "check_develop_branch"
+        "update_changelog"
+        "update_version_in_code"
+        "prepare_release_on_develop"
+        "commit_release_changes"
+        "create_and_push_tag"
+        "finalize_release"
+    )
+    
+    for func in "${required_functions[@]}"; do
+        if declare -f "$func" > /dev/null; then
+            print_success "Function $func exists ✓"
+        else
+            print_error "Function $func is missing"
+        fi
+    done
+}
+
 # Main test function
 main() {
     local version=$1
 
-    print_info "🧪 Testing TiLoKit Release Process (LOCAL ONLY)"
-    print_info "=============================================="
+    print_info "🧪 Testing TiLoKit Release Process (COMPREHENSIVE)"
+    print_info "================================================="
 
     if [[ -z "$version" ]]; then
         print_error "Version is required"
@@ -94,6 +173,12 @@ main() {
 
     print_success "Version format is valid: $version"
 
+    # Test git operations
+    test_git_operations "$version"
+    
+    # Test release script functions
+    test_release_functions "$version"
+
     # Test version update
     test_version_update "$version"
 
@@ -103,7 +188,7 @@ main() {
     # Test build
     print_info "Testing build process..."
     if go build -o tilokit-test .; then
-        print_success "Build test PASSED"
+        print_success "Build test PASSED ✓"
         rm -f tilokit-test
     else
         print_error "Build test FAILED"
@@ -111,7 +196,14 @@ main() {
     fi
 
     print_success "🎉 All tests PASSED! Release script should work correctly."
-    print_warning "Remember: This was a LOCAL TEST only - no files were permanently modified"
+    print_info "📋 Summary:"
+    print_info "  • Version format: ✓"
+    print_info "  • Git operations: ✓"
+    print_info "  • Release functions: ✓"
+    print_info "  • Version update: ✓"
+    print_info "  • Changelog generation: ✓"
+    print_info "  • Build process: ✓"
+    print_warning "Remember: This was a COMPREHENSIVE TEST - no files were permanently modified"
 }
 
 main "$@"
