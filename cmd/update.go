@@ -146,9 +146,9 @@ func downloadAndInstall(release *GitHubRelease) error {
 		return err
 	}
 	
-	// Create temporary file with secure permissions
+	// Create temporary file
 	tmpFile := currentExe + ".tmp"
-	// #nosec G304 - tmpFile is constructed from os.Executable() which is safe
+	// #nosec G304 - safe path from os.Executable()
 	out, err := os.Create(tmpFile)
 	if err != nil {
 		return err
@@ -158,15 +158,15 @@ func downloadAndInstall(release *GitHubRelease) error {
 	// Copy downloaded content
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		// #nosec G104 - we're returning the primary error, removing temp file is cleanup
+		// #nosec G104 - cleanup error ignored
 		_ = os.Remove(tmpFile)
 		return err
 	}
 
-	// Make executable with more restrictive permissions
-	// #nosec G302 - executable files need execute permission (0700 is appropriate)
+	// Make executable
+	// #nosec G302 - executables need 0700 permissions
 	if err := os.Chmod(tmpFile, 0700); err != nil {
-		// #nosec G104 - we're returning the primary error, removing temp file is cleanup
+		// #nosec G104 - cleanup error ignored
 		_ = os.Remove(tmpFile)
 		return err
 	}
@@ -183,20 +183,20 @@ func downloadAndInstall(release *GitHubRelease) error {
 }
 
 func replaceExecutableWindows(currentExe, tmpFile string) error {
-	// Create a batch script to replace the executable after this process exits
+	// Create batch script for replacement
 	batchScript := currentExe + "_update.bat"
 	scriptContent := fmt.Sprintf(`@echo off
 timeout /t 2
 move "%s" "%s"
 del "%%~f0"`, tmpFile, currentExe)
 	
-	// Write batch script with restrictive permissions
+	// Write batch script
 	if err := os.WriteFile(batchScript, []byte(scriptContent), 0600); err != nil {
 		return err
 	}
 	
-	// Execute the batch script in background
-	// #nosec G204 - batchScript is created by us with known safe content
+	// Execute batch script
+	// #nosec G204 - safe script content
 	cmd := exec.Command("cmd", "/C", "start", "/B", batchScript)
 	return cmd.Start()
 }
