@@ -225,7 +225,11 @@ update_changelog() {
         print "### Changed"
         print "- Development continues..."
         print ""
-        print "## [" substr(version, 2) "] - " date
+        # Create anchor ID from version (e.g., v0.1.2-dev -> 012-dev)
+        anchor_id = substr(version, 2)
+        gsub(/\./, "", anchor_id)
+        gsub(/-/, "-", anchor_id)
+        print "## [" substr(version, 2) "] - " date " {#" anchor_id "}"
         print ""
         # Read content from file
         while ((getline line < content_file) > 0) {
