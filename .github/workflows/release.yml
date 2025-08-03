@@ -297,21 +297,21 @@ jobs:
 
           # Extract pure changelog content from CHANGELOG.md for this version
           echo "📝 Extracting changelog content for version $VERSION_NUM"
-          
+
           # Extract changelog content directly using awk
-          awk 'BEGIN {found=0} 
-               /^## \['"$VERSION_NUM"'\]/ {found=1; next} 
-               /^## \[/ && found {exit} 
+          awk 'BEGIN {found=0}
+               /^## \['"$VERSION_NUM"'\]/ {found=1; next}
+               /^## \[/ && found {exit}
                found {print}' CHANGELOG.md > release_notes.md
 
           # Debug: Show extracted content
           echo "📋 Debug: Extracted content:"
           cat release_notes.md
           echo "📋 End of extracted content"
-          
+
           # Get previous version for Full Changelog link
           PREV_VERSION=$(git tag --sort=-version:refname | grep -v "$VERSION" | head -n1 || echo "")
-          
+
           # Add Full Changelog link like GoFiber
           if [ -n "$PREV_VERSION" ]; then
             echo "" >> release_notes.md
@@ -320,7 +320,7 @@ jobs:
             echo "" >> release_notes.md
             echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/releases/tag/${VERSION}" >> release_notes.md
           fi
-          
+
           # Simple fallback for empty content
           if [ ! -s release_notes.md ] || [ "$(wc -l < release_notes.md)" -le 3 ]; then
             echo "⚠️  No changelog entries found, creating fallback release notes"
@@ -337,15 +337,15 @@ jobs:
 
           # Copy release notes for GitHub Release
           cp release_notes.md release_notes.txt
-          
+
           # Debug: Show final release notes content
           echo "🔍 Final release notes content for GitHub Release:"
-          echo "=====================================" 
+          echo "====================================="
           cat release_notes.txt
-          echo "=====================================" 
+          echo "====================================="
           echo "File size: $(wc -c < release_notes.txt) bytes"
           echo "Line count: $(wc -l < release_notes.txt) lines"
-          
+
           echo "Release notes extracted for $VERSION"
 
       - name: Create GitHub Release
