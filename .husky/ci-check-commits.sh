@@ -40,8 +40,15 @@ validate_commit() {
     local commit_msg="$1"
     local commit_sha="$2"
 
-    # NO EXCEPTIONS: ALL commits must have emoji format
-    # Even merge and revert commits must follow emoji convention
+    # Skip GitHub auto-generated merge commits in CI (they start with "Merge")
+    # But still validate manual commits that happen to be merges
+    if [[ $commit_msg =~ ^Merge\ [a-f0-9]{7,40}\ into\ .* ]]; then
+        echo -e "${BLUE}ℹ️  Skipping GitHub auto-merge commit: ${commit_sha:0:8}${NC}"
+        return 0
+    fi
+
+    # ALL other commits must have emoji format
+    # Including manual merge and revert commits
 
     # Check if commit has emoji format
     local emoji_pattern='^[^[:space:]] [a-z]+: .+'
