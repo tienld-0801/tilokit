@@ -10,7 +10,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Valid conventional commit types (from pr-auto-label.yml)
+# Valid conventional commit types with required emojis (from setup-labels.yml)
 VALID_TYPES=(
     "feat"      # ✨ Enhancement
     "fix"       # 🐛 Bug
@@ -23,7 +23,27 @@ VALID_TYPES=(
     "chore"     # 🧹 Maintenance
     "style"     # 🎨 Style
     "revert"    # ⏪ Revert
+    "release"   # 🚀 Release
 )
+
+# Emoji mapping function for each commit type (must match setup-labels.yml)
+get_emoji_for_type() {
+    case "$1" in
+        "feat") echo "✨" ;;
+        "fix") echo "🐛" ;;
+        "docs") echo "📚" ;;
+        "refactor") echo "♻️" ;;
+        "perf") echo "⚡" ;;
+        "test") echo "🧪" ;;
+        "build") echo "🛠️" ;;
+        "ci") echo "🔄" ;;
+        "chore") echo "🧹" ;;
+        "style") echo "🎨" ;;
+        "revert") echo "⏪" ;;
+        "release") echo "🚀" ;;
+        *) echo "" ;;
+    esac
+}
 
 # Read commit message from file
 COMMIT_MSG_FILE=$1
@@ -31,16 +51,16 @@ COMMIT_MSG=$(head -n1 "$COMMIT_MSG_FILE")
 
 echo -e "${BLUE}🔍 Validating commit message:${NC} ${COMMIT_MSG}"
 
-# Skip validation for merge commits
-if [[ $COMMIT_MSG =~ ^Merge\ .*|^Revert\ .* ]]; then
-    echo -e "${GREEN}✅ Merge/Revert commit detected - skipping validation${NC}"
-    exit 0
-fi
+# NO EXCEPTIONS: ALL commits must have emoji format
+# Even merge and revert commits must follow emoji convention
 
-# Check strict conventional commit format: type: description (NO scopes allowed)
-# Must be: type: description with exactly one space after colon
+# Check strict conventional commit format with emoji: emoji type: description
+# Must be: emoji type: description with exactly one space after colon
 # Must not have leading/trailing whitespace
-COMMIT_PATTERN='^[a-z]+: .+'
+# Format: 🚀 release: v1.0.0 or ✨ feat: add new feature
+# Use POSIX-compatible emoji detection
+COMMIT_PATTERN_WITH_EMOJI='^[^[:space:]] [a-z]+: .+'
+COMMIT_PATTERN_WITHOUT_EMOJI='^[a-z]+: .+'
 
 # Check for leading/trailing whitespace
 if [[ "$COMMIT_MSG" != "$(echo "$COMMIT_MSG" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')" ]]; then
@@ -58,28 +78,60 @@ if echo "$COMMIT_MSG" | grep -qE '^[a-z]+\([^)]+\):'; then
     exit 1
 fi
 
-if [[ ! $COMMIT_MSG =~ $COMMIT_PATTERN ]]; then
-    echo -e "${RED}❌ Invalid commit message format!${NC}"
-    echo
-    echo -e "${YELLOW}📋 Required format:${NC} ${BLUE}type: description${NC}"
-    echo -e "${YELLOW}📋 Valid Examples:${NC}"
-    echo -e "  ${GREEN}✅ feat: add new authentication feature${NC}"
-    echo -e "  ${GREEN}✅ fix: resolve memory leak issue${NC}"
-    echo -e "  ${GREEN}✅ docs: update installation guide${NC}"
-    echo -e "  ${GREEN}✅ ci: update workflow configuration${NC}"
-    echo
-    echo -e "${YELLOW}🚫 Invalid examples:${NC}"
-    echo -e "  ${RED}❌ Add new feature${NC} (no type)"
-    echo -e "  ${RED}❌ FEAT: add feature${NC} (uppercase)"
-    echo -e "  ${RED}❌ feat:add feature${NC} (missing space after colon)"
-    echo -e "  ${RED}❌ feat(scope): add feature${NC} (scopes not allowed)"
-    echo -e "  ${RED}❌ ' fix: something'${NC} (leading whitespace)"
-    echo
-    exit 1
+# Check if commit message has REQUIRED emoji format
+HAS_EMOJI=false
+if [[ $COMMIT_MSG =~ $COMMIT_PATTERN_WITH_EMOJI ]]; then
+    HAS_EMOJI=true
+else
+    # Check if it's the old format without emoji
+    if [[ $COMMIT_MSG =~ $COMMIT_PATTERN_WITHOUT_EMOJI ]]; then
+        echo -e "${RED}❌ Emoji is REQUIRED in commit messages!${NC}"
+        echo
+        echo -e "${YELLOW}📋 Required format:${NC} ${BLUE}emoji type: description${NC}"
+        echo -e "${YELLOW}📋 Valid Examples:${NC}"
+        echo -e "  ${GREEN}✅ ✨ feat: add new authentication feature${NC}"
+        echo -e "  ${GREEN}✅ 🐛 fix: resolve memory leak issue${NC}"
+        echo -e "  ${GREEN}✅ 📚 docs: update installation guide${NC}"
+        echo -e "  ${GREEN}✅ 🧪 test: add unit tests${NC}"
+        echo -e "  ${GREEN}✅ 🚀 release: version 1.0.0${NC}"
+        echo
+        echo -e "${YELLOW}🚫 Invalid (missing emoji):${NC}"
+        echo -e "  ${RED}❌ feat: add new feature${NC} (no emoji)"
+        echo -e "  ${RED}❌ test: add tests${NC} (no emoji)"
+        echo
+        echo -e "${YELLOW}💡 Tip:${NC} Add the correct emoji for your commit type!"
+        exit 1
+    else
+        echo -e "${RED}❌ Invalid commit message format!${NC}"
+        echo
+        echo -e "${YELLOW}📋 Required format:${NC} ${BLUE}emoji type: description${NC}"
+        echo -e "${YELLOW}📋 Valid Examples:${NC}"
+        echo -e "  ${GREEN}✅ ✨ feat: add new authentication feature${NC}"
+        echo -e "  ${GREEN}✅ 🐛 fix: resolve memory leak issue${NC}"
+        echo -e "  ${GREEN}✅ 📚 docs: update installation guide${NC}"
+        echo
+        echo -e "${YELLOW}🚫 Invalid examples:${NC}"
+        echo -e "  ${RED}❌ Add new feature${NC} (no type)"
+        echo -e "  ${RED}❌ FEAT: add feature${NC} (uppercase)"
+        echo -e "  ${RED}❌ feat:add feature${NC} (missing space after colon)"
+        echo -e "  ${RED}❌ feat(scope): add feature${NC} (scopes not allowed)"
+        echo
+        exit 1
+    fi
 fi
 
-# Extract type from commit message
-COMMIT_TYPE=$(echo "$COMMIT_MSG" | sed -E 's/^([a-z]+)(\([^)]*\))?: .*/\1/')
+# Extract type and emoji from commit message
+if [[ "$HAS_EMOJI" == true ]]; then
+    # Extract from: emoji type: description
+    COMMIT_TYPE=$(echo "$COMMIT_MSG" | sed -E 's/^[^[:space:]]+ ([a-z]+): .*/\1/')
+    COMMIT_EMOJI=$(echo "$COMMIT_MSG" | sed -E 's/^([^[:space:]]+) [a-z]+: .*/\1/')
+else
+    # Extract from: type: description
+    COMMIT_TYPE=$(echo "$COMMIT_MSG" | sed -E 's/^([a-z]+): .*/\1/')
+    COMMIT_EMOJI=""
+fi
+
+echo -e "${BLUE}🔍 Detected type: ${COMMIT_TYPE}, emoji: ${COMMIT_EMOJI:-'none'}${NC}"
 
 # Check if type is valid
 VALID_TYPE=false
@@ -105,13 +157,49 @@ if [[ "$VALID_TYPE" == false ]]; then
     echo -e "  ${GREEN}🧹 chore${NC}     - maintenance tasks"
     echo -e "  ${GREEN}🎨 style${NC}     - code style changes"
     echo -e "  ${GREEN}⏪ revert${NC}    - reverting previous commits"
+    echo -e "  ${GREEN}🚀 release${NC}   - version releases"
     echo
     echo -e "${YELLOW}💡 Tip:${NC} Use ${BLUE}git commit --amend${NC} to fix your commit message"
     echo
     exit 1
 fi
 
+# Validate emoji if present
+if [[ "$HAS_EMOJI" == true ]]; then
+    EXPECTED_EMOJI=$(get_emoji_for_type "$COMMIT_TYPE")
+    if [[ "$COMMIT_EMOJI" != "$EXPECTED_EMOJI" ]]; then
+        echo -e "${RED}❌ Wrong emoji for commit type '${COMMIT_TYPE}'!${NC}"
+        echo -e "${YELLOW}📋 Expected emoji:${NC} ${GREEN}$EXPECTED_EMOJI${NC}"
+        echo -e "${YELLOW}📋 Found emoji:${NC} ${RED}$COMMIT_EMOJI${NC}"
+        echo
+        echo -e "${YELLOW}📋 Correct format:${NC} ${GREEN}$EXPECTED_EMOJI $COMMIT_TYPE: description${NC}"
+        echo -e "${YELLOW}📋 Your message:${NC} ${RED}$COMMIT_MSG${NC}"
+        echo
+        echo -e "${YELLOW}📋 Valid emoji mappings:${NC}"
+        echo -e "  ${GREEN}✨ feat${NC}      - new features"
+        echo -e "  ${GREEN}🐛 fix${NC}       - bug fixes"
+        echo -e "  ${GREEN}📚 docs${NC}      - documentation changes"
+        echo -e "  ${GREEN}♻️  refactor${NC}  - code refactoring"
+        echo -e "  ${GREEN}⚡ perf${NC}      - performance improvements"
+        echo -e "  ${GREEN}🧪 test${NC}      - adding or updating tests"
+        echo -e "  ${GREEN}🛠️  build${NC}     - build system changes"
+        echo -e "  ${GREEN}🔄 ci${NC}        - CI/CD changes"
+        echo -e "  ${GREEN}🧹 chore${NC}     - maintenance tasks"
+        echo -e "  ${GREEN}🎨 style${NC}     - code style changes"
+        echo -e "  ${GREEN}⏪ revert${NC}    - reverting previous commits"
+        echo -e "  ${GREEN}🚀 release${NC}   - version releases"
+        echo
+        echo -e "${YELLOW}💡 Tip:${NC} Use ${BLUE}git commit --amend${NC} to fix your commit message"
+        echo
+        exit 1
+    fi
+    echo -e "${GREEN}✅ Emoji validation passed! ${COMMIT_EMOJI} matches ${COMMIT_TYPE}${NC}"
+fi
+
 echo -e "${GREEN}✅ Commit message validation passed!${NC}"
 echo -e "${GREEN}📝 Type: ${COMMIT_TYPE}${NC}"
+if [[ "$HAS_EMOJI" == true ]]; then
+    echo -e "${GREEN}🎨 Emoji: ${COMMIT_EMOJI}${NC}"
+fi
 
 exit 0
