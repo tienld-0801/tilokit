@@ -95,9 +95,11 @@ jobs:
           ./tilokit -v
           ./tilokit -l
 
+  # Only run integration tests on PRs (already verified when merging to develop)
   integration-test:
     runs-on: ubuntu-latest
     needs: [test, build]
+    if: github.event_name == 'pull_request'
 
     steps:
       - name: Checkout code
