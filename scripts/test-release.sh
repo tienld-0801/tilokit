@@ -74,9 +74,9 @@ test_changelog_generation() {
 # Test git operations (dry run)
 test_git_operations() {
     local version=$1
-    
+
     print_info "Testing git operations (dry run)..."
-    
+
     # Check if on develop branch
     local current_branch=$(git branch --show-current)
     if [[ "$current_branch" != "develop" ]]; then
@@ -85,7 +85,7 @@ test_git_operations() {
     else
         print_success "On develop branch ✓"
     fi
-    
+
     # Check working directory is clean
     if [[ -n $(git status --porcelain) ]]; then
         print_warning "Working directory has uncommitted changes"
@@ -93,7 +93,7 @@ test_git_operations() {
     else
         print_success "Working directory is clean ✓"
     fi
-    
+
     # Test tag creation (dry run)
     if git tag -l "$version" | grep -q "$version"; then
         print_warning "Tag $version already exists"
@@ -101,11 +101,11 @@ test_git_operations() {
     else
         print_success "Tag $version does not exist ✓"
     fi
-    
+
     # Test commit message format
     local commit_msg="🚀 release: $version"
     print_info "Testing commit message format: '$commit_msg'"
-    
+
     # Validate emoji commit format
     if [[ $commit_msg =~ ^🚀\ release:\ .+ ]]; then
         print_success "Commit message format is valid ✓"
@@ -117,9 +117,9 @@ test_git_operations() {
 # Test release script functions (without execution)
 test_release_functions() {
     local version=$1
-    
+
     print_info "Testing release script functions..."
-    
+
     # Source release script functions (without executing main)
     if source scripts/release.sh 2>/dev/null; then
         print_success "Release script syntax is valid ✓"
@@ -127,7 +127,7 @@ test_release_functions() {
         print_error "Release script has syntax errors"
         return 1
     fi
-    
+
     # Test if required functions exist
     local required_functions=(
         "validate_version"
@@ -140,7 +140,7 @@ test_release_functions() {
         "create_and_push_tag"
         "finalize_release"
     )
-    
+
     for func in "${required_functions[@]}"; do
         if declare -f "$func" > /dev/null; then
             print_success "Function $func exists ✓"
@@ -175,7 +175,7 @@ main() {
 
     # Test git operations
     test_git_operations "$version"
-    
+
     # Test release script functions
     test_release_functions "$version"
 

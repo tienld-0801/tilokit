@@ -115,7 +115,7 @@ update_version_in_code() {
 # Function to prepare release directly on develop
 prepare_release_on_develop() {
     local version=$1
-    
+
     print_info "Preparing release $version directly on develop branch"
     # Stay on develop branch - no need to create release branch
     return 0
@@ -186,11 +186,11 @@ finalize_release() {
     local version=$1
 
     print_info "Finalizing release $version..."
-    
+
     # No merge needed - we committed directly to develop
     # Version remains as-is for continued development
     print_info "Version remains $version for continued development..."
-    
+
     print_success "Release finalized on $DEVELOP_BRANCH"
 }
 
