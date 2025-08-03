@@ -46,7 +46,7 @@ validate_commit() {
     # Check if commit has emoji format
     local emoji_pattern='^[^[:space:]] [a-z]+: .+'
     local no_emoji_pattern='^[a-z]+: .+'
-    
+
     if [[ $commit_msg =~ $emoji_pattern ]]; then
         # Extract type and emoji from: emoji type: description
         local commit_type=$(echo "$commit_msg" | sed -E 's/^[^[:space:]]+ ([a-z]+): .*/\1/')
