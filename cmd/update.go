@@ -146,24 +146,27 @@ func downloadAndInstall(release *GitHubRelease) error {
 		return err
 	}
 	
-	// Create temporary file
+	// Create temporary file with secure permissions
 	tmpFile := currentExe + ".tmp"
+	// #nosec G304 - tmpFile is constructed from os.Executable() which is safe
 	out, err := os.Create(tmpFile)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
-	
+
 	// Copy downloaded content
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		os.Remove(tmpFile)
+		// #nosec G104 - we're returning the primary error, removing temp file is cleanup
+		_ = os.Remove(tmpFile)
 		return err
 	}
-	
-	// Make executable
-	if err := os.Chmod(tmpFile, 0755); err != nil {
-		os.Remove(tmpFile)
+
+	// Make executable with more restrictive permissions
+	if err := os.Chmod(tmpFile, 0700); err != nil {
+		// #nosec G104 - we're returning the primary error, removing temp file is cleanup
+		_ = os.Remove(tmpFile)
 		return err
 	}
 	
@@ -186,11 +189,13 @@ timeout /t 2
 move "%s" "%s"
 del "%%~f0"`, tmpFile, currentExe)
 	
-	if err := os.WriteFile(batchScript, []byte(scriptContent), 0644); err != nil {
+	// Write batch script with restrictive permissions
+	if err := os.WriteFile(batchScript, []byte(scriptContent), 0600); err != nil {
 		return err
 	}
 	
 	// Execute the batch script in background
+	// #nosec G204 - batchScript is created by us with known safe content
 	cmd := exec.Command("cmd", "/C", "start", "/B", batchScript)
 	return cmd.Start()
 }
