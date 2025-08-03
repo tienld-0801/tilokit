@@ -169,8 +169,7 @@ Full Changelog: [Initial Release](https://github.com/tienld-0801/tilokit/release
 - 🐛 replace regex with sed for conventional commit parsing
 - 🐛 remove dangling else statement in generate-changelog.sh
 - 🐛 replace associative arrays with simple variables
-- 🐛 use literal newlines instead of 
- escapes
+- 🐛 use literal newlines instead of \n escapes
 - 🐛 use temporary file for awk changelog content
 - 🐛 add empty string extension for macOS sed -i compatibility
 - 🐛 use temporary file for git tag message to avoid ANSI codes
@@ -210,8 +209,7 @@ Full Changelog: [Initial Release](https://github.com/tienld-0801/tilokit/release
 - 🐛 replace regex with sed for conventional commit parsing
 - 🐛 remove dangling else statement in generate-changelog.sh
 - 🐛 replace associative arrays with simple variables
-- 🐛 use literal newlines instead of 
- escapes
+- 🐛 use literal newlines instead of \n escapes
 - 🐛 use temporary file for awk changelog content
 
 ### Changed
@@ -247,8 +245,7 @@ Full Changelog: [Initial Release](https://github.com/tienld-0801/tilokit/release
 - 🐛 replace regex with sed for conventional commit parsing
 - 🐛 remove dangling else statement in generate-changelog.sh
 - 🐛 replace associative arrays with simple variables
-- 🐛 use literal newlines instead of 
- escapes
+- 🐛 use literal newlines instead of \n escapes
 - 🐛 use temporary file for awk changelog content
 
 ### Changed
