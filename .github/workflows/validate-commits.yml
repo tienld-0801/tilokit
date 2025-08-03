@@ -38,29 +38,34 @@ jobs:
           script: |
             const message = `## ❌ Commit Validation Failed
 
-            Your commits don't follow the conventional commit format. Please fix them before merging.
+            Your commits don't follow the **MANDATORY EMOJI** commit format. Please fix them before merging.
 
-            ### 📋 Required Format:
-            \`type(scope): description\`
+            ### 📋 REQUIRED Format (Emoji is MANDATORY):
+            \`emoji type: description\`
 
-            ### ✅ Valid Types:
-            - \`feat\`: new features
-            - \`fix\`: bug fixes
-            - \`docs\`: documentation
-            - \`refactor\`: code refactoring
-            - \`perf\`: performance improvements
-            - \`test\`: adding tests
-            - \`build\`: build system changes
-            - \`ci\`: CI/CD changes
-            - \`chore\`: maintenance tasks
-            - \`style\`: code style changes
-            - \`revert\`: reverting changes
+            ### ✅ Valid Types with Required Emojis:
+            - \`✨ feat\`: new features
+            - \`🐛 fix\`: bug fixes
+            - \`📚 docs\`: documentation
+            - \`♻️ refactor\`: code refactoring
+            - \`⚡ perf\`: performance improvements
+            - \`🧪 test\`: adding tests
+            - \`🛠️ build\`: build system changes
+            - \`🔄 ci\`: CI/CD changes
+            - \`🧹 chore\`: maintenance tasks
+            - \`🎨 style\`: code style changes
+            - \`⏪ revert\`: reverting changes
+            - \`🚀 release\`: version releases
 
-            ### 📝 Examples:
-            - \`feat: add user authentication\`
-            - \`fix(core): resolve memory leak\`
-            - \`docs: update API documentation\`
-            - \`chore(deps): upgrade dependencies\`
+            ### 📝 Examples (Emoji REQUIRED):
+            - \`✨ feat: add user authentication\`
+            - \`🐛 fix: resolve memory leak\`
+            - \`📚 docs: update API documentation\`
+            - \`🧹 chore: upgrade dependencies\`
+
+            ### ❌ Invalid Examples:
+            - \`feat: add feature\` (missing emoji)
+            - \`🐛 docs: update\` (wrong emoji for docs type)
 
             ### 🔧 How to Fix:
             1. Use \`git rebase -i\` to edit commit messages
