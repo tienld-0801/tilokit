@@ -15,6 +15,16 @@ var KnownLongFlags = []string{
 	"quiet", "force", "update", "help",
 }
 
+// Supported Frameworks - central registry
+var SupportedFrameworks = []string{
+	"react", "vue", "svelte", "angular", "next", "nuxt",
+	"django", "flask", "fastapi",
+	"laravel", "symfony",
+	"spring-boot", "quarkus",
+	"gin", "echo", "fiber",
+	"rails",
+}
+
 // CLI Messages
 const (
 	AppName        = "tilokit"

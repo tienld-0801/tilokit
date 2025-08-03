@@ -3,6 +3,8 @@ package cli
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/ti-lo/tilokit/internal/config"
@@ -19,8 +21,13 @@ func (m *Manager) RunProjectGenerationProcess() error {
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		utils.Warning("Failed to load config, using defaults: %v", err)
-		cfg = &config.Config{}
+		// Only continue with defaults for specific expected errors
+		if os.IsNotExist(err) {
+			utils.Info("No config file found, using defaults")
+			cfg = &config.Config{}
+		} else {
+			return fmt.Errorf("failed to load config: %w", err)
+		}
 	}
 
 	// Interactive prompts if values not provided
@@ -88,7 +95,7 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 
 	// Framework
 	if m.Framework == "" {
-		supportedFrameworks := []string{"react", "vue", "svelte", "angular", "next", "nuxt", "flask", "fastapi", "quarkus", "spring-boot", "rails"}
+		supportedFrameworks := SupportedFrameworks
 		prompt := &survey.Select{
 			Message: "🚀 Choose framework:",
 			Options: supportedFrameworks,
@@ -114,7 +121,8 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 		} else if len(supportedBuildTools) == 1 {
 			m.BuildTool = supportedBuildTools[0]
 		} else {
-			m.BuildTool = "vite" // fallback
+			// Use framework-appropriate default
+			m.BuildTool = m.getDefaultBuildTool(m.Framework)
 		}
 	}
 
@@ -134,7 +142,7 @@ func (m *Manager) validateInputs() error {
 	// Check if project directory already exists
 	projectPath := m.ProjectName
 	if m.OutputDir != "." {
-		projectPath = m.OutputDir + "/" + m.ProjectName
+		projectPath = filepath.Join(m.OutputDir, m.ProjectName)
 	}
 
 	if utils.DirExists(projectPath) && !m.Force {
@@ -232,4 +240,26 @@ func (m *Manager) getBuildToolsForFramework(framework string) []string {
 		return tools
 	}
 	return []string{"vite"}
+}
+
+func (m *Manager) getDefaultBuildTool(framework string) string {
+	defaults := map[string]string{
+		"django":      "pip",
+		"flask":       "pip",
+		"fastapi":     "pip",
+		"spring-boot": "maven",
+		"quarkus":     "maven",
+		"rails":       "bundler",
+		"gin":         "go-modules",
+		"echo":        "go-modules",
+		"fiber":       "go-modules",
+		"laravel":     "composer",
+		"symfony":     "composer",
+		// JavaScript frameworks default to vite
+	}
+
+	if tool, exists := defaults[framework]; exists {
+		return tool
+	}
+	return "vite" // fallback for JS frameworks
 }

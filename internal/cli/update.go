@@ -63,7 +63,7 @@ func RunUpdateProcess() error {
 	}
 
 	utils.Success("🎉 Successfully updated to %s!", latestRelease.TagName)
-	utils.Info("Run 'tilokit version' to verify the update")
+	utils.Info("Run 'tilokit --version' to verify the update")
 	return nil
 }
 

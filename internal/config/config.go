@@ -22,16 +22,8 @@ type Config struct {
 }
 
 // LoadConfig loads configuration from file and environment
+// Currently returns default config as file loading is disabled
 func LoadConfig() (*Config, error) {
-	viper.SetConfigName("tilokit")
-	viper.SetConfigType("yaml")
-
-	// Add config paths - only use the config directory
-	viper.AddConfigPath("./config")
-
-	// Set defaults
-	setDefaults()
-
 	// For now, skip config file loading to avoid unmarshal errors
 	// Just return default config
 	logrus.Debug("Using default configuration (config file loading disabled)")
