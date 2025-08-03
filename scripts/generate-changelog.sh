@@ -243,16 +243,20 @@ update_changelog() {
     # Cleanup temporary file
     rm -f "$content_file"
     
-    # Clean up trailing spaces to prevent markdownlint issues
+    # Clean up trailing spaces and multiple blank lines to prevent markdownlint issues
     if command -v sed >/dev/null 2>&1; then
         if [[ "$OSTYPE" == "darwin"* ]]; then
-            # macOS sed
+            # macOS sed - remove trailing spaces
             sed -i '' 's/[[:space:]]*$//' CHANGELOG.md
+            # Remove multiple consecutive blank lines (MD012)
+            sed -i '' '/^$/N;/^\n$/d' CHANGELOG.md
         else
-            # GNU sed
+            # GNU sed - remove trailing spaces
             sed -i 's/[[:space:]]*$//' CHANGELOG.md
+            # Remove multiple consecutive blank lines (MD012)
+            sed -i '/^$/N;/^\n$/d' CHANGELOG.md
         fi
-        print_info "Cleaned trailing spaces from CHANGELOG.md"
+        print_info "Cleaned trailing spaces and multiple blank lines from CHANGELOG.md"
     fi
     
     print_success "CHANGELOG.md updated for version $version"
