@@ -38,7 +38,8 @@ if [[ $COMMIT_MSG =~ ^Merge\ .*|^Revert\ .* ]]; then
 fi
 
 # Check conventional commit format: type(scope): description
-if [[ ! $COMMIT_MSG =~ ^[a-z]+(\([^)]+\))?:\ .+ ]]; then
+COMMIT_PATTERN='^[a-z]+(\([^)]+\))?:[ ].+'
+if [[ ! $COMMIT_MSG =~ $COMMIT_PATTERN ]]; then
     echo -e "${RED}❌ Invalid commit message format!${NC}"
     echo
     echo -e "${YELLOW}📋 Required format:${NC} ${BLUE}type(scope): description${NC}"
@@ -57,7 +58,7 @@ if [[ ! $COMMIT_MSG =~ ^[a-z]+(\([^)]+\))?:\ .+ ]]; then
 fi
 
 # Extract type from commit message
-COMMIT_TYPE=$(echo "$COMMIT_MSG" | sed -n 's/^\([a-z]\+\).*/\1/p')
+COMMIT_TYPE=$(echo "$COMMIT_MSG" | sed -E 's/^([a-z]+)(\([^)]*\))?: .*/\1/')
 
 # Check if type is valid
 VALID_TYPE=false

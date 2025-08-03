@@ -18,20 +18,38 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
     exit 1
 fi
 
-# Check for merge conflicts
-if git diff --check --cached > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ No merge conflict markers found${NC}"
-else
+# Check for merge conflicts and whitespace issues
+WHITESPACE_ISSUES=$(git diff --check --cached 2>&1 || true)
+# Check for actual conflict markers (not in strings or comments)
+CONFLICT_MARKERS=$(git diff --cached | grep -E '^\+[^#"'\'']*(<<<<<<< |=======$|>>>>>>> )' || true)
+
+if [[ -n "$CONFLICT_MARKERS" ]]; then
     echo -e "${RED}❌ Merge conflict markers detected${NC}"
     echo -e "${YELLOW}💡 Please resolve merge conflicts before committing${NC}"
+    echo "$CONFLICT_MARKERS"
     exit 1
+fi
+
+if [[ -n "$WHITESPACE_ISSUES" ]] && [[ "$WHITESPACE_ISSUES" != *"trailing whitespace"* ]]; then
+    echo -e "${RED}❌ Git diff check failed${NC}"
+    echo "$WHITESPACE_ISSUES"
+    exit 1
+fi
+
+if [[ "$WHITESPACE_ISSUES" == *"trailing whitespace"* ]]; then
+    echo -e "${YELLOW}⚠️  Trailing whitespace detected, auto-fixing...${NC}"
+    # Auto-fix trailing whitespace
+    git diff --cached --name-only | xargs -I {} sed -i '' 's/[[:space:]]*$//' {}
+    echo -e "${GREEN}✅ Trailing whitespace cleaned${NC}"
+else
+    echo -e "${GREEN}✅ No whitespace issues found${NC}"
 fi
 
 # Check for Go syntax errors (if Go files are being committed)
 GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$')
 if [[ -n "$GO_FILES" ]]; then
     echo -e "${BLUE}🔍 Checking Go syntax...${NC}"
-    
+
     # Check if go is installed
     if ! command -v go &> /dev/null; then
         echo -e "${YELLOW}⚠️  Go not found, skipping syntax check${NC}"

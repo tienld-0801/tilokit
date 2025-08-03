@@ -4,14 +4,14 @@ This directory contains Git hooks for TiLoKit project, organized in a `.husky`-s
 
 ## 📋 Available Hooks
 
-### `commit-msg` 
+### `commit-msg`
 - **Purpose**: Validates commit messages follow conventional commit format
 - **Format**: `type(scope): description`
 - **Valid Types**: `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `style`, `revert`
 
 ### `pre-commit`
 - **Purpose**: Runs pre-commit checks before allowing commits
-- **Checks**: 
+- **Checks**:
   - Go syntax validation
   - Merge conflict markers
   - Large files detection (>10MB)
@@ -93,10 +93,20 @@ rm .git/hooks/pre-commit
 | `style` | 🎨 | Code style | `style: format Go code` |
 | `revert` | ⏪ | Reverts | `revert: undo previous commit` |
 
+## 🔄 Auto-Installation
+
+**No manual setup required!** Hooks are automatically installed when contributors run:
+- `make build` - Builds project and ensures hooks are installed
+- `make dev` - Development mode with hook checking
+- `make release` - Release process (mandatory hook installation)
+
+This ensures all contributors have commit validation without manual intervention.
+
 ## 🎯 Integration with GitHub
 
 These commit message formats integrate with:
 - **.github/workflows/pr-auto-label.yml**: Auto-adds labels to PRs
+- **.github/workflows/validate-commits.yml**: Validates all PR commits in CI
 - **Release notes generation**: Groups commits by type
 - **Changelog automation**: Creates organized changelogs
 

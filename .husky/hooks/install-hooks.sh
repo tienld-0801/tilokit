@@ -43,23 +43,23 @@ install_hook() {
     local hook_description=$2
     local source_file="${SCRIPT_DIR}/${hook_name}"
     local target_file="${GIT_HOOKS_DIR}/${hook_name}"
-    
+
     if [[ ! -f "$source_file" ]]; then
         echo -e "${RED}❌ Source hook not found: $source_file${NC}"
         return 1
     fi
-    
+
     # Backup existing hook if it exists
     if [[ -f "$target_file" ]]; then
         echo -e "${YELLOW}⚠️  Existing hook found: $hook_name${NC}"
         cp "$target_file" "${target_file}.backup.$(date +%Y%m%d_%H%M%S)"
         echo -e "${YELLOW}📦 Backed up to: ${target_file}.backup.$(date +%Y%m%d_%H%M%S)${NC}"
     fi
-    
+
     # Copy and make executable
     cp "$source_file" "$target_file"
     chmod +x "$target_file"
-    
+
     echo -e "${GREEN}✅ Installed: $hook_name${NC}"
     echo -e "${BLUE}   Description: $hook_description${NC}"
     return 0
@@ -100,9 +100,9 @@ if [[ $SUCCESS_COUNT -eq $TOTAL_COUNT ]]; then
     echo
     echo -e "${YELLOW}📋 Valid types:${NC}"
     echo -e "   ${GREEN}✨ feat${NC}      - new features"
-    echo -e "   ${GREEN}🐛 fix${NC}       - bug fixes"  
+    echo -e "   ${GREEN}🐛 fix${NC}       - bug fixes"
     echo -e "   ${GREEN}📚 docs${NC}      - documentation"
-    echo -e "   ${GREEN}♻️  refactor${NC}  - code refactoring" 
+    echo -e "   ${GREEN}♻️  refactor${NC}  - code refactoring"
     echo -e "   ${GREEN}⚡ perf${NC}      - performance"
     echo -e "   ${GREEN}🧪 test${NC}      - tests"
     echo -e "   ${GREEN}🛠️  build${NC}     - build system"
