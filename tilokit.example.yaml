@@ -1,0 +1,35 @@
+# TiLoKit Configuration File
+# Copy this file to ~/.tilokit/tilokit.yaml or ./tilokit.yaml
+
+# Default framework to use when not specified
+default_framework: "react"
+
+# Default build tool to use when not specified
+default_build_tool: "vite"
+
+# Default package manager
+default_package_manager: "npm"
+
+# Default output directory
+default_output_dir: "."
+
+# Custom templates (optional)
+templates:
+  # my-react-template: "/path/to/custom/react/template"
+  # my-vue-template: "/path/to/custom/vue/template"
+
+# Enabled plugins (optional)
+plugins:
+  - "react-framework"
+  - "vue-framework"
+  - "vite-builder"
+  - "git-integration"
+
+# Feature flags
+features:
+  typescript: true
+  eslint: true
+  prettier: true
+  testing: true
+  git_init: true
+  install_deps: true

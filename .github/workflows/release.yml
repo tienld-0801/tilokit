@@ -1,0 +1,364 @@
+name: Release and Deploy
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v0.1.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  GO_VERSION: '1.24.5'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Run tests
+        run: go test -v ./...
+
+      - name: Run linter
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          args: --timeout=5m
+
+      - name: Set build variables
+        run: |
+          # Determine version from tag or manual input
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
+
+          # Fallback to git describe if version is empty
+          if [ -z "$VERSION" ] || [ "$VERSION" = "$GITHUB_REF" ]; then
+            VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "v0.1.0-dev")
+          fi
+
+          # Set environment variables
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
+          echo "GIT_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+          # Determine if this is a prerelease
+          if [[ "$VERSION" =~ (alpha|beta|rc|dev) ]] || [ "${{ inputs.prerelease }}" = "true" ]; then
+            echo "IS_PRERELEASE=true" >> $GITHUB_ENV
+          else
+            echo "IS_PRERELEASE=false" >> $GITHUB_ENV
+          fi
+
+          echo "Release version: $VERSION"
+          echo "Is prerelease: ${IS_PRERELEASE:-false}"
+
+      - name: Build multi-platform binaries
+        run: |
+          mkdir -p dist
+
+          # Enhanced build flags with optimization
+          LDFLAGS="-w -s -X main.Version=$VERSION -X main.BuildDate=$BUILD_DATE -X main.GitCommit=$GIT_COMMIT"
+
+          # Build for multiple platforms with platform-specific optimizations
+          declare -A platforms=(
+            ["linux/amd64"]="CGO_ENABLED=0"
+            ["linux/arm64"]="CGO_ENABLED=0"
+            ["darwin/amd64"]="CGO_ENABLED=0"
+            ["darwin/arm64"]="CGO_ENABLED=0 GOARM=" # Apple Silicon optimization
+            ["windows/amd64"]="CGO_ENABLED=0"
+            ["windows/arm64"]="CGO_ENABLED=0"
+          )
+
+          for platform in "${!platforms[@]}"; do
+            GOOS=${platform%/*}
+            GOARCH=${platform#*/}
+            BUILD_ENV=${platforms[$platform]}
+
+            output_name="tilokit-$GOOS-$GOARCH"
+            if [ "$GOOS" = "windows" ]; then
+              output_name="${output_name}.exe"
+            fi
+
+            echo "🔨 Building for $GOOS/$GOARCH with optimizations..."
+
+            # Platform-specific build with optimizations
+            if [ "$GOOS" = "darwin" ] && [ "$GOARCH" = "arm64" ]; then
+              # Apple Silicon specific optimizations
+              echo "  └─ Applying Apple Silicon optimizations"
+              env GOOS=$GOOS GOARCH=$GOARCH $BUILD_ENV go build \
+                -ldflags "$LDFLAGS" \
+                -trimpath \
+                -buildmode=exe \
+                -o "dist/$output_name" .
+            else
+              # Standard build for other platforms
+              env GOOS=$GOOS GOARCH=$GOARCH $BUILD_ENV go build \
+                -ldflags "$LDFLAGS" \
+                -trimpath \
+                -o "dist/$output_name" .
+            fi
+
+            # Verify binary was created
+            if [ ! -f "dist/$output_name" ]; then
+              echo "❌ Failed to build $output_name"
+              exit 1
+            fi
+
+            # Generate checksums
+            cd dist
+            if command -v sha256sum >/dev/null 2>&1; then
+              sha256sum "$output_name" > "${output_name}.sha256"
+            elif command -v shasum >/dev/null 2>&1; then
+              shasum -a 256 "$output_name" > "${output_name}.sha256"
+            fi
+            cd ..
+
+            echo "  ✅ Built $output_name ($(du -h dist/$output_name | cut -f1))"
+          done
+
+          echo ""
+          echo "📦 Build Summary:"
+          ls -la dist/ | grep -E '\.(exe)?$' || true
+          echo ""
+          echo "🔐 Checksums:"
+          ls -la dist/*.sha256 || true
+
+      - name: Create GitHub Pages deployment
+        run: |
+          mkdir -p pages
+          cp dist/* pages/
+          cp scripts/install.sh pages/
+
+          # Create enhanced index.html for GitHub Pages with clear URLs
+          cat > pages/index.html << EOF
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <title>TiLoKit - Universal CLI Toolkit</title>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <meta name="description" content="Universal CLI Toolkit for Multi-Framework Project Generation">
+              <style>
+                  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+                  .container { max-width: 900px; margin: 0 auto; background: white; padding: 3rem; border-radius: 12px; margin-top: 2rem; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+                  .header { text-align: center; margin-bottom: 3rem; }
+                  .header h1 { font-size: 3rem; margin: 0; color: #2d3748; }
+                  .header p { font-size: 1.2rem; color: #718096; margin-top: 1rem; }
+                  .install-section { margin: 2rem 0; }
+                  .install-cmd { background: #2d3748; color: #e2e8f0; padding: 1.5rem; border-radius: 8px; font-family: 'SF Mono', Monaco, monospace; margin: 1rem 0; position: relative; }
+                  .install-cmd::before { content: '$ '; color: #68d391; }
+                  .copy-btn { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: #4299e1; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+                  .platform-section { margin: 3rem 0; }
+                  .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+                  .platform-card { background: #f7fafc; padding: 2rem; border-radius: 8px; text-align: center; border: 2px solid #e2e8f0; transition: all 0.3s ease; }
+                  .platform-card:hover { border-color: #4299e1; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(66, 153, 225, 0.15); }
+                  .platform-card h3 { margin: 0 0 1rem 0; color: #2d3748; font-size: 1.3rem; }
+                  .platform-card .platform-icon { font-size: 2rem; margin-bottom: 1rem; }
+                  .download-btn { display: inline-block; background: #4299e1; color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: 600; margin: 0.5rem; transition: background 0.3s ease; }
+                  .download-btn:hover { background: #3182ce; }
+                  .command-line { background: #1a202c; color: #e2e8f0; padding: 1rem; border-radius: 6px; font-family: monospace; margin: 0.5rem 0; }
+                  .command-line::before { content: '$ '; color: #68d391; }
+                  .footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; text-align: center; color: #718096; }
+                  .links { display: flex; justify-content: center; gap: 2rem; margin: 1rem 0; }
+                  .links a { color: #4299e1; text-decoration: none; font-weight: 500; }
+                  .links a:hover { text-decoration: underline; }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="header">
+                      <h1>🚀 TiLoKit</h1>
+                      <p>Universal CLI Toolkit for Multi-Framework Project Generation</p>
+                      <p><strong>Version:</strong> $VERSION | <strong>Build:</strong> $BUILD_DATE</p>
+                  </div>
+
+                  <div class="install-section">
+                      <h2>⚡ Quick Installation</h2>
+                      <p>The easiest way to install TiLoKit on macOS and Linux:</p>
+                      <div class="install-cmd" id="install-cmd">
+                          curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
+                          <button class="copy-btn" onclick="copyToClipboard('curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash')">Copy</button>
+                      </div>
+                  </div>
+
+                  <div class="platform-section">
+                      <h2>💾 Platform-Specific Downloads</h2>
+                      <p>Choose your platform for direct binary download:</p>
+
+                      <div class="platform-grid">
+                          <div class="platform-card">
+                              <div class="platform-icon">🐧</div>
+                              <h3>Linux</h3>
+                              <a href="./tilokit-linux-amd64" class="download-btn">Download x86-64</a>
+                              <a href="./tilokit-linux-arm64" class="download-btn">Download ARM64</a>
+                              <div class="command-line">wget https://tienld-0801.github.io/tilokit/tilokit-linux-amd64</div>
+                              <div class="command-line">chmod +x tilokit-linux-amd64 && sudo mv tilokit-linux-amd64 /usr/local/bin/tilokit</div>
+                          </div>
+
+                          <div class="platform-card">
+                              <div class="platform-icon">🍎</div>
+                              <h3>macOS</h3>
+                              <a href="./tilokit-darwin-amd64" class="download-btn">Download Intel</a>
+                              <a href="./tilokit-darwin-arm64" class="download-btn">Download Apple Silicon</a>
+                              <div class="command-line">curl -LO https://tienld-0801.github.io/tilokit/tilokit-darwin-arm64</div>
+                              <div class="command-line">chmod +x tilokit-darwin-arm64 && sudo mv tilokit-darwin-arm64 /usr/local/bin/tilokit</div>
+                          </div>
+
+                          <div class="platform-card">
+                              <div class="platform-icon">🪟</div>
+                              <h3>Windows</h3>
+                              <a href="./tilokit-windows-amd64.exe" class="download-btn">Download x86-64</a>
+                              <a href="./tilokit-windows-arm64.exe" class="download-btn">Download ARM64</a>
+                              <div class="command-line">curl -LO https://tienld-0801.github.io/tilokit/tilokit-windows-amd64.exe</div>
+                              <div class="command-line"># Add to PATH or run directly: .\tilokit-windows-amd64.exe</div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="footer">
+                      <div class="links">
+                          <a href="https://github.com/tienld-0801/tilokit">📚 Documentation</a>
+                          <a href="https://github.com/tienld-0801/tilokit/issues">🐛 Report Issues</a>
+                          <a href="https://github.com/tienld-0801/tilokit/discussions">💬 Discussions</a>
+                          <a href="https://github.com/tienld-0801/tilokit/releases">📦 All Releases</a>
+                      </div>
+                      <p>Made with ❤️ by TienLD | Licensed under MIT</p>
+                  </div>
+              </div>
+
+              <script>
+                  function copyToClipboard(text) {
+                      navigator.clipboard.writeText(text).then(() => {
+                          const btn = event.target;
+                          const originalText = btn.textContent;
+                          btn.textContent = 'Copied!';
+                          btn.style.background = '#68d391';
+                          setTimeout(() => {
+                              btn.textContent = originalText;
+                              btn.style.background = '#4299e1';
+                          }, 2000);
+                      });
+                  }
+              </script>
+          </body>
+          </html>
+          EOF
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./pages
+          force_orphan: true
+
+      - name: Extract release notes from CHANGELOG
+        id: release_notes
+        run: |
+          # Extract release notes for current version from CHANGELOG.md
+          VERSION_NUM=$(echo "$VERSION" | sed 's/^v//')
+
+          echo "📝 Extracting release notes for version $VERSION_NUM"
+
+          # Extract pure changelog content from CHANGELOG.md for this version
+          echo "📝 Extracting changelog content for version $VERSION_NUM"
+          
+          # Extract changelog content directly using awk
+          awk 'BEGIN {found=0} 
+               /^## \['"$VERSION_NUM"'\]/ {found=1; next} 
+               /^## \[/ && found {exit} 
+               found {print}' CHANGELOG.md > release_notes.md
+
+          # Debug: Show extracted content
+          echo "📋 Debug: Extracted content:"
+          cat release_notes.md
+          echo "📋 End of extracted content"
+          
+          # Get previous version for Full Changelog link
+          PREV_VERSION=$(git tag --sort=-version:refname | grep -v "$VERSION" | head -n1 || echo "")
+          
+          # Add Full Changelog link like GoFiber
+          if [ -n "$PREV_VERSION" ]; then
+            echo "" >> release_notes.md
+            echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/compare/${PREV_VERSION}...${VERSION}" >> release_notes.md
+          else
+            echo "" >> release_notes.md
+            echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/releases/tag/${VERSION}" >> release_notes.md
+          fi
+          
+          # Simple fallback for empty content
+          if [ ! -s release_notes.md ] || [ "$(wc -l < release_notes.md)" -le 3 ]; then
+            echo "⚠️  No changelog entries found, creating fallback release notes"
+            echo "Release $VERSION" > release_notes.md
+            echo "" >> release_notes.md
+            echo "This release includes various improvements and enhancements." >> release_notes.md
+            echo "" >> release_notes.md
+            if [ -n "$PREV_VERSION" ]; then
+              echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/compare/${PREV_VERSION}...${VERSION}" >> release_notes.md
+            else
+              echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/releases/tag/${VERSION}" >> release_notes.md
+            fi
+          fi
+
+          # Copy release notes for GitHub Release
+          cp release_notes.md release_notes.txt
+          
+          # Debug: Show final release notes content
+          echo "🔍 Final release notes content for GitHub Release:"
+          echo "=====================================" 
+          cat release_notes.txt
+          echo "=====================================" 
+          echo "File size: $(wc -c < release_notes.txt) bytes"
+          echo "Line count: $(wc -l < release_notes.txt) lines"
+          
+          echo "Release notes extracted for $VERSION"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: TiLoKit ${{ env.VERSION }}
+          body_path: release_notes.txt
+          files: |
+            dist/*
+          prerelease: ${{ env.IS_PRERELEASE == 'true' }}
+          draft: false
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

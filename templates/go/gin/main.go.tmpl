@@ -1,0 +1,43 @@
+package main
+
+import (
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
+)
+
+func main() {
+	// Create Gin router
+	r := gin.Default()
+
+	// CORS middleware
+	r.Use(cors.Default())
+
+	// Health check endpoint
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"service": "{{.ProjectName}}",
+		})
+	})
+
+	// API routes
+	api := r.Group("/api/v1")
+	{
+		api.GET("/", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "Welcome to {{.ProjectName}} API",
+				"version": "1.0.0",
+			})
+		})
+	}
+
+	// Start server
+	port := ":8080"
+	log.Printf("Server starting on port %s", port)
+	if err := r.Run(port); err != nil {
+		log.Fatal("Failed to start server:", err)
+	}
+}

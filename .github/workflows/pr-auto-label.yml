@@ -1,0 +1,127 @@
+name: 🏷️ Auto Label PR
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Auto-label PR based on conventional commits
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = context.payload.pull_request.title;
+            console.log(`🔍 PR Title: "${title}"`);
+
+            const labelMap = {
+              feat: '✨ Enhancement',
+              fix: '🐛 Bug',
+              perf: '⚡ Performance',
+              refactor: '♻️ Refactor',
+              docs: '📚 Documentation',
+              test: '🧪 Test',
+              build: '🛠️ Build',
+              ci: '🔄 CI/CD',
+              chore: '🧹 Maintenance',
+              style: '🎨 Style',
+              revert: '⏪ Revert'
+            };
+
+            const emojiMap = {
+              feat: '✨',
+              fix: '🐛',
+              perf: '⚡',
+              refactor: '♻️',
+              docs: '📚',
+              test: '🧪',
+              build: '🛠️',
+              ci: '🔄',
+              chore: '🧹',
+              style: '🎨',
+              revert: '⏪'
+            };
+
+            const hasEmoji = /^[\u{1F300}-\u{1F9FF}]|^[\u{2600}-\u{26FF}]|^[\u{2700}-\u{27BF}]/u.test(title);
+            const match = title.match(/^([a-z]+)(\([^)]+\))?:/);
+
+            if (match) {
+              const type = match[1];
+              const label = labelMap[type];
+              const emoji = emojiMap[type];
+
+              console.log(`🔍 Detected type: "${type}", Label: "${label}", Emoji: "${emoji}"`);
+
+              if (label && emoji) {
+                // Update title if missing emoji
+                if (!hasEmoji) {
+                  const newTitle = `${emoji} ${title}`;
+                  await github.rest.pulls.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: context.payload.pull_request.number,
+                    title: newTitle
+                  });
+                  console.log(`✨ Updated title: "${newTitle}"`);
+                }
+
+                // Add label if not already present
+                const currentLabels = context.payload.pull_request.labels.map(l => l.name);
+                console.log(`🔍 Current labels:`, currentLabels);
+
+                if (!currentLabels.includes(label)) {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.payload.pull_request.number,
+                    labels: [label]
+                  });
+                  console.log(`✅ Added label: ${label}`);
+                } else {
+                  console.log(`🔄 Label "${label}" already exists`);
+                }
+
+                const actions = [];
+                if (!hasEmoji) actions.push('added emoji to title');
+                if (!currentLabels.includes(label)) actions.push('added label');
+
+                if (actions.length > 0) {
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.payload.pull_request.number,
+                    body: `🤖 **Auto-formatted PR**\n\n` +
+                          `**Type:** \`${type}\` ${emoji}\n` +
+                          `**Label:** \`${label}\`\n` +
+                          `**Actions:** ${actions.join(', ')}\n\n` +
+                          `Thank you for following conventional commit standards! 🚀`
+                  });
+                }
+              } else {
+                console.log(`❓ No label/emoji mapping found for type: ${type}`);
+              }
+            } else {
+              console.log(`❌ Title doesn't follow conventional commit format`);
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `❌ **Invalid PR Title Format**\n\n` +
+                      `Your PR title should follow [Conventional Commits](https://www.conventionalcommits.org):\n` +
+                      `\`type(scope): description\`\n\n` +
+                      `**Valid types:** feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\n\n` +
+                      `**Examples:**\n` +
+                      `- \`feat: add new feature\`\n` +
+                      `- \`fix(core): resolve critical bug\`\n` +
+                      `- \`docs: update README\`\n\n` +
+                      `Please update your PR title to follow this format for automatic labeling.`
+              });
+            }
