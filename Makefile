@@ -105,9 +105,6 @@ release: ## Create a new release (usage: make release VERSION=v0.1.0)
 	@./.husky/check-hooks.sh
 	@echo "🔍 Checking release readiness..."
 	@$(MAKE) check-release
-	@echo "📝 Generating changelog..."
-	@chmod +x scripts/generate-changelog.sh
-	@./scripts/generate-changelog.sh $(VERSION)
 	@echo "🏠 Creating release..."
 	@chmod +x scripts/release.sh
 	@./scripts/release.sh $(VERSION)
