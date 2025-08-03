@@ -112,18 +112,13 @@ update_version_in_code() {
     print_success "Version updated to $version in code"
 }
 
-# Function to create release branch
-create_release_branch() {
+# Function to prepare release directly on develop
+prepare_release_on_develop() {
     local version=$1
-    local release_branch="release/$version"
 
-    print_info "Creating release branch: $release_branch" >&2
-
-    # Create and checkout release branch
-    git checkout -b "$release_branch"
-
-    print_success "Release branch $release_branch created" >&2
-    echo "$release_branch"
+    print_info "Preparing release $version directly on develop branch"
+    # Stay on develop branch - no need to create release branch
+    return 0
 }
 
 # Function to commit release changes
@@ -145,54 +140,58 @@ commit_release_changes() {
 # Function to create and push tag
 create_and_push_tag() {
     local version=$1
-    local release_branch=$2
 
-    print_info "Creating and pushing tag $version..."
+    print_info "Creating tag $version..."
 
-    # Extract release notes to temporary file
-    local tag_msg_file=$(mktemp)
+    # Create tag message file
+    local tag_msg_file="/tmp/tag_message_$version.txt"
     echo "Release $version" > "$tag_msg_file"
     echo "" >> "$tag_msg_file"
-    awk '/^## \['"${version#v}"'\]/, /^## \[/ {
-        if (/^## \['"${version#v}"'\]/) next
-        if (/^## \[/ && !/^## \['"${version#v}"'\]/) exit
-        print
+    echo "Changes in this release:" >> "$tag_msg_file"
+    echo "" >> "$tag_msg_file"
+
+    # Extract changes for this version from CHANGELOG.md
+    awk -v version="$version" '
+    BEGIN { in_version = 0; found_version = 0 }
+    /^## \[/ {
+        if (found_version && in_version) {
+            exit
+        }
+        if ($0 ~ "\\[" substr(version, 2) "\\]") {
+            in_version = 1
+            found_version = 1
+            next
+        } else {
+            in_version = 0
+        }
+    }
+    in_version && !/^## \[/ && !/^$/ {
+        print $0
     }' CHANGELOG.md | sed '/^$/d' >> "$tag_msg_file"
 
-    # Create annotated tag
+    # Create annotated tag from current commit
     git tag -a "$version" -F "$tag_msg_file"
     rm -f "$tag_msg_file"
 
-    # Push branch and tag
-    git push origin "$release_branch"
+    # Push develop branch and tag together
+    print_info "Pushing develop branch and tag..."
+    git push origin "$DEVELOP_BRANCH"
     git push origin "$version"
 
-    print_success "Tag $version created and pushed"
+    print_success "Tag $version created and pushed with develop branch"
 }
 
-# Function to merge back to develop
-merge_release() {
+# Function to finalize release (no merge needed since we're already on develop)
+finalize_release() {
     local version=$1
-    local release_branch=$2
 
-    print_info "Merging release back to develop..."
-    git checkout "$DEVELOP_BRANCH"
-    git pull origin "$DEVELOP_BRANCH"
-    git merge --no-ff "$release_branch" -m "Merge release $version back to develop"
+    print_info "Finalizing release $version..."
 
-    # Keep version as-is after release (no auto-bump)
+    # No merge needed - we committed directly to develop
+    # Version remains as-is for continued development
     print_info "Version remains $version for continued development..."
 
-    git push origin "$DEVELOP_BRANCH"
-
-    print_success "Merged back to $DEVELOP_BRANCH"
-
-    # Clean up release branch
-    print_info "Cleaning up release branch..."
-    git branch -d "$release_branch"
-    git push origin --delete "$release_branch"
-
-    print_success "Release branch cleaned up"
+    print_success "Release finalized on $DEVELOP_BRANCH"
 }
 
 # Main function
@@ -225,18 +224,17 @@ main() {
     update_changelog "$version"
     update_version_in_code "$version"
 
-    # Create release branch
-    local release_branch
-    release_branch=$(create_release_branch "$version")
+    # Prepare release on develop (no branch creation)
+    prepare_release_on_develop "$version"
 
-    # Commit changes
+    # Commit changes directly to develop
     commit_release_changes "$version"
 
-    # Create and push tag
-    create_and_push_tag "$version" "$release_branch"
+    # Create and push tag from develop
+    create_and_push_tag "$version"
 
-    # Merge release
-    merge_release "$version" "$release_branch"
+    # Finalize release (no merge needed)
+    finalize_release "$version"
 
     print_success "🎉 Release $version completed successfully!"
     print_info "Release workflow will now build and deploy automatically."
