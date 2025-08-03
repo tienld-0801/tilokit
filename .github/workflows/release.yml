@@ -309,12 +309,30 @@ jobs:
           cat release_notes.md
           echo "📋 End of extracted content"
           
+          # Get previous version for Full Changelog link
+          PREV_VERSION=$(git tag --sort=-version:refname | grep -v "$VERSION" | head -n1 || echo "")
+          
+          # Add Full Changelog link like GoFiber
+          if [ -n "$PREV_VERSION" ]; then
+            echo "" >> release_notes.md
+            echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/compare/${PREV_VERSION}...${VERSION}" >> release_notes.md
+          else
+            echo "" >> release_notes.md
+            echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/releases/tag/${VERSION}" >> release_notes.md
+          fi
+          
           # Simple fallback for empty content
-          if [ ! -s release_notes.md ]; then
+          if [ ! -s release_notes.md ] || [ "$(wc -l < release_notes.md)" -le 3 ]; then
             echo "⚠️  No changelog entries found, creating fallback release notes"
             echo "Release $VERSION" > release_notes.md
             echo "" >> release_notes.md
             echo "This release includes various improvements and enhancements." >> release_notes.md
+            echo "" >> release_notes.md
+            if [ -n "$PREV_VERSION" ]; then
+              echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/compare/${PREV_VERSION}...${VERSION}" >> release_notes.md
+            else
+              echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/releases/tag/${VERSION}" >> release_notes.md
+            fi
           fi
 
           # Copy release notes for GitHub Release
