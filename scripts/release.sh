@@ -66,9 +66,9 @@ check_develop_branch() {
 # Function to update changelog
 update_changelog() {
     local version=$1
-    
+
     print_info "Generating changelog from conventional commits..."
-    
+
     # Use the new changelog generator
     if [ -f "scripts/generate-changelog.sh" ]; then
         chmod +x scripts/generate-changelog.sh
@@ -77,7 +77,7 @@ update_changelog() {
         # Fallback to simple update
         local date=$(date +%Y-%m-%d)
         local temp_file=$(mktemp)
-        
+
         awk -v version="$version" -v date="$date" '
         /^## \[Unreleased\]$/ {
             print $0
@@ -94,7 +94,7 @@ update_changelog() {
         }
         1
         ' CHANGELOG.md > "$temp_file"
-        
+
         mv "$temp_file" CHANGELOG.md
         print_success "CHANGELOG.md updated for version $version"
     fi
@@ -103,12 +103,12 @@ update_changelog() {
 # Function to update version in code
 update_version_in_code() {
     local version=$1
-    
-    print_info "Updating version in cmd/version.go..."
-    
-    # Update version.go
-    sed -i "" "s/Version = \".*\"/Version = \"$version\"/" cmd/version.go
-    
+
+    print_info "Updating version in internal/cli/constants.go..."
+
+    # Update constants.go
+    sed -i "" "s/Version   = \".*\"/Version   = \"$version\"/" internal/cli/constants.go
+
     print_success "Version updated to $version in code"
 }
 
@@ -116,12 +116,12 @@ update_version_in_code() {
 create_release_branch() {
     local version=$1
     local release_branch="release/$version"
-    
+
     print_info "Creating release branch: $release_branch" >&2
-    
+
     # Create and checkout release branch
     git checkout -b "$release_branch"
-    
+
     print_success "Release branch $release_branch created" >&2
     echo "$release_branch"
 }
@@ -129,16 +129,16 @@ create_release_branch() {
 # Function to commit release changes
 commit_release_changes() {
     local version=$1
-    
+
     print_info "Committing release changes..."
-    
-    git add CHANGELOG.md cmd/version.go
+
+    git add CHANGELOG.md internal/cli/constants.go
     git commit -m "chore: prepare release $version
 
 - Update version to $version
 - Update CHANGELOG.md with release notes
 - Ready for release process"
-    
+
     print_success "Release changes committed"
 }
 
@@ -146,9 +146,9 @@ commit_release_changes() {
 create_and_push_tag() {
     local version=$1
     local release_branch=$2
-    
+
     print_info "Creating and pushing tag $version..."
-    
+
     # Extract release notes to temporary file
     local tag_msg_file=$(mktemp)
     echo "Release $version" > "$tag_msg_file"
@@ -158,15 +158,15 @@ create_and_push_tag() {
         if (/^## \[/ && !/^## \['"${version#v}"'\]/) exit
         print
     }' CHANGELOG.md | sed '/^$/d' >> "$tag_msg_file"
-    
+
     # Create annotated tag
     git tag -a "$version" -F "$tag_msg_file"
     rm -f "$tag_msg_file"
-    
+
     # Push branch and tag
     git push origin "$release_branch"
     git push origin "$version"
-    
+
     print_success "Tag $version created and pushed"
 }
 
@@ -174,12 +174,12 @@ create_and_push_tag() {
 merge_release() {
     local version=$1
     local release_branch=$2
-    
+
     print_info "Merging release back to develop..."
     git checkout "$DEVELOP_BRANCH"
     git pull origin "$DEVELOP_BRANCH"
     git merge --no-ff "$release_branch" -m "Merge release $version back to develop"
-    
+
     # Update version back to dev
     local next_dev_version
     if [[ $version =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
@@ -188,33 +188,33 @@ merge_release() {
         local patch=$((${BASH_REMATCH[3]} + 1))
         next_dev_version="v$major.$minor.$patch-dev"
     fi
-    
+
     if [[ -n "$next_dev_version" ]]; then
         print_info "Updating version to $next_dev_version for continued development..."
-        sed -i "" "s/Version = \".*\"/Version = \"$next_dev_version\"/" cmd/version.go
-        git add cmd/version.go
+        sed -i "" "s/Version   = \".*\"/Version   = \"$next_dev_version\"/" internal/cli/constants.go
+        git add internal/cli/constants.go
         git commit -m "chore: bump version to $next_dev_version for development"
     fi
-    
+
     git push origin "$DEVELOP_BRANCH"
-    
+
     print_success "Merged back to $DEVELOP_BRANCH"
-    
+
     # Clean up release branch
     print_info "Cleaning up release branch..."
     git branch -d "$release_branch"
     git push origin --delete "$release_branch"
-    
+
     print_success "Release branch cleaned up"
 }
 
 # Main function
 main() {
     local version=$1
-    
+
     print_info "🚀 Starting TiLoKit Release Process"
     print_info "=================================="
-    
+
     # Validate input
     if [[ -z "$version" ]]; then
         print_error "Version is required"
@@ -222,35 +222,35 @@ main() {
         print_info "Example: $0 v0.1.0"
         exit 1
     fi
-    
+
     validate_version "$version"
-    
+
     # Pre-flight checks
     print_info "Running pre-flight checks..."
     check_clean_working_dir
     check_develop_branch
-    
+
     # Ensure we're up to date
     print_info "Updating develop branch..."
     git pull origin "$DEVELOP_BRANCH"
-    
+
     # Update files
     update_changelog "$version"
     update_version_in_code "$version"
-    
+
     # Create release branch
     local release_branch
     release_branch=$(create_release_branch "$version")
-    
+
     # Commit changes
     commit_release_changes "$version"
-    
+
     # Create and push tag
     create_and_push_tag "$version" "$release_branch"
-    
+
     # Merge release
     merge_release "$version" "$release_branch"
-    
+
     print_success "🎉 Release $version completed successfully!"
     print_info "Release workflow will now build and deploy automatically."
     print_info "Monitor the progress at: https://github.com/tienld-0801/tilokit/actions"
