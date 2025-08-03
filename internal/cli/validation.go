@@ -12,7 +12,7 @@ func ValidateFlagUsage(args []string) error {
 		if !strings.HasPrefix(arg, "-") || arg == "--help" || arg == "-h" {
 			continue
 		}
-		
+
 		// Single dash flags must be exactly 2 characters (-x)
 		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") {
 			if len(arg) > 2 {

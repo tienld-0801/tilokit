@@ -31,7 +31,7 @@ func NewManager() *Manager {
 // HasAnyFlags checks if any flags are provided
 func (m *Manager) HasAnyFlags(cmd *cobra.Command) bool {
 	return m.ProjectName != "" || m.Framework != "" || m.BuildTool != "" ||
-		m.ListFrameworks || m.ListBuildTools || m.Update || m.Quiet || 
+		m.ListFrameworks || m.ListBuildTools || m.Update || m.Quiet ||
 		m.Force || m.ShowVersion || m.InitProject
 }
 
@@ -41,40 +41,40 @@ func (m *Manager) HandleCommand(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		return fmt.Errorf(InvalidCommandMsg, args[0])
 	}
-	
+
 	// Handle version flag first
 	if m.ShowVersion {
 		return ShowVersionInfo()
 	}
-	
+
 	// Handle init flag - this is the only case that shows banner
 	if m.InitProject {
 		return m.RunGenerateWithBanner()
 	}
-	
+
 	// Handle other flags
 	if m.Update {
 		return m.RunUpdate()
 	}
-	
+
 	if m.ListFrameworks {
 		return m.ListSupportedFrameworks()
 	}
-	
+
 	if m.ListBuildTools {
 		return m.ListSupportedBuildTools()
 	}
-	
+
 	// If project creation flags provided, run generation without banner
 	if m.ProjectName != "" || m.Framework != "" {
 		return m.RunGenerate()
 	}
-	
+
 	// If no flags provided, show usage
 	if !m.HasAnyFlags(cmd) {
 		return ShowUsageTable()
 	}
-	
+
 	return nil
 }
 
@@ -100,15 +100,15 @@ func (m *Manager) SetupFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&m.Framework, "framework", "f", "", "Framework to use (react, vue, svelte, etc.)")
 	cmd.Flags().StringVarP(&m.BuildTool, "build-tool", "b", "", "Build tool to use (vite, webpack, etc.)")
 	cmd.Flags().StringVarP(&m.OutputDir, "output", "o", ".", "Output directory")
-	
+
 	// Information flags
 	cmd.Flags().BoolVarP(&m.ListFrameworks, "list-frameworks", "l", false, "List all supported frameworks")
 	cmd.Flags().BoolVarP(&m.ListBuildTools, "list-build-tools", "t", false, "List all supported build tools")
 	cmd.Flags().BoolVarP(&m.ShowVersion, "version", "v", false, "Show version information")
-	
+
 	// Project initialization
 	cmd.Flags().BoolVarP(&m.InitProject, "init", "i", false, "Initialize a new project (with banner)")
-	
+
 	// Other options
 	cmd.Flags().BoolVarP(&m.Quiet, "quiet", "q", false, "Quiet mode (suppress output)")
 	cmd.Flags().BoolVarP(&m.Force, "force", "F", false, "Force overwrite existing directory")

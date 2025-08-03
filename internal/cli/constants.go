@@ -10,8 +10,8 @@ var (
 
 // Known long flags for validation
 var KnownLongFlags = []string{
-	"version", "init", "name", "framework", "build-tool", 
-	"output", "list-frameworks", "list-build-tools", 
+	"version", "init", "name", "framework", "build-tool",
+	"output", "list-frameworks", "list-build-tools",
 	"quiet", "force", "update", "help",
 }
 
@@ -20,7 +20,7 @@ const (
 	AppName        = "tilokit"
 	AppShort       = "✨ TiLoKit – Modern Multi-Framework Project Generator"
 	AppDescription = "Universal CLI toolkit for multi-framework project generation"
-	
+
 	// Error messages
 	InvalidCommandMsg = "invalid command '%s'. All commands must use flags with - or -- prefix. Use --help for available options"
 	InvalidFlagMsg    = "invalid flag '%s'. Use --%s for long form or find the correct short form (e.g., -v for --version, -i for --init)"

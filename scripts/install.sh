@@ -225,7 +225,7 @@ verify_installation() {
             echo ""
 
             # Show version
-            if tilokit version 2>/dev/null; then
+            if tilokit -v 2>/dev/null; then
                 echo ""
             else
                 log_warning "Could not get version info"

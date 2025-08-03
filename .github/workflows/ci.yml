@@ -92,8 +92,8 @@ jobs:
 
       - name: Test binary
         run: |
-          ./tilokit version
-          ./tilokit list --all
+          ./tilokit -v
+          ./tilokit -l
 
   integration-test:
     runs-on: ubuntu-latest
@@ -121,14 +121,14 @@ jobs:
 
       - name: Test React project generation
         run: |
-          ./tilokit --name test-react --framework react --build-tool vite --quiet
+          ./tilokit -i -n test-react -f react -b vite -q
           cd test-react
           npm install
           npm run build
 
       - name: Test Vue project generation
         run: |
-          ./tilokit --name test-vue --framework vue --build-tool vite --quiet
+          ./tilokit -i -n test-vue -f vue -b vite -q
           cd test-vue
           npm install
           npm run build

@@ -15,7 +15,7 @@ func main() {
 		utils.Error("%v", err)
 		os.Exit(1)
 	}
-	
+
 	// Set up graceful error handling
 	defer func() {
 		if r := recover(); r != nil {

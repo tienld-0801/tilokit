@@ -32,10 +32,10 @@ func Execute() {
 func init() {
 	// Set up flags using CLI manager
 	cliManager.SetupFlags(rootCmd)
-	
+
 	// Disable default completion command
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
-	
+
 	// Custom help template
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.SetUsageTemplate("")
