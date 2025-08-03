@@ -2,6 +2,11 @@
 
 All notable changes to TiLoKit will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- Development continues...
+
 ## [v0.1.1-dev] - 2025-08-03
 
 ### ✨ New Features
