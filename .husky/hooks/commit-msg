@@ -10,7 +10,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Valid conventional commit types (from pr-auto-label.yml)
+# Valid conventional commit types (from pr-auto-label.yml + release)
 VALID_TYPES=(
     "feat"      # ✨ Enhancement
     "fix"       # 🐛 Bug
@@ -23,6 +23,7 @@ VALID_TYPES=(
     "chore"     # 🧹 Maintenance
     "style"     # 🎨 Style
     "revert"    # ⏪ Revert
+    "release"   # 🚀 Release
 )
 
 # Read commit message from file
@@ -105,6 +106,7 @@ if [[ "$VALID_TYPE" == false ]]; then
     echo -e "  ${GREEN}🧹 chore${NC}     - maintenance tasks"
     echo -e "  ${GREEN}🎨 style${NC}     - code style changes"
     echo -e "  ${GREEN}⏪ revert${NC}    - reverting previous commits"
+    echo -e "  ${GREEN}🚀 release${NC}   - version releases"
     echo
     echo -e "${YELLOW}💡 Tip:${NC} Use ${BLUE}git commit --amend${NC} to fix your commit message"
     echo

@@ -133,7 +133,7 @@ commit_release_changes() {
     print_info "Committing release changes..."
 
     git add CHANGELOG.md internal/cli/constants.go
-    git commit -m "chore: prepare release $version
+    git commit -m "release: $version
 
 - Update version to $version
 - Update CHANGELOG.md with release notes
@@ -180,21 +180,8 @@ merge_release() {
     git pull origin "$DEVELOP_BRANCH"
     git merge --no-ff "$release_branch" -m "Merge release $version back to develop"
 
-    # Update version back to dev
-    local next_dev_version
-    if [[ $version =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
-        local major=${BASH_REMATCH[1]}
-        local minor=${BASH_REMATCH[2]}
-        local patch=$((${BASH_REMATCH[3]} + 1))
-        next_dev_version="v$major.$minor.$patch-dev"
-    fi
-
-    if [[ -n "$next_dev_version" ]]; then
-        print_info "Updating version to $next_dev_version for continued development..."
-        sed -i "" "s/Version   = \".*\"/Version   = \"$next_dev_version\"/" internal/cli/constants.go
-        git add internal/cli/constants.go
-        git commit -m "chore: bump version to $next_dev_version for development"
-    fi
+    # Keep version as-is after release (no auto-bump)
+    print_info "Version remains $version for continued development..."
 
     git push origin "$DEVELOP_BRANCH"
 
