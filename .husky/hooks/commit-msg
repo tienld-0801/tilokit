@@ -51,11 +51,8 @@ COMMIT_MSG=$(head -n1 "$COMMIT_MSG_FILE")
 
 echo -e "${BLUE}🔍 Validating commit message:${NC} ${COMMIT_MSG}"
 
-# Skip validation for merge commits
-if [[ $COMMIT_MSG =~ ^Merge\ .*|^Revert\ .* ]]; then
-    echo -e "${GREEN}✅ Merge/Revert commit detected - skipping validation${NC}"
-    exit 0
-fi
+# NO EXCEPTIONS: ALL commits must have emoji format
+# Even merge and revert commits must follow emoji convention
 
 # Check strict conventional commit format with emoji: emoji type: description
 # Must be: emoji type: description with exactly one space after colon
@@ -81,30 +78,46 @@ if echo "$COMMIT_MSG" | grep -qE '^[a-z]+\([^)]+\):'; then
     exit 1
 fi
 
-# Check if commit message has emoji format or not
+# Check if commit message has REQUIRED emoji format
 HAS_EMOJI=false
 if [[ $COMMIT_MSG =~ $COMMIT_PATTERN_WITH_EMOJI ]]; then
     HAS_EMOJI=true
-elif [[ $COMMIT_MSG =~ $COMMIT_PATTERN_WITHOUT_EMOJI ]]; then
-    HAS_EMOJI=false
 else
-    echo -e "${RED}❌ Invalid commit message format!${NC}"
-    echo
-    echo -e "${YELLOW}📋 Required format:${NC} ${BLUE}emoji type: description${NC} or ${BLUE}type: description${NC}"
-    echo -e "${YELLOW}📋 Valid Examples:${NC}"
-    echo -e "  ${GREEN}✅ ✨ feat: add new authentication feature${NC}"
-    echo -e "  ${GREEN}✅ 🐛 fix: resolve memory leak issue${NC}"
-    echo -e "  ${GREEN}✅ 📚 docs: update installation guide${NC}"
-    echo -e "  ${GREEN}✅ feat: add new authentication feature${NC} (emoji optional)"
-    echo
-    echo -e "${YELLOW}🚫 Invalid examples:${NC}"
-    echo -e "  ${RED}❌ Add new feature${NC} (no type)"
-    echo -e "  ${RED}❌ FEAT: add feature${NC} (uppercase)"
-    echo -e "  ${RED}❌ feat:add feature${NC} (missing space after colon)"
-    echo -e "  ${RED}❌ feat(scope): add feature${NC} (scopes not allowed)"
-    echo -e "  ${RED}❌ ' fix: something'${NC} (leading whitespace)"
-    echo
-    exit 1
+    # Check if it's the old format without emoji
+    if [[ $COMMIT_MSG =~ $COMMIT_PATTERN_WITHOUT_EMOJI ]]; then
+        echo -e "${RED}❌ Emoji is REQUIRED in commit messages!${NC}"
+        echo
+        echo -e "${YELLOW}📋 Required format:${NC} ${BLUE}emoji type: description${NC}"
+        echo -e "${YELLOW}📋 Valid Examples:${NC}"
+        echo -e "  ${GREEN}✅ ✨ feat: add new authentication feature${NC}"
+        echo -e "  ${GREEN}✅ 🐛 fix: resolve memory leak issue${NC}"
+        echo -e "  ${GREEN}✅ 📚 docs: update installation guide${NC}"
+        echo -e "  ${GREEN}✅ 🧪 test: add unit tests${NC}"
+        echo -e "  ${GREEN}✅ 🚀 release: version 1.0.0${NC}"
+        echo
+        echo -e "${YELLOW}🚫 Invalid (missing emoji):${NC}"
+        echo -e "  ${RED}❌ feat: add new feature${NC} (no emoji)"
+        echo -e "  ${RED}❌ test: add tests${NC} (no emoji)"
+        echo
+        echo -e "${YELLOW}💡 Tip:${NC} Add the correct emoji for your commit type!"
+        exit 1
+    else
+        echo -e "${RED}❌ Invalid commit message format!${NC}"
+        echo
+        echo -e "${YELLOW}📋 Required format:${NC} ${BLUE}emoji type: description${NC}"
+        echo -e "${YELLOW}📋 Valid Examples:${NC}"
+        echo -e "  ${GREEN}✅ ✨ feat: add new authentication feature${NC}"
+        echo -e "  ${GREEN}✅ 🐛 fix: resolve memory leak issue${NC}"
+        echo -e "  ${GREEN}✅ 📚 docs: update installation guide${NC}"
+        echo
+        echo -e "${YELLOW}🚫 Invalid examples:${NC}"
+        echo -e "  ${RED}❌ Add new feature${NC} (no type)"
+        echo -e "  ${RED}❌ FEAT: add feature${NC} (uppercase)"
+        echo -e "  ${RED}❌ feat:add feature${NC} (missing space after colon)"
+        echo -e "  ${RED}❌ feat(scope): add feature${NC} (scopes not allowed)"
+        echo
+        exit 1
+    fi
 fi
 
 # Extract type and emoji from commit message
