@@ -78,23 +78,6 @@ func SaveConfig(config *Config) error {
 	return viper.WriteConfigAs(configFile)
 }
 
-func setDefaults() {
-	viper.SetDefault("default_framework", "react")
-	viper.SetDefault("default_build_tool", "vite")
-	viper.SetDefault("default_package_manager", "npm")
-	viper.SetDefault("default_output_dir", ".")
-	viper.SetDefault("templates", map[string]string{})
-	viper.SetDefault("plugins", []string{})
-	viper.SetDefault("features", map[string]bool{
-		"typescript":   true,
-		"eslint":       true,
-		"prettier":     true,
-		"testing":      true,
-		"git_init":     true,
-		"install_deps": true,
-	})
-}
-
 func getDefaultConfig() *Config {
 	return &Config{
 		DefaultFramework:      "react",
