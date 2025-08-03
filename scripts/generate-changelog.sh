@@ -85,48 +85,38 @@ categorize_commits() {
             # Add to appropriate category
             case "$type" in
                 feat)
-                    feat_items="${feat_items}- ✨ $description
-"
+                    feat_items="${feat_items}- ✨ $description\n"
                     ;;
                 fix)
-                    fix_items="${fix_items}- 🐛 $description
-"
+                    fix_items="${fix_items}- 🐛 $description\n"
                     ;;
                 perf)
-                    perf_items="${perf_items}- ⚡ $description
-"
+                    perf_items="${perf_items}- ⚡ $description\n"
                     ;;
                 refactor)
-                    refactor_items="${refactor_items}- ♻️ $description
-"
+                    refactor_items="${refactor_items}- ♻️ $description\n"
                     ;;
                 docs)
-                    docs_items="${docs_items}- 📚 $description
-"
+                    docs_items="${docs_items}- 📚 $description\n"
                     ;;
                 test)
-                    test_items="${test_items}- 🧪 $description
-"
+                    test_items="${test_items}- 🧪 $description\n"
                     ;;
                 build)
-                    build_items="${build_items}- 🔧 $description
-"
+                    build_items="${build_items}- 🔧 $description\n"
                     ;;
                 ci)
-                    ci_items="${ci_items}- 🔄 $description
-"
+                    ci_items="${ci_items}- 🔄 $description\n"
                     ;;
                 chore)
                     # Skip chore commits (maintenance tasks) from release notes
                     continue
                     ;;
                 style)
-                    style_items="${style_items}- 💄 $description
-"
+                    style_items="${style_items}- 💄 $description\n"
                     ;;
                 revert)
-                    revert_items="${revert_items}- ⏪ $description
-"
+                    revert_items="${revert_items}- ⏪ $description\n"
                     ;;
             esac
     done <<< "$commits"
@@ -252,6 +242,22 @@ update_changelog() {
     
     # Cleanup temporary file
     rm -f "$content_file"
+    
+    # Clean up trailing spaces and multiple blank lines to prevent markdownlint issues
+    if command -v sed >/dev/null 2>&1; then
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS sed - remove trailing spaces
+            sed -i '' 's/[[:space:]]*$//' CHANGELOG.md
+            # Remove multiple consecutive blank lines (MD012)
+            sed -i '' '/^$/N;/^\n$/d' CHANGELOG.md
+        else
+            # GNU sed - remove trailing spaces
+            sed -i 's/[[:space:]]*$//' CHANGELOG.md
+            # Remove multiple consecutive blank lines (MD012)
+            sed -i '/^$/N;/^\n$/d' CHANGELOG.md
+        fi
+        print_info "Cleaned trailing spaces and multiple blank lines from CHANGELOG.md"
+    fi
     
     print_success "CHANGELOG.md updated for version $version"
 }

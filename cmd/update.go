@@ -148,22 +148,26 @@ func downloadAndInstall(release *GitHubRelease) error {
 	
 	// Create temporary file
 	tmpFile := currentExe + ".tmp"
+	// #nosec G304 - safe path from os.Executable()
 	out, err := os.Create(tmpFile)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
-	
+
 	// Copy downloaded content
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		os.Remove(tmpFile)
+		// #nosec G104 - cleanup error ignored
+		_ = os.Remove(tmpFile)
 		return err
 	}
-	
+
 	// Make executable
-	if err := os.Chmod(tmpFile, 0755); err != nil {
-		os.Remove(tmpFile)
+	// #nosec G302 - executables need 0700 permissions
+	if err := os.Chmod(tmpFile, 0700); err != nil {
+		// #nosec G104 - cleanup error ignored
+		_ = os.Remove(tmpFile)
 		return err
 	}
 	
@@ -179,18 +183,20 @@ func downloadAndInstall(release *GitHubRelease) error {
 }
 
 func replaceExecutableWindows(currentExe, tmpFile string) error {
-	// Create a batch script to replace the executable after this process exits
+	// Create batch script for replacement
 	batchScript := currentExe + "_update.bat"
 	scriptContent := fmt.Sprintf(`@echo off
 timeout /t 2
 move "%s" "%s"
 del "%%~f0"`, tmpFile, currentExe)
 	
-	if err := os.WriteFile(batchScript, []byte(scriptContent), 0644); err != nil {
+	// Write batch script
+	if err := os.WriteFile(batchScript, []byte(scriptContent), 0600); err != nil {
 		return err
 	}
 	
-	// Execute the batch script in background
+	// Execute batch script
+	// #nosec G204 - safe script content
 	cmd := exec.Command("cmd", "/C", "start", "/B", batchScript)
 	return cmd.Start()
 }
@@ -206,11 +212,12 @@ func askConfirmation(question string) bool {
 		}
 		
 		response = strings.ToLower(strings.TrimSpace(response))
-		if response == "y" || response == "yes" {
+		switch response {
+		case "y", "yes":
 			return true
-		} else if response == "n" || response == "no" || response == "" {
+		case "n", "no", "":
 			return false
-		} else {
+		default:
 			fmt.Println("Please answer 'y' or 'n'")
 		}
 	}

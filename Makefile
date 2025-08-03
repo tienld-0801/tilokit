@@ -98,9 +98,27 @@ release: ## Create a new release (usage: make release VERSION=v0.1.0)
 		echo "❌ VERSION is required. Usage: make release VERSION=v0.1.0"; \
 		exit 1; \
 	fi
-	@echo "Starting release process for $(VERSION)..."
+	@echo "🚀 Starting release process for $(VERSION)..."
+	@echo "🔍 Checking release readiness..."
+	@$(MAKE) check-release
+	@echo "📝 Generating changelog..."
+	@chmod +x scripts/generate-changelog.sh
+	@./scripts/generate-changelog.sh $(VERSION)
+	@echo "🏠 Creating release..."
 	@chmod +x scripts/release.sh
-	./scripts/release.sh $(VERSION)
+	@./scripts/release.sh $(VERSION)
+	@echo "✨ Release $(VERSION) completed!"
+
+quick-release: ## Quick release with automatic version bump (dev releases)
+	@echo "⚡ Quick release process..."
+	@NEXT_VERSION=$$(date +"v0.1.%s-dev"); \
+	echo "🚀 Creating quick release: $$NEXT_VERSION"; \
+	$(MAKE) release VERSION=$$NEXT_VERSION
+
+dev-release: ## Create development release (usage: make dev-release)
+	@NEXT_VERSION="v0.1.$$(date +%s)-dev"; \
+	echo "🔧 Creating dev release: $$NEXT_VERSION"; \
+	$(MAKE) release VERSION=$$NEXT_VERSION
 
 hotfix: ## Create a hotfix release (usage: make hotfix VERSION=v0.1.1)
 	@if [ -z "$(VERSION)" ]; then \
@@ -124,11 +142,34 @@ check-release: ## Check if ready for release
 	@echo "🔍 Checking release readiness..."
 	@echo "Current branch: $$(git branch --show-current)"
 	@echo "Working directory status:"
-	@git status --porcelain || echo "✅ Working directory is clean"
+	@if [ -n "$$(git status --porcelain)" ]; then \
+		echo "❌ Working directory is dirty:"; \
+		git status --short; \
+		echo "Please commit or stash changes before release"; \
+		exit 1; \
+	else \
+		echo "✅ Working directory is clean"; \
+	fi
 	@echo "Latest tags:"
 	@git tag --sort=-version:refname | head -5
 	@echo "Unreleased commits:"
 	@git log --oneline $$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")..HEAD | head -10
+
+release-status: ## Show current release status
+	@echo "📋 Release Status"
+	@echo "==============="
+	@echo "Current branch: $$(git branch --show-current)"
+	@echo "Latest tag: $$(git describe --tags --abbrev=0 2>/dev/null || echo 'No tags found')"
+	@echo "Commits since last tag: $$(git rev-list $$(git describe --tags --abbrev=0 2>/dev/null || echo HEAD)..HEAD --count 2>/dev/null || echo '0')"
+	@echo "Version in code: $$(grep 'Version =' cmd/version.go | cut -d'"' -f2)"
+	@echo "Working directory: $$(if [ -n "$$(git status --porcelain)" ]; then echo 'dirty'; else echo 'clean'; fi)"
+
+validate-release: ## Validate release readiness with tests
+	@echo "⚙️ Validating release readiness..."
+	@$(MAKE) lint
+	@$(MAKE) test
+	@$(MAKE) build
+	@echo "✅ Release validation passed!"
 
 version-info: ## Show current version information
 	@echo "📋 Version Information"

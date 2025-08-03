@@ -5,48 +5,115 @@ All notable changes to TiLoKit will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.1.0-dev] - 2025-08-03
 
-### Changed
-- Development continues...
+### 🚀 New Features
 
-## [0.1.5-dev] - 2025-08-03
+#### Core CLI Framework
+- ✨ **Project scaffolding system** with multiple framework support
+- ✨ **Template engine** for React, Vue, and custom templates
+- ✨ **Interactive CLI** with beautiful project creation wizard
+- ✨ **Auto-update functionality** - Self-updating from GitHub releases
+- ✨ **Global `--update` flag** for quick updates
+- ✨ **Cross-platform support** - macOS, Linux, and Windows
+- ✨ **Smart binary detection** with automatic platform identification
+- ✨ **Release notes display** during updates
 
-### Added
-- ✨ add auto-update functionality
+#### Template System
+- 📦 **React templates** with modern build tools (Vite, Create React App)
+- 📦 **Vue templates** with complete component structure
+- 📦 **Custom template support** with flexible configuration
+- 📦 **Template validation** and structure verification
+- 📦 **Package management** with npm/yarn support
+- 📦 **TypeScript configurations** for modern development
 
-### Changed
-- Development continues...
+#### Development Tools
+- 🔧 **Professional release system** with GitFlow integration
+- 🔧 **Automated changelog generation** from conventional commits
+- 🔧 **Multi-platform builds** with Apple Silicon optimizations
+- 🔧 **GitHub Actions integration** for CI/CD
+- 🔧 **Hotfix workflow** for emergency releases
+- 🔧 **Release branch management** with automatic cleanup
 
-## [0.1.5-dev] - 2025-08-03
+#### GitHub Integration
+- 🐙 **GitHub Pages deployment** with modern responsive interface
+- 🐙 **Automated PR labeling** with conventional commit parsing
+- 🐙 **Release notes extraction** with proper categorization
+- 🐙 **Multi-platform asset publishing** with checksums
+- 🐙 **Install script generation** with dependency checking
 
-### Added
-- ✨ **New `tilokit update` command** - Auto-update to latest version from GitHub releases
-- ✨ **Global `--update` flag** - Quick update option: `tilokit --update`
-- 🔄 **Cross-platform update support** - Works on macOS, Linux, and Windows
-- 🎯 **Smart binary detection** - Automatically detects correct platform binary
-- 💬 **Interactive confirmation** - Ask user before updating
-- 📋 **Release notes display** - Shows what's new before updating
+### 🧹 Updates
 
-### Enhanced
-- 🚀 **Improved CLI experience** with self-updating capabilities
-- 🔒 **Secure downloads** from GitHub releases with timeout handling
-- 🎯 **Better user experience** with clear update process feedback
+#### Dependencies & Compatibility
+- ⬆️ **Go 1.24+ compatibility** with modern language features
+- ⬆️ **Cobra CLI framework** updated to v1.9.1
+- ⬆️ **Viper configuration** updated to v1.20.1
+- ⬆️ **Color output support** with fatih/color v1.18.0
+- ⬆️ **Git integration** with go-git v5.16.2
+- ⬆️ **Cross-platform compatibility** improvements
 
-## [0.1.4-dev] - 2025-08-03
+#### Build & Release
+- 🏗️ **Build optimization** with size reduction flags (-w -s)
+- 🏗️ **Apple Silicon support** with darwin/arm64 optimizations
+- 🏗️ **Windows executable** handling with proper .exe extensions
+- 🏗️ **Checksum generation** with cross-platform sha256 support
+- 🏗️ **Install script** with Git Bash/WSL detection
 
-### Added
-- ✨ Enhanced release workflow automation with better branch management
-- ✨ Pure changelog extraction for GitHub releases
+### 🐛 Bug Fixes
 
-### Fixed
-- 🐛 GitHub release notes now display full changelog content
-- 🐛 Improved awk pattern matching for version extraction
-- 🐛 Resolved Go module dependency issues with version 1.24.5
+#### Release System
+- 🐛 **ANSI color codes** removed from git tag messages
+- 🐛 **macOS sed compatibility** with empty string extensions
+- 🐛 **Regex syntax errors** in changelog generation
+- 🐛 **Associative array issues** replaced with simple variables
+- 🐛 **Awk newline handling** for proper changelog formatting
+- 🐛 **stderr redirection** for clean command output
 
-### Changed
-- 🔄 Simplified release workflow by removing complex processing
-- 🔄 Updated Go version to 1.24.5 for better compatibility
+#### Template & Structure
+- 🐛 **Missing Vue components** and icons directory
+- 🐛 **TypeScript configuration** for Vue templates
+- 🐛 **Base CSS files** inclusion in templates
+- 🐛 **Package.json validation** and dependency checking
+- 🐛 **Template structure** completeness verification
+
+#### CI/CD & Workflows
+- 🐛 **GitHub Actions permissions** resolved
+- 🐛 **PR auto-labeling** workflow conditions
+- 🐛 **Markdown linting** with proper header checking
+- 🐛 **Security scanning** and testing improvements
+- 🐛 **Deploy process** automation fixes
+
+### 🛠️ Maintenance
+
+#### Code Quality
+- 🧹 **Code organization** with proper module structure
+- 🧹 **Error handling** improvements across all components
+- 🧹 **Documentation** updates with comprehensive examples
+- 🧹 **License management** and compliance
+- 🧹 **README formatting** and content updates
+
+#### Testing & Security
+- 🔒 **CodeQL integration** for security scanning
+- 🔒 **Dependabot configuration** for automated updates
+- 🔒 **Security policy** establishment
+- 🔒 **Code review** automation with proper workflows
+
+### 📚 Documentation
+
+#### User Guides
+- 📖 **Installation instructions** for all platforms
+- 📖 **Usage examples** with command-line references
+- 📖 **Template creation** guides and best practices
+- 📖 **Release process** documentation
+- 📖 **Contributing guidelines** and development setup
+
+#### Technical Documentation
+- 📝 **API documentation** with docstrings
+- 📝 **Architecture diagrams** and system overview
+- 📝 **Configuration options** reference
+- 📝 **Troubleshooting guides** for common issues
+
+Full Changelog: [Initial Release](https://github.com/tienld-0801/tilokit/releases/tag/v0.1.0-dev)
 
 ## [0.1.6-dev] - 2025-08-03
 
@@ -102,8 +169,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🐛 replace regex with sed for conventional commit parsing
 - 🐛 remove dangling else statement in generate-changelog.sh
 - 🐛 replace associative arrays with simple variables
-- 🐛 use literal newlines instead of 
- escapes
+- 🐛 use literal newlines instead of \n escapes
 - 🐛 use temporary file for awk changelog content
 - 🐛 add empty string extension for macOS sed -i compatibility
 - 🐛 use temporary file for git tag message to avoid ANSI codes
@@ -143,8 +209,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🐛 replace regex with sed for conventional commit parsing
 - 🐛 remove dangling else statement in generate-changelog.sh
 - 🐛 replace associative arrays with simple variables
-- 🐛 use literal newlines instead of 
- escapes
+- 🐛 use literal newlines instead of \n escapes
 - 🐛 use temporary file for awk changelog content
 
 ### Changed
@@ -180,8 +245,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🐛 replace regex with sed for conventional commit parsing
 - 🐛 remove dangling else statement in generate-changelog.sh
 - 🐛 replace associative arrays with simple variables
-- 🐛 use literal newlines instead of 
- escapes
+- 🐛 use literal newlines instead of \n escapes
 - 🐛 use temporary file for awk changelog content
 
 ### Changed
@@ -235,53 +299,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ♻️ Refactored release scripts to follow conventional commits
 - 🔄 Enhanced GitFlow integration with better branch management
 - 📚 Updated documentation and inline help messages
-
-## [0.1.0-dev] - Development Phase
-
-### Added
-- 🚀 **Multi-Framework Support**: Complete plugin architecture supporting 25+ frameworks
-- 🔧 **Universal Build Tools**: Support for language-specific build tools and package managers
-- 🎯 **Interactive CLI**: Beautiful command-line interface with prompts and validation
-- 📦 **Plugin System**: Extensible architecture for easy framework additions
-- 🐳 **Docker Support**: Container configurations for all supported frameworks
-- 🔄 **CI/CD Integration**: GitHub Actions workflows for testing and releases
-- 📋 **Comprehensive Testing**: Unit tests and integration testing framework
-- 🛠️ **Development Tools**: Build scripts, linting, and formatting automation
-
-### Framework Support
-- **JavaScript/TypeScript**: React, Vue, Angular, Svelte, Next.js, Nuxt.js
-- **Python**: Django, Flask, FastAPI
-- **PHP**: Laravel, Symfony
-- **Java**: Spring Boot, Quarkus
-- **Go**: Gin, Echo, Fiber
-- **Rust**: Actix, Rocket, Axum
-- **C#**: ASP.NET Core, Blazor
-- **Ruby**: Rails, Sinatra
-- **Node.js**: Express, NestJS, Fastify
-- **Mobile**: React Native, Flutter, Ionic
-- **Desktop**: Electron, Tauri, Wails
-
-### Build Tools
-- **JavaScript**: Vite, Webpack, Rollup, Parcel
-- **Package Managers**: npm, yarn, pnpm
-- **Language-Specific**: pip, poetry, composer, maven, gradle, cargo, dotnet, bundler
-
-### Infrastructure
-- Modern Go architecture with clean separation of concerns
-- Plugin registry with lifecycle management
-- Rich execution context for project generation
-- Configuration management with YAML support
-- Template engine for dynamic file generation
-- Git integration with smart .gitignore generation
-
-### Development Features
-- Initial project structure
-- Core engine implementation
-- Basic CLI framework setup
-- Basic React and Vue support
-- Vite build tool integration
-- CLI foundation with Cobra
-
----
-
-> **Note**: TiLoKit is currently in active development. This changelog will be updated as features are implemented and released.
