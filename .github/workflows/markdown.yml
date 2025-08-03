@@ -1,9 +1,7 @@
 name: markdownlint
 
 on:
-  push:
-    branches:
-      - develop
+  # Only run on PRs - no need to re-check markdown on develop merge
   pull_request:
 
 jobs:

@@ -1,10 +1,10 @@
 name: 🔍 Validate Commits
 
 on:
+  # Only run on PRs - commits are already validated by pre-commit hooks
+  # No need to re-validate when merging to develop
   pull_request:
     types: [opened, synchronize, reopened]
-  push:
-    branches: [main, develop]
 
 permissions:
   contents: read

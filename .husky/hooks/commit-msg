@@ -37,22 +37,43 @@ if [[ $COMMIT_MSG =~ ^Merge\ .*|^Revert\ .* ]]; then
     exit 0
 fi
 
-# Check conventional commit format: type(scope): description
-COMMIT_PATTERN='^[a-z]+(\([^)]+\))?:[ ].+'
+# Check strict conventional commit format: type: description (NO scopes allowed)
+# Must be: type: description with exactly one space after colon
+# Must not have leading/trailing whitespace
+COMMIT_PATTERN='^[a-z]+: .+'
+
+# Check for leading/trailing whitespace
+if [[ "$COMMIT_MSG" != "$(echo "$COMMIT_MSG" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')" ]]; then
+    echo -e "${RED}❌ Commit message has leading or trailing whitespace!${NC}"
+    echo -e "${YELLOW}📋 Example of invalid:${NC} ${RED}' fix: something'${NC} or ${RED}'fix: something '${NC}"
+    echo -e "${YELLOW}📋 Example of valid:${NC} ${GREEN}'fix: something'${NC}"
+    exit 1
+fi
+
+# Check for scope usage (not allowed)
+if echo "$COMMIT_MSG" | grep -qE '^[a-z]+\([^)]+\):'; then
+    echo -e "${RED}❌ Scopes are not allowed in commit messages!${NC}"
+    echo -e "${YELLOW}📋 Invalid:${NC} ${RED}feat(ci): something${NC}"
+    echo -e "${YELLOW}📋 Valid:${NC} ${GREEN}ci: something${NC}"
+    exit 1
+fi
+
 if [[ ! $COMMIT_MSG =~ $COMMIT_PATTERN ]]; then
     echo -e "${RED}❌ Invalid commit message format!${NC}"
     echo
-    echo -e "${YELLOW}📋 Required format:${NC} ${BLUE}type(scope): description${NC}"
-    echo -e "${YELLOW}📋 Examples:${NC}"
+    echo -e "${YELLOW}📋 Required format:${NC} ${BLUE}type: description${NC}"
+    echo -e "${YELLOW}📋 Valid Examples:${NC}"
     echo -e "  ${GREEN}✅ feat: add new authentication feature${NC}"
-    echo -e "  ${GREEN}✅ fix(core): resolve memory leak issue${NC}"
+    echo -e "  ${GREEN}✅ fix: resolve memory leak issue${NC}"
     echo -e "  ${GREEN}✅ docs: update installation guide${NC}"
-    echo -e "  ${GREEN}✅ chore(deps): update dependencies${NC}"
+    echo -e "  ${GREEN}✅ ci: update workflow configuration${NC}"
     echo
     echo -e "${YELLOW}🚫 Invalid examples:${NC}"
-    echo -e "  ${RED}❌ Add new feature${NC}"
-    echo -e "  ${RED}❌ FEAT: add feature${NC}"
+    echo -e "  ${RED}❌ Add new feature${NC} (no type)"
+    echo -e "  ${RED}❌ FEAT: add feature${NC} (uppercase)"
     echo -e "  ${RED}❌ feat:add feature${NC} (missing space after colon)"
+    echo -e "  ${RED}❌ feat(scope): add feature${NC} (scopes not allowed)"
+    echo -e "  ${RED}❌ ' fix: something'${NC} (leading whitespace)"
     echo
     exit 1
 fi
