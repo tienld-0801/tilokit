@@ -30,8 +30,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "tilokit",
-	Short: "✨ TiLoKit – Modern Multi-Framework Project Generator",
+	Use:     "tilokit",
+	Aliases: []string{"tilo", "tk"},
+	Short:   "✨ TiLoKit – Modern Multi-Framework Project Generator",
 	Long: `TiLoKit is a powerful CLI tool for generating modern web projects
 with support for multiple frameworks, build tools, and best practices.
 
@@ -42,7 +43,13 @@ Features:
   • ESLint & Prettier configuration
   • Testing setup
   • Git initialization
-  • Dependency management`,
+  • Dependency management
+
+Examples:
+  tilokit --name my-app --framework react --build-tool vite
+  tilokit -n my-vue-app -f vue -b vite -o ./projects
+  tilokit --list-frameworks
+  tilokit --update`,
 	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Handle update flag
@@ -352,13 +359,21 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().StringVarP(&projectName, "name", "n", "", "Project name")
+	// Core project flags
+	rootCmd.Flags().StringVarP(&projectName, "name", "n", "", "Project name (required)")
 	rootCmd.Flags().StringVarP(&framework, "framework", "f", "", "Framework to use (react, vue, svelte, etc.)")
 	rootCmd.Flags().StringVarP(&buildTool, "build-tool", "b", "", "Build tool to use (vite, webpack, etc.)")
 	rootCmd.Flags().StringVarP(&outputDir, "output", "o", ".", "Output directory")
-	rootCmd.Flags().BoolVar(&listFrameworks, "list-frameworks", false, "List supported frameworks")
-	rootCmd.Flags().BoolVar(&listBuildTools, "list-build-tools", false, "List supported build tools")
-	rootCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "Quiet mode")
-	rootCmd.Flags().BoolVar(&force, "force", false, "Force overwrite existing directory")
-	rootCmd.Flags().BoolVar(&update, "update", false, "Update TiLoKit to the latest version")
+	
+	// Information flags
+	rootCmd.Flags().BoolVarP(&listFrameworks, "list-frameworks", "l", false, "List all supported frameworks")
+	rootCmd.Flags().BoolVarP(&listBuildTools, "list-build-tools", "t", false, "List all supported build tools")
+	
+	// Behavior flags
+	rootCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "Quiet mode (suppress output)")
+	rootCmd.Flags().BoolVarP(&force, "force", "F", false, "Force overwrite existing directory")
+	rootCmd.Flags().BoolVarP(&update, "update", "u", false, "Update TiLoKit to the latest version")
+	
+	// Add helpful flag groupings
+	rootCmd.Flags().SortFlags = false // Keep our custom order
 }
