@@ -1,4 +1,4 @@
-.PHONY: help build test clean install dev lint docker
+.PHONY: help build test clean install dev lint docker hooks install-hooks uninstall-hooks
 
 # Build configurations  
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
@@ -183,3 +183,26 @@ version-info: ## Show current version information
 	else \
 		echo "Binary not built (run 'make build' first)"; \
 	fi
+
+##@ Git Hooks
+
+hooks: install-hooks ## Alias for install-hooks
+
+install-hooks: ## Install Git hooks for commit message validation
+	@echo "🔧 Installing Git hooks from .husky..."
+	@chmod +x .husky/hooks/install-hooks.sh
+	@./.husky/hooks/install-hooks.sh
+
+uninstall-hooks: ## Uninstall Git hooks
+	@echo "🗑️ Uninstalling Git hooks..."
+	@if [ -f ".git/hooks/commit-msg" ]; then \
+		rm .git/hooks/commit-msg && echo "✅ Removed commit-msg hook"; \
+	else \
+		echo "ℹ️ commit-msg hook not found"; \
+	fi
+	@if [ -f ".git/hooks/pre-commit" ]; then \
+		rm .git/hooks/pre-commit && echo "✅ Removed pre-commit hook"; \
+	else \
+		echo "ℹ️ pre-commit hook not found"; \
+	fi
+	@echo "🎉 Git hooks uninstalled!"
