@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 # Function to check if hooks are installed
 check_hooks_installed() {
     local git_hooks_dir="$(git rev-parse --git-dir)/hooks"
-    
+
     if [[ -f "$git_hooks_dir/commit-msg" ]] && [[ -f "$git_hooks_dir/pre-commit" ]]; then
         return 0  # Hooks are installed
     else
@@ -26,11 +26,11 @@ check_hooks_installed() {
 auto_install_hooks() {
     echo -e "${YELLOW}⚠️  Git hooks not found!${NC}"
     echo -e "${BLUE}🔧 Auto-installing hooks for commit message validation...${NC}"
-    
+
     # Make installer executable and run it
     chmod +x .husky/hooks/install-hooks.sh
     ./.husky/hooks/install-hooks.sh
-    
+
     if [[ $? -eq 0 ]]; then
         echo -e "${GREEN}✅ Hooks installed successfully!${NC}"
         return 0
@@ -47,14 +47,14 @@ main() {
         echo -e "${RED}❌ Not in a git repository${NC}"
         exit 1
     fi
-    
+
     # Check if .husky directory exists
     if [[ ! -d ".husky" ]]; then
         echo -e "${YELLOW}⚠️  .husky directory not found${NC}"
         echo -e "${BLUE}ℹ️  This project uses Git hooks for commit validation${NC}"
         exit 0
     fi
-    
+
     # Check if hooks are installed
     if check_hooks_installed; then
         echo -e "${GREEN}✅ Git hooks are installed${NC}"
