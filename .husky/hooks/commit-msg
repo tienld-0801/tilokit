@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# TiLoKit Commit Message Validator
+# Ensures all commit messages follow conventional commit format
+
+# ANSI color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Valid conventional commit types (from pr-auto-label.yml)
+VALID_TYPES=(
+    "feat"      # ✨ Enhancement
+    "fix"       # 🐛 Bug
+    "docs"      # 📚 Documentation
+    "refactor"  # ♻️ Refactor
+    "perf"      # ⚡ Performance
+    "test"      # 🧪 Test
+    "build"     # 🛠️ Build
+    "ci"        # 🔄 CI/CD
+    "chore"     # 🧹 Maintenance
+    "style"     # 🎨 Style
+    "revert"    # ⏪ Revert
+)
+
+# Read commit message from file
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(head -n1 "$COMMIT_MSG_FILE")
+
+echo -e "${BLUE}🔍 Validating commit message:${NC} ${COMMIT_MSG}"
+
+# Skip validation for merge commits
+if [[ $COMMIT_MSG =~ ^Merge\ .*|^Revert\ .* ]]; then
+    echo -e "${GREEN}✅ Merge/Revert commit detected - skipping validation${NC}"
+    exit 0
+fi
+
+# Check conventional commit format: type(scope): description
+COMMIT_PATTERN='^[a-z]+(\([^)]+\))?:[ ].+'
+if [[ ! $COMMIT_MSG =~ $COMMIT_PATTERN ]]; then
+    echo -e "${RED}❌ Invalid commit message format!${NC}"
+    echo
+    echo -e "${YELLOW}📋 Required format:${NC} ${BLUE}type(scope): description${NC}"
+    echo -e "${YELLOW}📋 Examples:${NC}"
+    echo -e "  ${GREEN}✅ feat: add new authentication feature${NC}"
+    echo -e "  ${GREEN}✅ fix(core): resolve memory leak issue${NC}"
+    echo -e "  ${GREEN}✅ docs: update installation guide${NC}"
+    echo -e "  ${GREEN}✅ chore(deps): update dependencies${NC}"
+    echo
+    echo -e "${YELLOW}🚫 Invalid examples:${NC}"
+    echo -e "  ${RED}❌ Add new feature${NC}"
+    echo -e "  ${RED}❌ FEAT: add feature${NC}"
+    echo -e "  ${RED}❌ feat:add feature${NC} (missing space after colon)"
+    echo
+    exit 1
+fi
+
+# Extract type from commit message
+COMMIT_TYPE=$(echo "$COMMIT_MSG" | sed -E 's/^([a-z]+)(\([^)]*\))?: .*/\1/')
+
+# Check if type is valid
+VALID_TYPE=false
+for type in "${VALID_TYPES[@]}"; do
+    if [[ "$COMMIT_TYPE" == "$type" ]]; then
+        VALID_TYPE=true
+        break
+    fi
+done
+
+if [[ "$VALID_TYPE" == false ]]; then
+    echo -e "${RED}❌ Invalid commit type: ${COMMIT_TYPE}${NC}"
+    echo
+    echo -e "${YELLOW}📋 Valid types:${NC}"
+    echo -e "  ${GREEN}✨ feat${NC}      - new features"
+    echo -e "  ${GREEN}🐛 fix${NC}       - bug fixes"
+    echo -e "  ${GREEN}📚 docs${NC}      - documentation changes"
+    echo -e "  ${GREEN}♻️  refactor${NC}  - code refactoring"
+    echo -e "  ${GREEN}⚡ perf${NC}      - performance improvements"
+    echo -e "  ${GREEN}🧪 test${NC}      - adding or updating tests"
+    echo -e "  ${GREEN}🛠️  build${NC}     - build system changes"
+    echo -e "  ${GREEN}🔄 ci${NC}        - CI/CD changes"
+    echo -e "  ${GREEN}🧹 chore${NC}     - maintenance tasks"
+    echo -e "  ${GREEN}🎨 style${NC}     - code style changes"
+    echo -e "  ${GREEN}⏪ revert${NC}    - reverting previous commits"
+    echo
+    echo -e "${YELLOW}💡 Tip:${NC} Use ${BLUE}git commit --amend${NC} to fix your commit message"
+    echo
+    exit 1
+fi
+
+echo -e "${GREEN}✅ Commit message validation passed!${NC}"
+echo -e "${GREEN}📝 Type: ${COMMIT_TYPE}${NC}"
+
+exit 0

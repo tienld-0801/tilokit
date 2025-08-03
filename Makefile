@@ -1,6 +1,6 @@
-.PHONY: help build test clean install dev lint docker
+.PHONY: help build test clean install dev lint docker hooks install-hooks uninstall-hooks
 
-# Build configurations  
+# Build configurations
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
@@ -21,12 +21,14 @@ help: ## Show this help message
 ##@ Development
 
 dev: ## Run in development mode
+	@./.husky/check-hooks.sh 2>/dev/null || true
 	go run . --help
 
-build: ## Build the binary
+build: ## Build the project
+	@./.husky/check-hooks.sh 2>/dev/null || true
 	@echo "Building $(BINARY_NAME)..."
 	go build -ldflags "$(LDFLAGS)" -o $(BINARY_NAME) .
-	@echo "✅ Build complete: ./$(BINARY_NAME)"
+	@echo "✅ Build completed: ./$(BINARY_NAME)"
 
 lint: ## Run linter
 	@echo "Running linter..."
@@ -99,6 +101,8 @@ release: ## Create a new release (usage: make release VERSION=v0.1.0)
 		exit 1; \
 	fi
 	@echo "🚀 Starting release process for $(VERSION)..."
+	@echo "🔧 Ensuring Git hooks are installed..."
+	@./.husky/check-hooks.sh
 	@echo "🔍 Checking release readiness..."
 	@$(MAKE) check-release
 	@echo "📝 Generating changelog..."
@@ -183,3 +187,34 @@ version-info: ## Show current version information
 	else \
 		echo "Binary not built (run 'make build' first)"; \
 	fi
+
+##@ Git Hooks
+
+hooks: install-hooks ## Alias for install-hooks
+
+install-hooks: ## Install Git hooks for commit message validation
+	@echo "🔧 Installing Git hooks from .husky..."
+	@chmod +x .husky/hooks/install-hooks.sh
+	@./.husky/hooks/install-hooks.sh
+
+uninstall-hooks: ## Uninstall Git hooks
+	@echo "🗑️ Uninstalling Git hooks..."
+	@if [ -f ".git/hooks/commit-msg" ]; then \
+		rm .git/hooks/commit-msg && echo "✅ Removed commit-msg hook"; \
+	else \
+		echo "ℹ️ commit-msg hook not found"; \
+	fi
+	@if [ -f ".git/hooks/pre-commit" ]; then \
+		rm .git/hooks/pre-commit && echo "✅ Removed pre-commit hook"; \
+	else \
+		echo "ℹ️ pre-commit hook not found"; \
+	fi
+	@echo "🎉 Git hooks uninstalled!"
+
+check-hooks: ## Check if Git hooks are installed
+	@./.husky/check-hooks.sh
+
+validate-commits: ## Validate recent commit messages
+	@echo "🔍 Validating commit messages..."
+	@chmod +x .husky/ci-check-commits.sh
+	@./.husky/ci-check-commits.sh

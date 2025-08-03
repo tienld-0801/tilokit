@@ -292,41 +292,50 @@ jobs:
         run: |
           # Extract release notes for current version from CHANGELOG.md
           VERSION_NUM=$(echo "$VERSION" | sed 's/^v//')
-
-          echo "📝 Extracting release notes for version $VERSION_NUM"
-
-          # Extract pure changelog content from CHANGELOG.md for this version
-          echo "📝 Extracting changelog content for version $VERSION_NUM"
-
-          # Extract changelog content directly using awk
-          awk 'BEGIN {found=0}
-               /^## \['"$VERSION_NUM"'\]/ {found=1; next}
-               /^## \[/ && found {exit}
+          # Escape dots for regex
+          VERSION_ESCAPED=$(echo "$VERSION_NUM" | sed 's/\./\\./g')
+          
+          echo "📝 Extracting release notes for version: $VERSION (pattern: v$VERSION_ESCAPED)"
+          
+          # Extract changelog content for this version
+          awk '/^## \[v'"$VERSION_ESCAPED"'\]/{found=1; next} 
+               /^## \[/ && found {exit} 
                found {print}' CHANGELOG.md > release_notes.md
 
+          # Clean up extracted content - remove empty lines at start/end
+          sed -i '/^$/d; /^[[:space:]]*$/d' release_notes.md 2>/dev/null || sed -i '' '/^$/d; /^[[:space:]]*$/d' release_notes.md
+          
           # Debug: Show extracted content
           echo "📋 Debug: Extracted content:"
           cat release_notes.md
           echo "📋 End of extracted content"
+          echo "📋 Content line count: $(wc -l < release_notes.md)"
+
+          # Validate content quality
+          CONTENT_LINES=$(wc -l < release_notes.md)
+          if [ "$CONTENT_LINES" -lt 5 ]; then
+            echo "⚠️  Warning: Release notes seem too short ($CONTENT_LINES lines)"
+          fi
 
           # Get previous version for Full Changelog link
           PREV_VERSION=$(git tag --sort=-version:refname | grep -v "$VERSION" | head -n1 || echo "")
 
           # Add Full Changelog link like GoFiber
+          echo "" >> release_notes.md
           if [ -n "$PREV_VERSION" ]; then
-            echo "" >> release_notes.md
             echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/compare/${PREV_VERSION}...${VERSION}" >> release_notes.md
           else
-            echo "" >> release_notes.md
             echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/releases/tag/${VERSION}" >> release_notes.md
           fi
 
-          # Simple fallback for empty content
-          if [ ! -s release_notes.md ] || [ "$(wc -l < release_notes.md)" -le 3 ]; then
-            echo "⚠️  No changelog entries found, creating fallback release notes"
-            echo "Release $VERSION" > release_notes.md
+          # Fallback for empty content
+          if [ ! -s release_notes.md ] || [ "$CONTENT_LINES" -le 2 ]; then
+            echo "😱 ERROR: No changelog content extracted! Creating minimal fallback."
+            echo "# Release $VERSION" > release_notes.md
             echo "" >> release_notes.md
-            echo "This release includes various improvements and enhancements." >> release_notes.md
+            echo "This release includes improvements and bug fixes." >> release_notes.md
+            echo "" >> release_notes.md
+            echo "Please check the [CHANGELOG.md](https://github.com/tienld-0801/tilokit/blob/main/CHANGELOG.md) for detailed information." >> release_notes.md
             echo "" >> release_notes.md
             if [ -n "$PREV_VERSION" ]; then
               echo "**Full Changelog**: https://github.com/tienld-0801/tilokit/compare/${PREV_VERSION}...${VERSION}" >> release_notes.md
