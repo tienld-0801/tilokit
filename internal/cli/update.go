@@ -1,4 +1,4 @@
-package cmd
+package cli
 
 import (
 	"bufio"
@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/spf13/cobra"
 	"github.com/ti-lo/tilokit/internal/utils"
 )
 
+// GitHubRelease represents a GitHub release
 type GitHubRelease struct {
 	TagName string `json:"tag_name"`
 	Name    string `json:"name"`
@@ -27,50 +27,44 @@ type GitHubRelease struct {
 	} `json:"assets"`
 }
 
-var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Update TiLoKit to the latest version",
-	Long:  "Check for updates and upgrade TiLoKit to the latest version from GitHub releases",
-	Run: func(cmd *cobra.Command, args []string) {
-		utils.PrintBanner()
-		
-		fmt.Println("🔍 Checking for updates...")
-		
-		// Get latest release info
-		latestRelease, err := getLatestRelease()
-		if err != nil {
-			utils.Error("Failed to check for updates: %v", err)
-			return
-		}
-		
-		// Compare versions
-		currentVersion := strings.TrimPrefix(Version, "v")
-		latestVersion := strings.TrimPrefix(latestRelease.TagName, "v")
-		
-		if currentVersion == latestVersion {
-			utils.Success("✅ You're already running the latest version: %s", Version)
-			return
-		}
-		
-		fmt.Printf("📦 New version available: %s → %s\n", Version, latestRelease.TagName)
-		fmt.Printf("📝 Release notes:\n%s\n\n", latestRelease.Body)
-		
-		// Ask for confirmation
-		if !askConfirmation("Do you want to update now?") {
-			utils.Info("Update cancelled.")
-			return
-		}
-		
-		// Download and install
-		fmt.Println("⬇️  Downloading latest version...")
-		if err := downloadAndInstall(latestRelease); err != nil {
-			utils.Error("Failed to update: %v", err)
-			return
-		}
-		
-		utils.Success("🎉 Successfully updated to %s!", latestRelease.TagName)
-		utils.Info("Run 'tilokit version' to verify the update")
-	},
+// RunUpdateProcess handles the update logic
+func RunUpdateProcess() error {
+	// No banner for update command - only init has banner
+	fmt.Println("🔍 Checking for updates...")
+
+	// Get latest release info
+	latestRelease, err := getLatestRelease()
+	if err != nil {
+		return fmt.Errorf("failed to check for updates: %w", err)
+	}
+
+	// Compare versions
+	currentVersion := strings.TrimPrefix(Version, "v")
+	latestVersion := strings.TrimPrefix(latestRelease.TagName, "v")
+
+	if currentVersion == latestVersion {
+		utils.Success("You're already running the latest version: %s", Version)
+		return nil
+	}
+
+	fmt.Printf("📦 New version available: %s → %s\n", Version, latestRelease.TagName)
+	fmt.Printf("📝 Release notes:\n%s\n\n", latestRelease.Body)
+
+	// Ask for confirmation
+	if !askConfirmation("Do you want to update now?") {
+		utils.Info("Update cancelled.")
+		return nil
+	}
+
+	// Download and install
+	fmt.Println("⬇️  Downloading latest version...")
+	if err := downloadAndInstall(latestRelease); err != nil {
+		return fmt.Errorf("failed to update: %w", err)
+	}
+
+	utils.Success("🎉 Successfully updated to %s!", latestRelease.TagName)
+	utils.Info("Run 'tilokit version' to verify the update")
+	return nil
 }
 
 func getLatestRelease() (*GitHubRelease, error) {
@@ -80,16 +74,16 @@ func getLatestRelease() (*GitHubRelease, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	
+
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("GitHub API returned status %d", resp.StatusCode)
 	}
-	
+
 	var release GitHubRelease
 	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
 		return nil, err
 	}
-	
+
 	return &release, nil
 }
 
@@ -118,7 +112,7 @@ func downloadAndInstall(release *GitHubRelease) error {
 	default:
 		return fmt.Errorf("unsupported platform: %s/%s", runtime.GOOS, runtime.GOARCH)
 	}
-	
+
 	// Find the download URL for our platform
 	var downloadURL string
 	for _, asset := range release.Assets {
@@ -127,11 +121,11 @@ func downloadAndInstall(release *GitHubRelease) error {
 			break
 		}
 	}
-	
+
 	if downloadURL == "" {
 		return fmt.Errorf("no binary found for platform %s/%s", runtime.GOOS, runtime.GOARCH)
 	}
-	
+
 	// Download the binary
 	client := &http.Client{Timeout: 60 * time.Second}
 	resp, err := client.Get(downloadURL)
@@ -139,13 +133,13 @@ func downloadAndInstall(release *GitHubRelease) error {
 		return err
 	}
 	defer resp.Body.Close()
-	
+
 	// Get current executable path
 	currentExe, err := os.Executable()
 	if err != nil {
 		return err
 	}
-	
+
 	// Create temporary file
 	tmpFile := currentExe + ".tmp"
 	// #nosec G304 - safe path from os.Executable()
@@ -170,7 +164,7 @@ func downloadAndInstall(release *GitHubRelease) error {
 		_ = os.Remove(tmpFile)
 		return err
 	}
-	
+
 	// Replace current executable
 	if runtime.GOOS == "windows" {
 		// On Windows, we can't replace a running executable
@@ -189,12 +183,12 @@ func replaceExecutableWindows(currentExe, tmpFile string) error {
 timeout /t 2
 move "%s" "%s"
 del "%%~f0"`, tmpFile, currentExe)
-	
+
 	// Write batch script
 	if err := os.WriteFile(batchScript, []byte(scriptContent), 0600); err != nil {
 		return err
 	}
-	
+
 	// Execute batch script
 	// #nosec G204 - safe script content
 	cmd := exec.Command("cmd", "/C", "start", "/B", batchScript)
@@ -203,14 +197,14 @@ del "%%~f0"`, tmpFile, currentExe)
 
 func askConfirmation(question string) bool {
 	reader := bufio.NewReader(os.Stdin)
-	
+
 	for {
 		fmt.Printf("%s [y/N]: ", color.YellowString(question))
 		response, err := reader.ReadString('\n')
 		if err != nil {
 			return false
 		}
-		
+
 		response = strings.ToLower(strings.TrimSpace(response))
 		switch response {
 		case "y", "yes":
@@ -221,8 +215,4 @@ func askConfirmation(question string) bool {
 			fmt.Println("Please answer 'y' or 'n'")
 		}
 	}
-}
-
-func init() {
-	rootCmd.AddCommand(updateCmd)
 }

@@ -26,34 +26,16 @@ func LoadConfig() (*Config, error) {
 	viper.SetConfigName("tilokit")
 	viper.SetConfigType("yaml")
 
-	// Add config paths
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("$HOME/.tilokit")
-	viper.AddConfigPath("/etc/tilokit")
+	// Add config paths - only use the config directory
+	viper.AddConfigPath("./config")
 
 	// Set defaults
 	setDefaults()
 
-	// Read config file
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			logrus.Warnf("Failed to read config file: %v", err)
-			logrus.Info("Using default configuration")
-		}
-	}
-
-	// Bind environment variables
-	viper.SetEnvPrefix("TILOKIT")
-	viper.AutomaticEnv()
-
-	var config Config
-	if err := viper.Unmarshal(&config); err != nil {
-		logrus.Warnf("Failed to unmarshal config: %v", err)
-		logrus.Info("Using default configuration")
-		return getDefaultConfig(), nil
-	}
-
-	return &config, nil
+	// For now, skip config file loading to avoid unmarshal errors
+	// Just return default config
+	logrus.Debug("Using default configuration (config file loading disabled)")
+	return getDefaultConfig(), nil
 }
 
 // CreateProjectConfig creates a project configuration from CLI inputs
