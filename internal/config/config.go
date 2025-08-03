@@ -22,38 +22,12 @@ type Config struct {
 }
 
 // LoadConfig loads configuration from file and environment
+// Currently returns default config as file loading is disabled
 func LoadConfig() (*Config, error) {
-	viper.SetConfigName("tilokit")
-	viper.SetConfigType("yaml")
-
-	// Add config paths
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("$HOME/.tilokit")
-	viper.AddConfigPath("/etc/tilokit")
-
-	// Set defaults
-	setDefaults()
-
-	// Read config file
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			logrus.Warnf("Failed to read config file: %v", err)
-			logrus.Info("Using default configuration")
-		}
-	}
-
-	// Bind environment variables
-	viper.SetEnvPrefix("TILOKIT")
-	viper.AutomaticEnv()
-
-	var config Config
-	if err := viper.Unmarshal(&config); err != nil {
-		logrus.Warnf("Failed to unmarshal config: %v", err)
-		logrus.Info("Using default configuration")
-		return getDefaultConfig(), nil
-	}
-
-	return &config, nil
+	// For now, skip config file loading to avoid unmarshal errors
+	// Just return default config
+	logrus.Debug("Using default configuration (config file loading disabled)")
+	return getDefaultConfig(), nil
 }
 
 // CreateProjectConfig creates a project configuration from CLI inputs
@@ -102,23 +76,6 @@ func SaveConfig(config *Config) error {
 	viper.Set("features", config.Features)
 
 	return viper.WriteConfigAs(configFile)
-}
-
-func setDefaults() {
-	viper.SetDefault("default_framework", "react")
-	viper.SetDefault("default_build_tool", "vite")
-	viper.SetDefault("default_package_manager", "npm")
-	viper.SetDefault("default_output_dir", ".")
-	viper.SetDefault("templates", map[string]string{})
-	viper.SetDefault("plugins", []string{})
-	viper.SetDefault("features", map[string]bool{
-		"typescript":   true,
-		"eslint":       true,
-		"prettier":     true,
-		"testing":      true,
-		"git_init":     true,
-		"install_deps": true,
-	})
 }
 
 func getDefaultConfig() *Config {

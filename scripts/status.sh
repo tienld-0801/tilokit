@@ -57,7 +57,7 @@ main() {
     
     if [ -f "tilokit" ]; then
         echo "Binary Version:"
-        ./tilokit version 2>/dev/null || echo "  Binary not working"
+        ./tilokit -v 2>/dev/null || echo "  Binary not working"
     else
         print_warning "Binary not built (run 'make build')"
     fi

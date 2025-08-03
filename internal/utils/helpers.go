@@ -141,3 +141,27 @@ func CommandExists(cmd string) bool {
 	_, err := exec.LookPath(cmd)
 	return err == nil
 }
+
+// ColorizeString colorizes a string with the given color
+func ColorizeString(text, colorName string) string {
+	switch colorName {
+	case "red":
+		return color.RedString(text)
+	case "green":
+		return color.GreenString(text)
+	case "yellow":
+		return color.YellowString(text)
+	case "blue":
+		return color.BlueString(text)
+	case "magenta":
+		return color.MagentaString(text)
+	case "cyan":
+		return color.CyanString(text)
+	case "white":
+		return color.WhiteString(text)
+	case "gray", "grey":
+		return color.HiBlackString(text)
+	default:
+		return text
+	}
+}

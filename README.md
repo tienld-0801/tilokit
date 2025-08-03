@@ -70,14 +70,14 @@
 
 ---
 
-## 🎯 Usage Preview
+## 🎯 Usage
 
-> ⚠️ **Coming Soon**: These features are planned for future releases.
-
-### Planned Interactive Mode
+### Interactive Mode
 ```bash
 # Start interactive project generation
-tilokit init
+tilokit -i
+# or
+tilokit --init
 
 # Choose from multiple categories:
 # 1. Frontend (React, Vue, Angular, Svelte...)
@@ -87,22 +87,37 @@ tilokit init
 # 5. Full-stack (Next.js, Nuxt, T3 Stack...)
 ```
 
-### Planned Direct Commands
+### CLI Commands
+```bash
+# Show version
+tilokit -v
+
+# List supported frameworks
+tilokit -l
+
+# List supported build tools
+tilokit -t
+
+# Update TiLoKit
+tilokit -u
+```
+
+### Quick Commands
 ```bash
 # Frontend projects
-tilokit create --type frontend --framework react --name my-app
-tilokit create --type frontend --framework vue --name my-vue-app
+tilokit -i -n my-app -f react -b vite
+tilokit -i -n my-vue-app -f vue -b vite
 
 # Backend projects
-tilokit create --type backend --framework laravel --name my-api
-tilokit create --type backend --framework django --name my-python-api
+tilokit -i -n my-api -f laravel -b composer
+tilokit -i -n my-python-api -f django -b pip
 
 # Mobile projects
-tilokit create --type mobile --framework react-native --name my-mobile-app
-tilokit create --type mobile --framework flutter --name my-flutter-app
+tilokit -i -n my-mobile-app -f react-native
+tilokit -i -n my-flutter-app -f flutter
 
 # Full-stack projects
-tilokit create --type fullstack --framework nextjs --name my-fullstack-app
+tilokit -i -n my-fullstack-app -f nextjs
 ```
 
 ---
