@@ -73,7 +73,12 @@ func getLatestRelease() (*GitHubRelease, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: failed to close response body: %v\n", err)
+		}
+	}()
 
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("GitHub API returned status %d", resp.StatusCode)
@@ -88,7 +93,6 @@ func getLatestRelease() (*GitHubRelease, error) {
 }
 
 func downloadAndInstall(release *GitHubRelease) error {
-	// Determine the correct binary name for current platform
 	var binaryName string
 	switch runtime.GOOS {
 	case "darwin":
@@ -132,7 +136,11 @@ func downloadAndInstall(release *GitHubRelease) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: failed to close response body: %v\n", err)
+		}
+	}()
 
 	// Get current executable path
 	currentExe, err := os.Executable()
@@ -142,12 +150,15 @@ func downloadAndInstall(release *GitHubRelease) error {
 
 	// Create temporary file
 	tmpFile := currentExe + ".tmp"
-	// #nosec G304 - safe path from os.Executable()
 	out, err := os.Create(tmpFile)
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	defer func() {
+		if err := out.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: failed to close file: %v\n", err)
+		}
+	}()
 
 	// Copy downloaded content
 	_, err = io.Copy(out, resp.Body)
