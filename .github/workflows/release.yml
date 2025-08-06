@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
 
@@ -294,17 +294,17 @@ jobs:
           VERSION_NUM=$(echo "$VERSION" | sed 's/^v//')
           # Escape dots for regex
           VERSION_ESCAPED=$(echo "$VERSION_NUM" | sed 's/\./\\./g')
-          
+
           echo "📝 Extracting release notes for version: $VERSION (pattern: v$VERSION_ESCAPED)"
-          
+
           # Extract changelog content for this version
-          awk '/^## \[v'"$VERSION_ESCAPED"'\]/{found=1; next} 
-               /^## \[/ && found {exit} 
+          awk '/^## \[v'"$VERSION_ESCAPED"'\]/{found=1; next}
+               /^## \[/ && found {exit}
                found {print}' CHANGELOG.md > release_notes.md
 
           # Clean up extracted content - remove empty lines at start/end
           sed -i '/^$/d; /^[[:space:]]*$/d' release_notes.md 2>/dev/null || sed -i '' '/^$/d; /^[[:space:]]*$/d' release_notes.md
-          
+
           # Debug: Show extracted content
           echo "📋 Debug: Extracted content:"
           cat release_notes.md
