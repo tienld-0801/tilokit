@@ -17,9 +17,9 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
-          fetch-depth: 0  # Fetch full history for commit checking
+          fetch-depth: 0 # Fetch full history for commit checking
 
       - name: 🔍 Validate commit messages
         env:
@@ -32,7 +32,7 @@ jobs:
 
       - name: 💬 Comment on PR (if validation fails)
         if: failure() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v7.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -83,7 +83,7 @@ jobs:
 
       - name: ✅ Comment on PR (if validation passes)
         if: success() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v7.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

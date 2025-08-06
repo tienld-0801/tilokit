@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
 	"github.com/ti-lo/tilokit/internal/utils"
 )
 
@@ -18,26 +18,32 @@ func NewVitePlugin() *VitePlugin {
 	return &VitePlugin{}
 }
 
+// Name returns the name of the Vite plugin.
 func (p *VitePlugin) Name() string {
 	return "vite-builder"
 }
 
+// Version returns the version of the Vite plugin.
 func (p *VitePlugin) Version() string {
 	return "1.0.0"
 }
 
+// Description returns the description of the Vite plugin.
 func (p *VitePlugin) Description() string {
 	return "Vite build tool integration with modern configuration"
 }
 
+// SupportedFrameworks returns the list of frameworks supported by Vite.
 func (p *VitePlugin) SupportedFrameworks() []string {
 	return []string{"react", "vue", "svelte", "vanilla"}
 }
 
+// SupportedBuildTools returns the list of build tools supported by Vite.
 func (p *VitePlugin) SupportedBuildTools() []string {
 	return []string{"vite"}
 }
 
+// PreGenerate validates Vite compatibility before project generation.
 func (p *VitePlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
 	// Validate Vite compatibility
 	framework := ctx.Config.Framework
@@ -80,7 +86,7 @@ func (p *VitePlugin) PostGenerate(ctx *tilocontext.ExecutionContext) error {
 
 func (p *VitePlugin) generateViteConfig(ctx *tilocontext.ExecutionContext) (string, error) {
 	framework := ctx.Config.Framework
-	
+
 	var config string
 	switch framework {
 	case "react":
@@ -190,7 +196,7 @@ export default defineConfig({
 
 func (p *VitePlugin) updatePackageJsonScripts(ctx *tilocontext.ExecutionContext) error {
 	packageJsonPath := filepath.Join(ctx.ProjectPath, "package.json")
-	
+
 	// Read existing package.json if it exists
 	var packageJson map[string]interface{}
 	if utils.FileExists(packageJsonPath) {
@@ -211,7 +217,7 @@ func (p *VitePlugin) updatePackageJsonScripts(ctx *tilocontext.ExecutionContext)
 	}
 
 	scripts := packageJson["scripts"].(map[string]interface{})
-	
+
 	// Add Vite scripts
 	scripts["dev"] = "vite"
 	scripts["build"] = "vite build"

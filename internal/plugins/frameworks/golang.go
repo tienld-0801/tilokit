@@ -1,7 +1,8 @@
 package frameworks
 
 import (
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // GoGinPlugin implements Gin framework support
@@ -16,7 +17,7 @@ func (p *GoGinPlugin) Name() string {
 }
 
 func (p *GoGinPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *GoGinPlugin) Description() string {
@@ -65,7 +66,7 @@ func (p *GoEchoPlugin) Name() string {
 }
 
 func (p *GoEchoPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *GoEchoPlugin) Description() string {
@@ -107,7 +108,7 @@ func (p *GoFiberPlugin) Name() string {
 }
 
 func (p *GoFiberPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *GoFiberPlugin) Description() string {

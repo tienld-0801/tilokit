@@ -1,32 +1,39 @@
+// Package builders provides build tool plugins for TiLoKit project generation.
 package builders
 
 import (
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
 )
 
 // RollupPlugin implements Rollup build tool support
 type RollupPlugin struct{}
 
+// NewRollupPlugin creates a new Rollup build tool plugin instance.
 func NewRollupPlugin() *RollupPlugin {
 	return &RollupPlugin{}
 }
 
+// Name returns the name of the Rollup plugin.
 func (p *RollupPlugin) Name() string {
 	return "rollup"
 }
 
+// Version returns the version of the Rollup plugin.
 func (p *RollupPlugin) Version() string {
 	return "1.0.0"
 }
 
+// Description returns the description of the Rollup plugin.
 func (p *RollupPlugin) Description() string {
 	return "Rollup module bundler for libraries and applications"
 }
 
+// SupportedFrameworks returns the list of frameworks supported by Rollup.
 func (p *RollupPlugin) SupportedFrameworks() []string {
 	return []string{"react", "vue", "svelte", "vanilla"}
 }
 
+// SupportedBuildTools returns the list of build tools supported by Rollup.
 func (p *RollupPlugin) SupportedBuildTools() []string {
 	return []string{"rollup"}
 }

@@ -1,39 +1,15 @@
 {
-  "header": "# Changelog\n\nAll notable changes to TiLoKit will be documented in this file.\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n\n",
-  "types": [
-    { "type": "feat", "section": "✨ New Features", "hidden": false },
-    { "type": "fix", "section": "🐛 Bug Fixes", "hidden": false },
-    { "type": "perf", "section": "⚡ Performance Improvements", "hidden": false },
-    { "type": "refactor", "section": "♻️ Code Refactoring", "hidden": false },
-    { "type": "docs", "section": "📚 Documentation", "hidden": false },
-    { "type": "test", "section": "🧪 Tests", "hidden": false },
-    { "type": "build", "section": "🔧 Build System", "hidden": false },
-    { "type": "ci", "section": "🔄 CI/CD", "hidden": false },
-    { "type": "chore", "section": "🏠 Chores", "hidden": true },
-    { "type": "style", "section": "💄 Styling", "hidden": true },
-    { "type": "revert", "section": "⏪ Reverts", "hidden": false }
-  ],
-  "preMajor": true,
-  "commitUrlFormat": "https://github.com/tienld-0801/tilokit/commit/{{hash}}",
-  "compareUrlFormat": "https://github.com/tienld-0801/tilokit/compare/{{previousTag}}...{{currentTag}}",
-  "issueUrlFormat": "https://github.com/tienld-0801/tilokit/issues/{{id}}",
-  "userUrlFormat": "https://github.com/{{user}}",
   "releaseCommitMessageFormat": "chore(release): 🚀 {{currentTag}}",
   "bumpFiles": [
     {
-      "filename": "cmd/version.go",
-      "type": "plain-text"
-    }
-  ],
-  "packageFiles": [
-    {
-      "filename": "cmd/version.go",
-      "type": "plain-text"
+      "filename": "internal/cli/constants.go",
+      "type": "go"
     }
   ],
   "skip": {
     "bump": false,
     "commit": false,
-    "tag": false
+    "tag": false,
+    "changelog": true
   }
 }

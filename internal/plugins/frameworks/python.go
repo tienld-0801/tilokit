@@ -1,7 +1,8 @@
 package frameworks
 
 import (
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // PythonDjangoPlugin implements Django framework support
@@ -16,7 +17,7 @@ func (p *PythonDjangoPlugin) Name() string {
 }
 
 func (p *PythonDjangoPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *PythonDjangoPlugin) Description() string {
@@ -64,7 +65,7 @@ func (p *PythonFlaskPlugin) Name() string {
 }
 
 func (p *PythonFlaskPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *PythonFlaskPlugin) Description() string {
@@ -106,7 +107,7 @@ func (p *PythonFastAPIPlugin) Name() string {
 }
 
 func (p *PythonFastAPIPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *PythonFastAPIPlugin) Description() string {

@@ -7,6 +7,7 @@ import (
 	"text/template"
 
 	"github.com/pkg/errors"
+
 	"github.com/ti-lo/tilokit/internal/core/context"
 	"github.com/ti-lo/tilokit/internal/utils"
 )

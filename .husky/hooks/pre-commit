@@ -38,8 +38,12 @@ fi
 
 if [[ "$WHITESPACE_ISSUES" == *"trailing whitespace"* ]]; then
     echo -e "${YELLOW}⚠️  Trailing whitespace detected, auto-fixing...${NC}"
-    # Auto-fix trailing whitespace
-    git diff --cached --name-only | xargs -I {} sed -i '' 's/[[:space:]]*$//' {}
+    # Auto-fix trailing whitespace (only for existing files)
+    git diff --cached --name-only | while read file; do
+        if [[ -f "$file" ]]; then
+            sed -i 's/[[:space:]]*$//' "$file"
+        fi
+    done
     echo -e "${GREEN}✅ Trailing whitespace cleaned${NC}"
 else
     echo -e "${GREEN}✅ No whitespace issues found${NC}"

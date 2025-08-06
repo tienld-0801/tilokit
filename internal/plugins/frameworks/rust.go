@@ -1,7 +1,8 @@
 package frameworks
 
 import (
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // RustActixPlugin implements Actix Web framework support
@@ -16,7 +17,7 @@ func (p *RustActixPlugin) Name() string {
 }
 
 func (p *RustActixPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *RustActixPlugin) Description() string {
@@ -65,7 +66,7 @@ func (p *RustRocketPlugin) Name() string {
 }
 
 func (p *RustRocketPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *RustRocketPlugin) Description() string {
@@ -107,7 +108,7 @@ func (p *RustAxumPlugin) Name() string {
 }
 
 func (p *RustAxumPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *RustAxumPlugin) Description() string {

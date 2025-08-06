@@ -1,4 +1,4 @@
-package cli
+package constants
 
 // Version information - set during build time
 var (
@@ -32,7 +32,14 @@ const (
 	AppDescription = "Universal CLI toolkit for multi-framework project generation"
 
 	// Error messages
-	InvalidCommandMsg = "invalid command '%s'. All commands must use flags with - or -- prefix. Use --help for available options"
-	InvalidFlagMsg    = "invalid flag '%s'. Use --%s for long form or find the correct short form (e.g., -v for --version, -i for --init)"
+	InvalidCommandMsg     = "invalid command '%s'. All commands must use flags with - or -- prefix. Use --help for available options"
+	InvalidFlagMsg        = "invalid flag '%s'. Use --%s for long form or find the correct short form (e.g., -v for --version, -i for --init)"
 	InvalidFlagGenericMsg = "invalid flag '%s'. Single dash flags must be exactly one character. Use double dash (--) for long form flags"
+)
+
+// CLI OS
+const (
+	VERSION = "1.0.0"
+	ARM64   = "arm64"
+	AMD64   = "amd64"
 )

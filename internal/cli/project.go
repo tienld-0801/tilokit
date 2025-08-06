@@ -14,6 +14,7 @@ import (
 	"github.com/ti-lo/tilokit/internal/plugins/frameworks"
 	"github.com/ti-lo/tilokit/internal/plugins/tools"
 	"github.com/ti-lo/tilokit/internal/utils"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // RunProjectGenerationProcess handles the project generation logic
@@ -95,7 +96,7 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 
 	// Framework
 	if m.Framework == "" {
-		supportedFrameworks := SupportedFrameworks
+		supportedFrameworks := constants.SupportedFrameworks
 		prompt := &survey.Select{
 			Message: "🚀 Choose framework:",
 			Options: supportedFrameworks,

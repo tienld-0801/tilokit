@@ -2,7 +2,9 @@ name: 🏷️ Auto Label PR
 
 on:
   pull_request:
-    types: [opened, edited, synchronize]
+    types: [opened, edited, synchronize, reopened]
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
 
 permissions:
   contents: read
@@ -12,10 +14,53 @@ permissions:
 jobs:
   auto-label:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
 
     steps:
+      - name: Setup labels first
+        uses: actions/github-script@v7.0.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const requiredLabels = [
+              { name: '✨ Enhancement', color: '0075ca', description: 'New feature or request' },
+              { name: '🐛 Bug', color: 'd73a4a', description: 'Something isn\'t working' },
+              { name: '⚡ Performance', color: 'f9d71c', description: 'Performance improvements' },
+              { name: '♻️ Refactor', color: 'cfd3d7', description: 'Code refactoring' },
+              { name: '📚 Documentation', color: '0052cc', description: 'Improvements or additions to documentation' },
+              { name: '🧪 Test', color: '0e8a16', description: 'Adding missing tests or correcting existing tests' },
+              { name: '🛠️ Build', color: 'fef2c0', description: 'Changes that affect the build system' },
+              { name: '🔄 CI/CD', color: '006b75', description: 'Changes to CI configuration files and scripts' },
+              { name: '🧹 Maintenance', color: 'fbca04', description: 'Other changes that don\'t modify src or test files' },
+              { name: '🎨 Style', color: 'c2e0c6', description: 'Changes that do not affect the meaning of the code' },
+              { name: '⏪ Revert', color: 'b60205', description: 'Reverts a previous commit' },
+              { name: '🚀 Release', color: 'ff6b35', description: 'Version releases and deployments' },
+              { name: '❓ Needs Review', color: 'd876e3', description: 'Requires manual review and labeling' }
+            ];
+
+            for (const label of requiredLabels) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name
+                });
+              } catch (error) {
+                if (error.status === 404) {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label.name,
+                    color: label.color,
+                    description: label.description
+                  });
+                  console.log(`🆕 Created missing label: ${label.name}`);
+                }
+              }
+            }
+
       - name: Auto-label PR based on conventional commits
-        uses: actions/github-script@v7
+        uses: actions/github-script@v7.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -112,6 +157,21 @@ jobs:
               }
             } else {
               console.log(`❌ Title doesn't follow conventional commit format`);
+
+              // FALLBACK: Apply "❓ Needs Review" label to ensure ALL PRs have labels
+              const currentLabels = context.payload.pull_request.labels.map(l => l.name);
+              const fallbackLabel = '❓ Needs Review';
+
+              if (!currentLabels.includes(fallbackLabel)) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.payload.pull_request.number,
+                  labels: [fallbackLabel]
+                });
+                console.log(`🔄 Applied fallback label: ${fallbackLabel}`);
+              }
+
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -124,6 +184,42 @@ jobs:
                       `- \`feat: add new feature\`\n` +
                       `- \`fix(core): resolve critical bug\`\n` +
                       `- \`docs: update README\`\n\n` +
+                      `⚠️ **This PR has been labeled as "❓ Needs Review" until the title is fixed.**\n\n` +
                       `Please update your PR title to follow this format for automatic labeling.`
               });
+            }
+
+      - name: Ensure PR has at least one label (Final Safety Check)
+        uses: actions/github-script@v7.0.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const currentLabels = context.payload.pull_request.labels.map(l => l.name);
+            console.log(`🔍 Final check - Current labels:`, currentLabels);
+
+            if (currentLabels.length === 0) {
+              console.log(`🚨 CRITICAL: PR has no labels! Applying emergency fallback.`);
+
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels: ['❓ Needs Review']
+              });
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `🚨 **Emergency Labeling Applied**\n\n` +
+                      `This PR was automatically labeled as "❓ Needs Review" because no other labels could be applied.\n\n` +
+                      `**Please:**\n` +
+                      `1. Update the PR title to follow conventional commit format\n` +
+                      `2. Or manually apply appropriate labels\n\n` +
+                      `This ensures proper organization and searchability of PRs.`
+              });
+
+              console.log(`✅ Emergency fallback label applied successfully`);
+            } else {
+              console.log(`✅ PR has ${currentLabels.length} label(s) - all good!`);
             }
