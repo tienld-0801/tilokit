@@ -4,8 +4,9 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
 	"github.com/ti-lo/tilokit/internal/utils"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // VuePlugin implements Vue framework support
@@ -21,7 +22,7 @@ func (p *VuePlugin) Name() string {
 }
 
 func (p *VuePlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *VuePlugin) Description() string {
@@ -624,21 +625,21 @@ h3 {
 
 	// Write files
 	files := map[string]string{
-		"src/main.ts":                  mainTs,
-		"src/App.vue":                  appVue,
-		"src/components/HelloWorld.vue": helloWorldVue,
-		"src/components/WelcomeItem.vue": welcomeItemVue,
+		"src/main.ts":                                mainTs,
+		"src/App.vue":                                appVue,
+		"src/components/HelloWorld.vue":              helloWorldVue,
+		"src/components/WelcomeItem.vue":             welcomeItemVue,
 		"src/components/icons/IconDocumentation.vue": iconDocumentation,
-		"src/components/icons/IconTooling.vue": iconTooling,
-		"src/components/icons/IconEcosystem.vue": iconEcosystem,
-		"src/components/icons/IconCommunity.vue": iconCommunity,
-		"src/components/icons/IconSupport.vue": iconSupport,
-		"src/router/index.ts":          routerTs,
-		"src/views/HomeView.vue":       homeViewVue,
-		"src/views/AboutView.vue":      aboutViewVue,
-		"src/components/TheWelcome.vue": theWelcomeVue,
-		"src/assets/main.css":          mainCss,
-		"src/assets/base.css":          baseCss,
+		"src/components/icons/IconTooling.vue":       iconTooling,
+		"src/components/icons/IconEcosystem.vue":     iconEcosystem,
+		"src/components/icons/IconCommunity.vue":     iconCommunity,
+		"src/components/icons/IconSupport.vue":       iconSupport,
+		"src/router/index.ts":                        routerTs,
+		"src/views/HomeView.vue":                     homeViewVue,
+		"src/views/AboutView.vue":                    aboutViewVue,
+		"src/components/TheWelcome.vue":              theWelcomeVue,
+		"src/assets/main.css":                        mainCss,
+		"src/assets/base.css":                        baseCss,
 	}
 
 	for path, content := range files {
@@ -669,8 +670,6 @@ func (p *VuePlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error
     }
   }
 }`
-
-
 
 	// Generate env.d.ts
 	envDts := `/// <reference types="vite/client" />`

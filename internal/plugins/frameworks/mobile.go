@@ -1,7 +1,8 @@
 package frameworks
 
 import (
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // ReactNativePlugin implements React Native framework support
@@ -16,7 +17,7 @@ func (p *ReactNativePlugin) Name() string {
 }
 
 func (p *ReactNativePlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *ReactNativePlugin) Description() string {
@@ -65,7 +66,7 @@ func (p *FlutterPlugin) Name() string {
 }
 
 func (p *FlutterPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *FlutterPlugin) Description() string {
@@ -107,7 +108,7 @@ func (p *IonicPlugin) Name() string {
 }
 
 func (p *IonicPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *IonicPlugin) Description() string {

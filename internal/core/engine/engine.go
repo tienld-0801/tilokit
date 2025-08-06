@@ -1,3 +1,4 @@
+// Package engine provides the core execution engine for TiLoKit project generation.
 package engine
 
 import (
@@ -6,8 +7,9 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
 	"github.com/ti-lo/tilokit/internal/core/registry"
-	"github.com/ti-lo/tilokit/internal/core/context"
 )
 
 // Engine represents the core execution engine for TiLoKit

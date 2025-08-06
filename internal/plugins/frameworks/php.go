@@ -1,7 +1,8 @@
 package frameworks
 
 import (
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // PHPLaravelPlugin implements Laravel framework support
@@ -16,7 +17,7 @@ func (p *PHPLaravelPlugin) Name() string {
 }
 
 func (p *PHPLaravelPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *PHPLaravelPlugin) Description() string {
@@ -66,7 +67,7 @@ func (p *PHPSymfonyPlugin) Name() string {
 }
 
 func (p *PHPSymfonyPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *PHPSymfonyPlugin) Description() string {

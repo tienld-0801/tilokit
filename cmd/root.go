@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/ti-lo/tilokit/internal/cli"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 var (
@@ -14,9 +15,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   cli.AppName,
-	Short: cli.AppShort,
-	Long:  cli.AppDescription,
+	Use:   constants.AppName,
+	Short: constants.AppShort,
+	Long:  constants.AppDescription,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return cliManager.HandleCommand(cmd, args)
 	},

@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/ti-lo/tilokit/internal/utils"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // Manager handles all CLI operations
@@ -39,7 +40,7 @@ func (m *Manager) HasAnyFlags(cmd *cobra.Command) bool {
 func (m *Manager) HandleCommand(cmd *cobra.Command, args []string) error {
 	// Reject any arguments without - or -- prefix
 	if len(args) > 0 {
-		return fmt.Errorf(InvalidCommandMsg, args[0])
+		return fmt.Errorf(constants.InvalidCommandMsg, args[0])
 	}
 
 	// Handle version flag first
@@ -124,16 +125,16 @@ func (m *Manager) ListSupportedFrameworks() error {
 	utils.Info("🚀 Supported Frameworks:")
 	frameworks := map[string][]string{
 		"JavaScript/TypeScript": {"react", "vue", "angular", "svelte", "nextjs", "nuxtjs"},
-		"Python": {"django", "flask", "fastapi"},
-		"PHP": {"laravel", "symfony"},
-		"Java": {"spring-boot", "quarkus"},
-		"Go": {"gin", "echo", "fiber"},
-		"Rust": {"actix", "rocket", "axum"},
-		"C#": {"aspnetcore", "blazor"},
-		"Ruby": {"rails", "sinatra"},
-		"Node.js": {"express", "nestjs", "fastify"},
-		"Mobile": {"react-native", "flutter", "ionic"},
-		"Desktop": {"electron", "tauri", "wails"},
+		"Python":                {"django", "flask", "fastapi"},
+		"PHP":                   {"laravel", "symfony"},
+		"Java":                  {"spring-boot", "quarkus"},
+		"Go":                    {"gin", "echo", "fiber"},
+		"Rust":                  {"actix", "rocket", "axum"},
+		"C#":                    {"aspnetcore", "blazor"},
+		"Ruby":                  {"rails", "sinatra"},
+		"Node.js":               {"express", "nestjs", "fastify"},
+		"Mobile":                {"react-native", "flutter", "ionic"},
+		"Desktop":               {"electron", "tauri", "wails"},
 	}
 	for category, fws := range frameworks {
 		utils.Log("  %s:", category)
@@ -147,16 +148,16 @@ func (m *Manager) ListSupportedFrameworks() error {
 func (m *Manager) ListSupportedBuildTools() error {
 	utils.Info("🔧 Supported Build Tools:")
 	buildTools := map[string][]string{
-		"JavaScript": {"vite", "webpack", "rollup", "parcel"},
+		"JavaScript":       {"vite", "webpack", "rollup", "parcel"},
 		"Package Managers": {"npm", "yarn", "pnpm"},
-		"Python": {"pip", "poetry", "pipenv"},
-		"PHP": {"composer"},
-		"Java": {"maven", "gradle"},
-		"Go": {"go-modules"},
-		"Rust": {"cargo"},
-		"C#": {"dotnet"},
-		"Ruby": {"bundler", "gem"},
-		"Mobile/Desktop": {"metro", "expo", "flutter-cli", "electron-builder"},
+		"Python":           {"pip", "poetry", "pipenv"},
+		"PHP":              {"composer"},
+		"Java":             {"maven", "gradle"},
+		"Go":               {"go-modules"},
+		"Rust":             {"cargo"},
+		"C#":               {"dotnet"},
+		"Ruby":             {"bundler", "gem"},
+		"Mobile/Desktop":   {"metro", "expo", "flutter-cli", "electron-builder"},
 	}
 	for category, tools := range buildTools {
 		utils.Log("  %s:", category)

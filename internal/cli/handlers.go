@@ -4,14 +4,15 @@ import (
 	"fmt"
 
 	"github.com/ti-lo/tilokit/internal/utils"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // ShowVersionInfo displays version information without banner
 func ShowVersionInfo() error {
-	fmt.Printf("TiLoKit Version: %s\n", Version)
-	fmt.Printf("Build Date: %s\n", BuildDate)
-	fmt.Printf("Git Commit: %s\n", GitCommit)
-	fmt.Printf("Go Version: %s\n", GoVersion)
+	fmt.Printf("TiLoKit Version: %s\n", constants.Version)
+	fmt.Printf("Build Date: %s\n", constants.BuildDate)
+	fmt.Printf("Git Commit: %s\n", constants.GitCommit)
+	fmt.Printf("Go Version: %s\n", constants.GoVersion)
 	return nil
 }
 
@@ -19,11 +20,11 @@ func ShowVersionInfo() error {
 func ShowUsageTable() error {
 	fmt.Printf(`
 %s
-`, utils.ColorizeString(AppShort, "cyan"))
-	fmt.Printf("%s\n\n", utils.ColorizeString(AppDescription, "gray"))
+`, utils.ColorizeString(constants.AppShort, "cyan"))
+	fmt.Printf("%s\n\n", utils.ColorizeString(constants.AppDescription, "gray"))
 
 	fmt.Printf("%s\n", utils.ColorizeString("USAGE", "yellow"))
-	fmt.Printf("  %s [flags]\n\n", AppName)
+	fmt.Printf("  %s [flags]\n\n", constants.AppName)
 
 	fmt.Printf("%s\n", utils.ColorizeString("⚠️  IMPORTANT: All commands must use - or -- prefix", "red"))
 	fmt.Printf("  %s\n\n", "Bare commands like 'version' or 'new' are not allowed")

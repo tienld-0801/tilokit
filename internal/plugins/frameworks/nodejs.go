@@ -1,7 +1,8 @@
 package frameworks
 
 import (
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // NodeExpressPlugin implements Express.js framework support
@@ -16,7 +17,7 @@ func (p *NodeExpressPlugin) Name() string {
 }
 
 func (p *NodeExpressPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *NodeExpressPlugin) Description() string {
@@ -66,7 +67,7 @@ func (p *NodeNestJSPlugin) Name() string {
 }
 
 func (p *NodeNestJSPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *NodeNestJSPlugin) Description() string {
@@ -108,7 +109,7 @@ func (p *NodeFastifyPlugin) Name() string {
 }
 
 func (p *NodeFastifyPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *NodeFastifyPlugin) Description() string {

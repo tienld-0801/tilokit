@@ -1,7 +1,8 @@
 package frameworks
 
 import (
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // ElectronPlugin implements Electron framework support
@@ -16,7 +17,7 @@ func (p *ElectronPlugin) Name() string {
 }
 
 func (p *ElectronPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *ElectronPlugin) Description() string {
@@ -65,7 +66,7 @@ func (p *TauriPlugin) Name() string {
 }
 
 func (p *TauriPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *TauriPlugin) Description() string {
@@ -107,7 +108,7 @@ func (p *WailsPlugin) Name() string {
 }
 
 func (p *WailsPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *WailsPlugin) Description() string {
