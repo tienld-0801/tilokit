@@ -1,7 +1,8 @@
 package frameworks
 
 import (
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // RubyRailsPlugin implements Ruby on Rails framework support
@@ -16,7 +17,7 @@ func (p *RubyRailsPlugin) Name() string {
 }
 
 func (p *RubyRailsPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *RubyRailsPlugin) Description() string {
@@ -65,7 +66,7 @@ func (p *RubySinatraPlugin) Name() string {
 }
 
 func (p *RubySinatraPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *RubySinatraPlugin) Description() string {

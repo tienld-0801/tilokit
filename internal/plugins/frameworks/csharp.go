@@ -1,7 +1,8 @@
 package frameworks
 
 import (
-	"github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // CSharpASPNetCorePlugin implements ASP.NET Core framework support
@@ -16,7 +17,7 @@ func (p *CSharpASPNetCorePlugin) Name() string {
 }
 
 func (p *CSharpASPNetCorePlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *CSharpASPNetCorePlugin) Description() string {
@@ -66,7 +67,7 @@ func (p *CSharpBlazorPlugin) Name() string {
 }
 
 func (p *CSharpBlazorPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *CSharpBlazorPlugin) Description() string {

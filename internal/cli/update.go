@@ -8,12 +8,14 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/fatih/color"
 	"github.com/ti-lo/tilokit/internal/utils"
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // GitHubRelease represents a GitHub release
@@ -39,15 +41,15 @@ func RunUpdateProcess() error {
 	}
 
 	// Compare versions
-	currentVersion := strings.TrimPrefix(Version, "v")
+	currentVersion := strings.TrimPrefix(constants.Version, "v")
 	latestVersion := strings.TrimPrefix(latestRelease.TagName, "v")
 
 	if currentVersion == latestVersion {
-		utils.Success("You're already running the latest version: %s", Version)
+		utils.Success("You're already running the latest version: %s", constants.Version)
 		return nil
 	}
 
-	fmt.Printf("📦 New version available: %s → %s\n", Version, latestRelease.TagName)
+	fmt.Printf("📦 New version available: %s → %s\n", constants.Version, latestRelease.TagName)
 	fmt.Printf("📝 Release notes:\n%s\n\n", latestRelease.Body)
 
 	// Ask for confirmation
@@ -73,7 +75,12 @@ func getLatestRelease() (*GitHubRelease, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: failed to close response body: %v\n", err)
+		}
+	}()
 
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("GitHub API returned status %d", resp.StatusCode)
@@ -88,23 +95,22 @@ func getLatestRelease() (*GitHubRelease, error) {
 }
 
 func downloadAndInstall(release *GitHubRelease) error {
-	// Determine the correct binary name for current platform
 	var binaryName string
 	switch runtime.GOOS {
 	case "darwin":
-		if runtime.GOARCH == "arm64" {
+		if runtime.GOARCH == constants.ARM64 {
 			binaryName = "tilokit-darwin-arm64"
 		} else {
 			binaryName = "tilokit-darwin-amd64"
 		}
 	case "linux":
-		if runtime.GOARCH == "arm64" {
+		if runtime.GOARCH == constants.ARM64 {
 			binaryName = "tilokit-linux-arm64"
 		} else {
 			binaryName = "tilokit-linux-amd64"
 		}
 	case "windows":
-		if runtime.GOARCH == "arm64" {
+		if runtime.GOARCH == constants.ARM64 {
 			binaryName = "tilokit-windows-arm64.exe"
 		} else {
 			binaryName = "tilokit-windows-amd64.exe"
@@ -132,7 +138,11 @@ func downloadAndInstall(release *GitHubRelease) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: failed to close response body: %v\n", err)
+		}
+	}()
 
 	// Get current executable path
 	currentExe, err := os.Executable()
@@ -140,14 +150,26 @@ func downloadAndInstall(release *GitHubRelease) error {
 		return err
 	}
 
-	// Create temporary file
+	// Create temporary file with path validation
+	// Clean the path to prevent directory traversal
+	currentExe = filepath.Clean(currentExe)
 	tmpFile := currentExe + ".tmp"
-	// #nosec G304 - safe path from os.Executable()
+
+	// Validate that tmpFile is in the same directory as currentExe
+	if filepath.Dir(tmpFile) != filepath.Dir(currentExe) {
+		return fmt.Errorf("security violation: temporary file path validation failed")
+	}
+
+	// #nosec G304 - tmpFile is validated and constructed from executable path, not user input
 	out, err := os.Create(tmpFile)
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	defer func() {
+		if err := out.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: failed to close file: %v\n", err)
+		}
+	}()
 
 	// Copy downloaded content
 	_, err = io.Copy(out, resp.Body)

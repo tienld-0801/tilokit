@@ -3,6 +3,8 @@ package cli
 import (
 	"fmt"
 	"strings"
+
+	"github.com/ti-lo/tilokit/pkg/constants"
 )
 
 // ValidateFlagUsage validates that flags follow proper format
@@ -18,12 +20,12 @@ func ValidateFlagUsage(args []string) error {
 			if len(arg) > 2 {
 				// Check if it's a known long flag being used with single dash
 				longFlag := arg[1:]
-				for _, known := range KnownLongFlags {
+				for _, known := range constants.KnownLongFlags {
 					if longFlag == known {
-						return fmt.Errorf(InvalidFlagMsg, arg, longFlag)
+						return fmt.Errorf(constants.InvalidFlagMsg, arg, longFlag)
 					}
 				}
-				return fmt.Errorf(InvalidFlagGenericMsg, arg)
+				return fmt.Errorf(constants.InvalidFlagGenericMsg, arg)
 			}
 		}
 	}

@@ -1,0 +1,25 @@
+# TiLoKit Project - golangci-lint configuration
+version: "2"
+
+run:
+  timeout: 5m
+  go: '1.24.5'
+
+# Linters configuration
+linters:
+  enable:
+    - errcheck      # Check for unchecked errors
+    - govet         # Vet examines Go source code
+    - ineffassign   # Detect ineffectual assignments
+    - unused        # Check for unused code
+    - staticcheck   # Static analysis checks
+    - misspell      # Finds commonly misspelled English words
+    - unconvert     # Remove unnecessary type conversions
+    - goconst       # Finds repeated strings that could be replaced by a constant
+    - gosec         # Inspects source code for security problems
+    - whitespace    # Tool for detection of leading and trailing whitespace
+  disable:
+    - revive        # Disable comment-related checks
+    - godot         # Disable comment period checks
+    - gocyclo       # Disable complexity checks
+    - nolintlint    # Disable nolint directive checks
