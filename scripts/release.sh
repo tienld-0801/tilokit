@@ -69,10 +69,10 @@ check_develop_branch() {
 update_version_in_code() {
     local version=$1
 
-    print_info "Updating version in internal/cli/constants.go..."
+    print_info "Updating version in pkg/constants/constants.go..."
 
     # Update constants.go
-    sed -i "" "s/Version   = \".*\"/Version   = \"$version\"/" internal/cli/constants.go
+    sed -i "s/Version   = \".*\"/Version   = \"$version\"/" pkg/constants/constants.go
 
     print_success "Version updated to $version in code"
 }
@@ -92,7 +92,7 @@ commit_release_changes() {
 
     print_info "Committing release changes..."
 
-    git add internal/cli/constants.go
+    git add pkg/constants/constants.go
     git commit -m "🚀 release: $version
 
 - Update version to $version
