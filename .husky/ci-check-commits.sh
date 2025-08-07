@@ -51,7 +51,7 @@ validate_commit() {
     # Including manual merge and revert commits
 
     # Check if commit has emoji format
-    local emoji_pattern='^[^[:space:]] [a-z]+: .+'
+    local emoji_pattern='^[^[:space:]]+ [a-z]+: .+'
     local no_emoji_pattern='^[a-z]+: .+'
 
     if [[ $commit_msg =~ $emoji_pattern ]]; then
