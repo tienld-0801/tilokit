@@ -1,0 +1,61 @@
+# GitHub Release Notes Configuration
+# This file configures how GitHub generates release notes automatically
+
+changelog:
+  # Exclude labels (commits with these labels won't appear in release notes)
+  exclude:
+    labels:
+      - ignore-for-release
+      - dependencies
+    authors:
+      - dependabot
+      - renovate[bot]
+
+  # Categories for grouping changes
+  categories:
+    - title: "✨ New Features"
+      labels:
+        - "feat"
+        - "feature"
+        - "enhancement"
+
+    - title: "🐛 Bug Fixes"
+      labels:
+        - "fix"
+        - "bug"
+        - "bugfix"
+
+    - title: "⚡ Performance"
+      labels:
+        - "perf"
+        - "performance"
+
+    - title: "♻️ Refactoring"
+      labels:
+        - "refactor"
+        - "refactoring"
+
+    - title: "📚 Documentation"
+      labels:
+        - "docs"
+        - "documentation"
+
+    - title: "🧪 Tests"
+      labels:
+        - "test"
+        - "tests"
+
+    - title: "🔧 Build & CI"
+      labels:
+        - "build"
+        - "ci"
+        - "ci/cd"
+
+    - title: "🔄 Dependencies"
+      labels:
+        - "deps"
+        - "dependencies"
+
+    - title: "Other Changes"
+      labels:
+        - "*"

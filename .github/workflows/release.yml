@@ -34,12 +34,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5.5.0
         with:
           go-version: ${{ env.GO_VERSION }}
 
       - name: Cache Go modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4.2.3
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
@@ -53,7 +53,7 @@ jobs:
         run: go test -v ./...
 
       - name: Run linter
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v8.0.0
         with:
           version: latest
           args: --timeout=5m
@@ -280,98 +280,24 @@ jobs:
           EOF
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-github-pages@v3.1.12
         if: startsWith(github.ref, 'refs/tags/')
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./pages
           force_orphan: true
 
-      - name: Extract release notes from CHANGELOG
-        id: release_notes
-        run: |
-          # Extract release notes for current version from CHANGELOG.md
-          VERSION_NUM=$(echo "$VERSION" | sed 's/^v//')
-          # Escape dots for regex
-          VERSION_ESCAPED=$(echo "$VERSION_NUM" | sed 's/\./\\./g')
-
-          echo "📝 Extracting release notes for version: $VERSION (pattern: v$VERSION_ESCAPED)"
-
-          # Extract changelog content for this version
-          awk '/^## \[v'"$VERSION_ESCAPED"'\]/{found=1; next}
-               /^## \[/ && found {exit}
-               found {print}' CHANGELOG.md > release_notes.md
-
-          # Clean up extracted content - remove empty lines at start/end
-          sed -i '/^$/d; /^[[:space:]]*$/d' release_notes.md 2>/dev/null || sed -i '' '/^$/d; /^[[:space:]]*$/d' release_notes.md
-
-          # Debug: Show extracted content
-          echo "📋 Debug: Extracted content:"
-          cat release_notes.md
-          echo "📋 End of extracted content"
-          echo "📋 Content line count: $(wc -l < release_notes.md)"
-
-          # Validate content quality
-          CONTENT_LINES=$(wc -l < release_notes.md)
-          if [ "$CONTENT_LINES" -lt 5 ]; then
-            echo "⚠️  Warning: Release notes seem too short ($CONTENT_LINES lines)"
-          fi
-
-          # Get previous version for Full Changelog link
-          PREV_VERSION=$(git tag --sort=-version:refname | grep -v "$VERSION" | head -n1 || echo "")
-
-          # Add Full Changelog link like GoFiber with better formatting
-          echo "" >> release_notes.md
-          echo "---" >> release_notes.md
-          echo "" >> release_notes.md
-          if [ -n "$PREV_VERSION" ]; then
-            echo "**Full Changelog**: [$PREV_VERSION...$VERSION](https://github.com/tienld-0801/tilokit/compare/${PREV_VERSION}...${VERSION})" >> release_notes.md
-          else
-            echo "**Full Changelog**: [View all changes](https://github.com/tienld-0801/tilokit/releases/tag/${VERSION})" >> release_notes.md
-          fi
-          echo "" >> release_notes.md
-          echo "📦 **Installation**: \`curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash\`" >> release_notes.md
-
-          # Fallback for empty content
-          if [ ! -s release_notes.md ] || [ "$CONTENT_LINES" -le 2 ]; then
-            echo "😱 ERROR: No changelog content extracted! Creating minimal fallback."
-            echo "This release includes improvements and bug fixes." > release_notes.md
-            echo "" >> release_notes.md
-            # Create anchor ID from version (e.g., v0.1.2-dev -> 012-dev)
-            ANCHOR_ID=$(echo $VERSION | sed 's/^v//' | tr -d '.' | sed 's/-/-/')
-            echo "Please check the [CHANGELOG.md](https://github.com/tienld-0801/tilokit/blob/$VERSION/CHANGELOG.md#$ANCHOR_ID) for detailed information." >> release_notes.md
-            echo "" >> release_notes.md
-            if [ -n "$PREV_VERSION" ]; then
-              echo "**Full Changelog**: [$PREV_VERSION...$VERSION](https://github.com/tienld-0801/tilokit/compare/${PREV_VERSION}...${VERSION})" >> release_notes.md
-            else
-              echo "**Full Changelog**: [View all changes](https://github.com/tienld-0801/tilokit/releases/tag/${VERSION})" >> release_notes.md
-            fi
-          fi
-
-          # Copy release notes for GitHub Release
-          cp release_notes.md release_notes.txt
-
-          # Debug: Show final release notes content
-          echo "🔍 Final release notes content for GitHub Release:"
-          echo "====================================="
-          cat release_notes.txt
-          echo "====================================="
-          echo "File size: $(wc -c < release_notes.txt) bytes"
-          echo "Line count: $(wc -l < release_notes.txt) lines"
-
-          echo "Release notes extracted for $VERSION"
-
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2.3.2
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         with:
           tag_name: ${{ env.VERSION }}
-          name: ${{ env.VERSION }}
-          body_path: release_notes.txt
+          name: Release ${{ env.VERSION }}
           files: |
             dist/*
           prerelease: ${{ env.IS_PRERELEASE == 'true' }}
           draft: false
-          generate_release_notes: false
+          # GitHub will auto-generate release notes from commits and PRs
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
