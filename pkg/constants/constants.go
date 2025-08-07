@@ -2,7 +2,7 @@ package constants
 
 // Version information - set during build time
 var (
-	Version   = "v0.1.2-dev"
+	Version   = "v0.1.3-dev"
 	BuildDate = "unknown"
 	GitCommit = "unknown"
 	GoVersion = "1.24.5"
