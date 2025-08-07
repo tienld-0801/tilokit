@@ -112,15 +112,15 @@ jobs:
               // Check if first group is emoji or type
               const firstGroup = match[1];
               const typeGroup = match[2] || match[1];
-              
+
               if (labelMap[typeGroup.toLowerCase()]) {
                 detectedType = typeGroup.toLowerCase();
                 typeSpecificLabel = labelMap[detectedType];
-                
+
                 if (!hasEmoji && emojiMap[detectedType]) {
                   shouldUpdateTitle = true;
                 }
-                
+
                 console.log(`🎯 Detected valid type: "${detectedType}" → Label: "${typeSpecificLabel}"`);
               }
             }
@@ -184,7 +184,7 @@ jobs:
                   `This PR has been labeled as "❓ Needs Review" for manual review.\n\n` +
                   `**Tip:** Use conventional commit format in your PR title (e.g., \`feat: add feature\`) for automatic labeling!\n\n` +
                   `Thank you for your contribution! 🚀`;
-              
+
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
