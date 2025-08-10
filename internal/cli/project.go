@@ -7,14 +7,14 @@ import (
 	"path/filepath"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/ti-lo/tilokit/internal/config"
-	"github.com/ti-lo/tilokit/internal/core/engine"
-	"github.com/ti-lo/tilokit/internal/core/registry"
-	"github.com/ti-lo/tilokit/internal/plugins/builders"
-	"github.com/ti-lo/tilokit/internal/plugins/frameworks"
-	"github.com/ti-lo/tilokit/internal/plugins/tools"
-	"github.com/ti-lo/tilokit/internal/utils"
-	"github.com/ti-lo/tilokit/pkg/constants"
+	"tilokit/internal/config"
+	"tilokit/internal/core/engine"
+	"tilokit/internal/core/registry"
+	"tilokit/internal/plugins/builders"
+	"tilokit/internal/plugins/frameworks"
+	"tilokit/internal/plugins/tools"
+	"tilokit/internal/utils"
+	"tilokit/pkg/constants"
 )
 
 // RunProjectGenerationProcess handles the project generation logic

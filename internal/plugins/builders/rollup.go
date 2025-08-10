@@ -2,7 +2,7 @@
 package builders
 
 import (
-	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "tilokit/internal/core/context"
 )
 
 // RollupPlugin implements Rollup build tool support

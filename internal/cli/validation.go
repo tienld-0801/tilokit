@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ti-lo/tilokit/pkg/constants"
+	"tilokit/pkg/constants"
 )
 
 // ValidateFlagUsage validates that flags follow proper format

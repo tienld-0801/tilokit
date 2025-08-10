@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
-	"github.com/ti-lo/tilokit/internal/utils"
+	tilocontext "tilokit/internal/core/context"
+	"tilokit/internal/utils"
 )
 
 // VitePlugin implements Vite build tool integration

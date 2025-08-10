@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/ti-lo/tilokit/internal/cli"
-	"github.com/ti-lo/tilokit/pkg/constants"
+	"tilokit/internal/cli"
+	"tilokit/pkg/constants"
 )
 
 var (

@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/ti-lo/tilokit/cmd"
-	"github.com/ti-lo/tilokit/internal/cli"
-	"github.com/ti-lo/tilokit/internal/utils"
+	"tilokit/cmd"
+	"tilokit/internal/cli"
+	"tilokit/internal/utils"
 )
 
 // main is the entry point of the application and invokes the command execution logic.

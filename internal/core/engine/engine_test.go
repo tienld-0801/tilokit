@@ -3,7 +3,7 @@ package engine
 import (
 	"testing"
 
-	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "tilokit/internal/core/context"
 )
 
 func TestEngineNew(t *testing.T) {
