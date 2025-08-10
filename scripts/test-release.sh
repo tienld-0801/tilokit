@@ -62,7 +62,7 @@ test_changelog_generation() {
 
     print_info "Testing changelog generation for $version"
 
-    if [ -f "scripts/generate-changelog.sh" ]; then
+    if [ -f ".github/scripts/generate-changelog.sh" ]; then
         print_info "Found changelog generator script"
         # Test without actually modifying
         print_success "Changelog generation test ready"
@@ -121,7 +121,7 @@ test_release_functions() {
     print_info "Testing release script functions..."
 
     # Source release script functions (without executing main)
-    if source scripts/release.sh 2>/dev/null; then
+    if source .github/scripts/release.sh 2>/dev/null; then
         print_success "Release script syntax is valid ✓"
     else
         print_error "Release script has syntax errors"
