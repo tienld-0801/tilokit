@@ -100,6 +100,10 @@ Download from [GitHub Releases](https://github.com/ti-lo/tilokit/releases):
 ```bash
 # Requires Go 1.24.5+
 go install github.com/ti-lo/tilokit@latest
+
+# Add $GOPATH/bin (or $HOME/go/bin) to your PATH if needed:
+# bash/zsh: echo 'export PATH="$HOME/go/bin:$PATH"' >> ~/.bashrc  # or ~/.zshrc +source ~/.bashrc
+# fish: set -Ux PATH $HOME/go/bin $PATH
 ```
 
 ### 🔍 **Verify Installation**
@@ -177,6 +181,10 @@ tilokit -i -n my-go-api -f gin -b go-modules
 - `-o, --output` - Output directory
 - `-q, --quiet` - Quiet mode (minimal output)
 - `-F, --force` - Force overwrite existing directory
+- `-l, --list-frameworks` - List all supported frameworks
+- `-t, --list-build-tools` - List all supported build tools
+- `-v, --version` - Show version information
+- `-u, --update` - Update TiLoKit to the latest version
 
 ---
 
@@ -342,6 +350,14 @@ furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
 
 ### 🙏 **Acknowledgments**
