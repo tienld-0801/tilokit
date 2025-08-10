@@ -106,8 +106,8 @@ release: ## Create a new release (usage: make release VERSION=v0.1.0)
 	@echo "🔍 Checking release readiness..."
 	@$(MAKE) check-release
 	@echo "🏠 Creating release..."
-	@chmod +x scripts/release.sh
-	@./scripts/release.sh $(VERSION)
+	@chmod +x .github/scripts/release.sh
+	@./.github/scripts/release.sh $(VERSION)
 	@echo "✨ Release $(VERSION) completed!"
 
 quick-release: ## Quick release with automatic version bump (dev releases)
