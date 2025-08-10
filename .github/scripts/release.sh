@@ -71,8 +71,8 @@ update_version_in_code() {
 
     print_info "Updating version in pkg/constants/constants.go..."
 
-    # Update constants.go
-    sed -i "s/Version   = \".*\"/Version   = \"$version\"/" pkg/constants/constants.go
+    # Update constants.go (macOS compatible sed syntax)
+    sed -i '' "s/Version   = \".*\"/Version   = \"$version\"/" pkg/constants/constants.go
 
     print_success "Version updated to $version in code"
 }
