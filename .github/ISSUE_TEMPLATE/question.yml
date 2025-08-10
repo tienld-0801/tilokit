@@ -1,0 +1,71 @@
+name: ❓ Question
+description: Ask a question about TiLoKit usage or functionality
+title: "[QUESTION] "
+labels: ["question", "needs-triage"]
+assignees:
+  - tienld-0801
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about TiLoKit? We're here to help! 💬
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Question Category
+      description: What is your question about?
+      options:
+        - Installation & Setup
+        - Usage & Commands
+        - Framework Templates
+        - Configuration
+        - Troubleshooting
+        - Development & Contributing
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know?
+      placeholder: Please describe your question in detail...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: TiLoKit Version (if applicable)
+      description: What version of TiLoKit are you using?
+      placeholder: "v0.1.2"
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System (if applicable)
+      description: What operating system are you using?
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Not applicable
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any additional information that might help us answer your question
+      placeholder: What have you tried? Any error messages? Related documentation you've read?
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before asking
+      options:
+        - label: I have read the README.md
+        - label: I have searched existing issues
+        - label: I have checked the documentation
