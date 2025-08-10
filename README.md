@@ -4,10 +4,10 @@
   <img src="./assets/banner.png" alt="TiLoKit CLI Banner" width="850"/>
 </p>
 
-[![Go Version](https://img.shields.io/badge/Go-1.24.5-blue)](https://golang.org/dl/)
-[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
-[![Release](https://img.shields.io/badge/release-v0.1.3--dev-green)](https://github.com/ti-lo/tilokit/releases)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/ti-lo/tilokit/actions)
+[![Go Version](https://img.shields.io/badge/Go-1.24.5-blue)](https://go.dev/dl/)
+[![License](https://img.shields.io/badge/license-Custom-red)](./LICENSE)
+[![Release](https://img.shields.io/badge/release-v0.1.3--dev-green)](https://github.com/tienld-0801/tilokit/releases)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/tienld-0801/tilokit/actions)
 
 > 🚀 **Production Ready**: TiLoKit is a powerful, production-ready CLI tool for bootstrapping projects across multiple programming languages and frameworks.
 >
@@ -76,14 +76,15 @@
 ### 🚀 **Quick Install Script**
 ```bash
 # Download and verify install script first
-curl -fsSLo install.sh https://ti-lo.github.io/tilokit/install.sh
-shasum -a 256 install.sh
-# Verify checksum against the value published in Releases, then:
+curl -fsSLo install.sh https://tienld-0801.github.io/tilokit/install.sh
+# Verify checksum against the value published in Releases:
+# macOS: shasum -a 256 install.sh
+# Linux: sha256sum install.sh
+# Compare against the checksum published in the corresponding Release, then:
 bash install.sh
 
 # Install specific version
-curl -fsSLo install.sh https://ti-lo.github.io/tilokit/install.sh
-shasum -a 256 install.sh
+curl -fsSLo install.sh https://tienld-0801.github.io/tilokit/install.sh
 # Verify checksum, then:
 bash install.sh v0.1.3-dev
 ```
@@ -91,7 +92,7 @@ bash install.sh v0.1.3-dev
 ### 📥 **Manual Installation**
 
 #### **Pre-built Binaries**
-Download from [GitHub Releases](https://github.com/ti-lo/tilokit/releases):
+Download from [GitHub Releases](https://github.com/tienld-0801/tilokit/releases):
 - 🐧 **Linux** (x64, ARM64)
 - 🍎 **macOS** (Intel, Apple Silicon)
 - 🪟 **Windows** (x64, ARM64)
@@ -99,7 +100,7 @@ Download from [GitHub Releases](https://github.com/ti-lo/tilokit/releases):
 #### **Build from Source**
 ```bash
 # Requires Go 1.24.5+
-go install github.com/ti-lo/tilokit@latest
+go install github.com/tienld-0801/tilokit@latest
 
 # Add $GOPATH/bin (or $HOME/go/bin) to your PATH if needed:
 # bash/zsh: echo 'export PATH="$HOME/go/bin:$PATH"' >> ~/.bashrc  # or ~/.zshrc +source ~/.bashrc
@@ -279,7 +280,7 @@ We welcome contributions from the developer community!
 
 ```bash
 # Fork and clone the repository
-git clone https://github.com/ti-lo/tilokit.git
+git clone https://github.com/tienld-0801/tilokit.git
 cd tilokit
 
 # Install dependencies
@@ -318,11 +319,11 @@ go test ./...
 - 🐛 **Issues**: Community-driven bug reports and feature requests
 
 ### 🌐 **Community Links**
-- 📖 **Documentation**: [GitHub Wiki](https://github.com/ti-lo/tilokit/wiki)
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/ti-lo/tilokit/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/ti-lo/tilokit/discussions)
-- 📦 **Releases**: [GitHub Releases](https://github.com/ti-lo/tilokit/releases)
-- 🔧 **Source Code**: [GitHub Repository](https://github.com/ti-lo/tilokit)
+- 📖 **Documentation**: [GitHub Wiki](https://github.com/tienld-0801/tilokit/wiki)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/tienld-0801/tilokit/issues)
+- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/tienld-0801/tilokit/discussions)
+- 📦 **Releases**: [GitHub Releases](https://github.com/tienld-0801/tilokit/releases)
+- 🔧 **Source Code**: [GitHub Repository](https://github.com/tienld-0801/tilokit)
 
 ### 📈 **Roadmap**
 - 🔜 **v0.2.0**: More framework support (Rust, C#, Flutter)
@@ -335,29 +336,23 @@ go test ./...
 
 ## 📄 **License & Legal**
 
-### 📜 **MIT License**
-TiLoKit is open-source software licensed under the [MIT License](./LICENSE).
+### 📜 **Custom License**
+TiLoKit is licensed under a Custom License by Le Duy Tien. See [LICENSE](./LICENSE) for details.
 
 ```
-Copyright (c) 2024 TiLoKit Contributors
+CUSTOM LICENSE – LE DUY TIEN
+Copyright (c) 2025 Le Duy Tien. All Rights Reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. PERMITTED USE
+   - View source code and contribute to the project
+   - Submit bug reports, suggestions, or pull requests
+   - NOT allowed to copy, distribute, modify for other purposes
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+2. NO COMMERCIAL USE
+   - No commercial use, selling, or distribution allowed
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+3. NO COPYING OR DERIVATIVE WORKS
+   - No forking or derivative works without written permission
 ```
 
 ### 🙏 **Acknowledgments**
@@ -376,10 +371,10 @@ SOFTWARE.
 ### Install TiLoKit now and generate your next project in seconds
 
 ```bash
-curl -fsSL https://ti-lo.github.io/tilokit/install.sh | bash
+curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
 ```
 
-**[⬇️ Download](https://github.com/ti-lo/tilokit/releases) • [📖 Documentation](https://github.com/ti-lo/tilokit/wiki) • [🐛 Report Issues](https://github.com/ti-lo/tilokit/issues) • [💡 Discussions](https://github.com/ti-lo/tilokit/discussions)**
+**[⬇️ Download](https://github.com/tienld-0801/tilokit/releases) • [📖 Documentation](https://github.com/tienld-0801/tilokit/wiki) • [🐛 Report Issues](https://github.com/tienld-0801/tilokit/issues) • [💡 Discussions](https://github.com/tienld-0801/tilokit/discussions)**
 
 ---
 
