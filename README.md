@@ -339,7 +339,7 @@ copies or substantial portions of the Software.
 
 ## 🚀 **Ready to boost your development productivity?**
 
-### Install TiLoKit now and generate your next project in seconds!
+### Install TiLoKit now and generate your next project in seconds
 
 ```bash
 curl -fsSL https://ti-lo.github.io/tilokit/install.sh | bash
@@ -349,7 +349,7 @@ curl -fsSL https://ti-lo.github.io/tilokit/install.sh | bash
 
 ---
 
-*Made with ❤️ by developers, for developers*
+### Made with ❤️ by developers, for developers
 
 **TiLoKit** - *The Universal Multi-Framework Project Generator*
 
