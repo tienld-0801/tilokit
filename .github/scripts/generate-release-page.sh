@@ -31,9 +31,16 @@ BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 # Copy template and replace variables
 cp "$TEMPLATE_FILE" "$OUTPUT_FILE"
 
-# Replace placeholders with actual values (only the ones that need to be dynamic)
-sed -i '' "s/{{VERSION}}/$VERSION/g" "$OUTPUT_FILE"
-sed -i '' "s/{{BUILD_DATE}}/$BUILD_DATE/g" "$OUTPUT_FILE"
+# Replace placeholders with actual values (cross-platform compatible)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    sed -i '' "s/{{VERSION}}/$VERSION/g" "$OUTPUT_FILE"
+    sed -i '' "s/{{BUILD_DATE}}/$BUILD_DATE/g" "$OUTPUT_FILE"
+else
+    # Linux
+    sed -i "s/{{VERSION}}/$VERSION/g" "$OUTPUT_FILE"
+    sed -i "s/{{BUILD_DATE}}/$BUILD_DATE/g" "$OUTPUT_FILE"
+fi
 
 # Clean up backup file
 rm -f "$OUTPUT_FILE.bak"

@@ -71,8 +71,14 @@ update_version_in_code() {
 
     print_info "Updating version in pkg/constants/constants.go..."
 
-    # Update constants.go (macOS compatible sed syntax)
-    sed -i '' "s/Version   = \".*\"/Version   = \"$version\"/" pkg/constants/constants.go
+    # Update constants.go (cross-platform compatible)
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        sed -i '' "s/Version   = \".*\"/Version   = \"$version\"/" pkg/constants/constants.go
+    else
+        # Linux
+        sed -i "s/Version   = \".*\"/Version   = \"$version\"/" pkg/constants/constants.go
+    fi
 
     print_success "Version updated to $version in code"
 }
