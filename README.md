@@ -25,25 +25,37 @@
 - ✅ **Cross-platform** - Works on Linux, macOS, and Windows
 - ✅ **Fast & reliable** - Built with Go for optimal performance
 
-### 🌐 **Currently Supported Frameworks**
+### ✅ **Supported Frameworks**
 
 #### **Frontend Frameworks**
-- ⚛️ **React** - TypeScript, Vite, modern tooling *(Coming Soon)*
-- 🟢 **Vue** - Vue 3, Composition API, Pinia *(Coming Soon)*
+- ⚛️ **React** - TypeScript, Vite, modern tooling
+- 🟢 **Vue** - Vue 3, Composition API, Pinia
+
+#### **Backend Frameworks**
+- 🐍 **Django** - Python web framework
+- 🐍 **Flask** - Lightweight Python framework
+- 🐍 **FastAPI** - Modern Python API framework
+- 🐘 **Laravel** - PHP web framework
+- 🐘 **Symfony** - PHP enterprise framework
+- ☕ **Spring Boot** - Java enterprise framework
+- ☕ **Quarkus** - Cloud-native Java framework
+- 🐹 **Gin** - Go web framework
+- 🐹 **Echo** - Go web framework
+- 🐹 **Fiber** - Go web framework
+- 💎 **Rails** - Ruby web framework
+
+### 🔜 **Planned Frameworks**
+
+#### **Frontend Frameworks**
 - 🔥 **Svelte** - SvelteKit, TypeScript *(Coming Soon)*
 - 🅰️ **Angular** - CLI integration, TypeScript *(Coming Soon)*
 - ⚡ **Next.js** - App Router, full-stack *(Coming Soon)*
 - 💚 **Nuxt** - Vue-based full-stack *(Coming Soon)*
 
 #### **Backend Frameworks**
-- 🐘 **Laravel** - PHP web framework *(Coming Soon)*
 - 🟢 **Node.js** - Express, Fastify, NestJS *(Coming Soon)*
-- 🐍 **Python** - Django, Flask, FastAPI *(Coming Soon)*
 - 🦀 **Rust** - Actix, Rocket, Axum *(Coming Soon)*
-- ☕ **Java** - Spring Boot, Quarkus *(Coming Soon)*
-- 💎 **Ruby** - Rails, Sinatra *(Coming Soon)*
 - 🔷 **C#** - ASP.NET Core, Blazor *(Coming Soon)*
-- 🐹 **Go** - Gin, Echo, Fiber *(Coming Soon)*
 
 #### **Mobile Development**
 - 📱 **React Native** - Cross-platform mobile *(Coming Soon)*
@@ -63,11 +75,17 @@
 
 ### 🚀 **Quick Install Script**
 ```bash
-# Install latest version (Linux/macOS)
-curl -fsSL https://ti-lo.github.io/tilokit/install.sh | bash
+# Download and verify install script first
+curl -fsSLo install.sh https://ti-lo.github.io/tilokit/install.sh
+shasum -a 256 install.sh
+# Verify checksum against the value published in Releases, then:
+bash install.sh
 
 # Install specific version
-curl -fsSL https://ti-lo.github.io/tilokit/install.sh | bash -s v0.1.3-dev
+curl -fsSLo install.sh https://ti-lo.github.io/tilokit/install.sh
+shasum -a 256 install.sh
+# Verify checksum, then:
+bash install.sh v0.1.3-dev
 ```
 
 ### 📥 **Manual Installation**
