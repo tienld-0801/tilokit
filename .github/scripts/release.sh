@@ -109,7 +109,7 @@ create_and_push_tag() {
 
     # Create tag message file
     local tag_msg_file="/tmp/tag_message_$version.txt"
-    echo "Release $version" > "$tag_msg_file"
+    echo "$version" > "$tag_msg_file"
     echo "" >> "$tag_msg_file"
     echo "Changes in this release:" >> "$tag_msg_file"
     echo "" >> "$tag_msg_file"
