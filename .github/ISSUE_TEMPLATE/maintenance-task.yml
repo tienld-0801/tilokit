@@ -1,0 +1,98 @@
+name: 🔧 Maintenance Task
+description: Report maintenance tasks, refactoring, or technical debt
+title: "[MAINTENANCE] "
+labels: ["maintenance", "tech-debt", "needs-triage"]
+assignees:
+  - tienld-0801
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve TiLoKit's codebase! 🛠️
+
+  - type: dropdown
+    id: task-type
+    attributes:
+      label: Task Type
+      description: What type of maintenance task is this?
+      options:
+        - Code Refactoring
+        - Technical Debt
+        - Performance Optimization
+        - Dependencies Update
+        - Documentation Update
+        - Test Coverage
+        - Code Cleanup
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Task Description
+      description: Describe the maintenance task that needs to be done
+      placeholder: What needs to be improved or fixed?
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-state
+    attributes:
+      label: Current State
+      description: Describe the current state of the code/feature
+      placeholder: What is the current implementation or issue?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: How do you suggest we address this maintenance task?
+      placeholder: What changes should be made?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this maintenance task?
+      options:
+        - Low - Can be done later
+        - Medium - Should be addressed soon
+        - High - Important for code quality
+        - Critical - Blocking or security issue
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: affected-areas
+    attributes:
+      label: Affected Areas
+      description: Which parts of the codebase are affected?
+      options:
+        - label: CLI Interface
+        - label: Template Generation
+        - label: Framework Templates
+        - label: Build System
+        - label: Documentation
+        - label: Tests
+        - label: CI/CD
+        - label: Dependencies
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact Assessment
+      description: What is the impact of not addressing this task?
+      placeholder: Performance issues, maintainability problems, security risks, etc.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any additional information, links, or references
+      placeholder: Related issues, documentation, external resources, etc.
