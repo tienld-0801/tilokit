@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>TiLoKit - Tool CLI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <meta name="title"
+      content="TiLoKit {{VERSION}} - Universal CLI Toolkit for Multi-Framework Development">
+    <meta name="description"
+      content="Download TiLoKit {{VERSION}} - Universal CLI toolkit for generating multi-framework projects. Supports React, Vue, Angular, Django, Flask, Spring Boot and more. Free download for Linux, macOS, Windows.">
+    <meta name="keywords"
+      content="CLI toolkit, project generator, multi-framework, React, Vue, Angular, Django, Flask, Spring Boot, developer tools, code generator, scaffold, boilerplate">
+    <meta name="author" content="TienLD">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tienld-0801.github.io/tilokit/">
+    <meta property="og:title"
+      content="TiLoKit {{VERSION}} - Universal CLI Toolkit">
+    <meta property="og:description"
+      content="Universal CLI toolkit for generating multi-framework projects. Download for Linux, macOS, Windows. Free and open source.">
+
+    <meta property="og:site_name" content="TiLoKit">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url"
+      content="https://tienld-0801.github.io/tilokit/">
+    <meta property="twitter:title"
+      content="TiLoKit {{VERSION}} - Universal CLI Toolkit for Multi-Framework Development">
+    <meta property="twitter:description"
+      content="Download TiLoKit {{VERSION}} - Universal CLI toolkit for generating multi-framework projects. Supports React, Vue, Angular, Django, Flask, Spring Boot and more. Free download for Linux, macOS, Windows.">
+
+    <!-- Additional SEO -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <link rel="canonical" href="https://tienld-0801.github.io/tilokit/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="./logo.svg">
+    <link rel="apple-touch-icon" href="./logo.svg">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "TiLoKit",
+      "version": "{{VERSION}}",
+      "description": "Universal CLI toolkit for generating multi-framework projects including React, Vue, Angular, Django, Flask, Spring Boot and more.",
+      "url": "https://tienld-0801.github.io/tilokit/",
+      "downloadUrl": "https://tienld-0801.github.io/tilokit/",
+      "author": {
+        "@type": "Person",
+        "name": "TienLD"
+      },
+      "operatingSystem": ["Linux", "macOS", "Windows"],
+      "applicationCategory": "DeveloperApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "softwareVersion": "{{VERSION}}",
+      "datePublished": "{{BUILD_DATE}}",
+      "license": "https://opensource.org/licenses/MIT"
+    }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header { text-align: center; margin-bottom: 3rem; }
+
+        .logo-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            filter: drop-shadow(0 4px 12px rgba(102, 126, 234, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .header h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin: 0;
+            color: #2d3748;
+        }
+        .header p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: #718096;
+            margin-top: 1rem;
+        }
+        .install-section {
+            margin: 3rem 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .install-cmd {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            margin: 1rem 0;
+            position: relative;
+            word-break: break-all;
+            overflow-wrap: break-word;
+        }
+        .install-cmd::before { content: '$ '; color: #68d391; }
+        .copy-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .copy-btn:hover { background: #3182ce; }
+        .platform-section { margin: 3rem 0; }
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .platform-card {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .platform-card:hover {
+            border-color: #4299e1;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(66, 153, 225, 0.15);
+        }
+        .platform-card h3 {
+            margin: 0 0 1rem 0;
+            color: #2d3748;
+            font-size: 1.3rem;
+        }
+        .platform-card .platform-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .download-btn {
+            display: inline-block;
+            background: #4299e1;
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 0.25rem;
+            transition: background 0.3s ease;
+            font-size: 0.875rem;
+        }
+        .download-btn:hover { background: #3182ce; }
+        .command-line {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            margin: 0.5rem 0;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            min-height: auto;
+        }
+        .command-line:hover {
+            background: #2d3748;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .command-line::before {
+            content: '$ ';
+            color: #68d391;
+            font-weight: bold;
+        }
+        .command-line::after {
+            content: '📋';
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            font-size: 0.9rem;
+        }
+        .command-line:hover::after {
+            opacity: 1;
+        }
+        .copy-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .copy-btn:hover {
+            background: #3182ce;
+            transform: translateY(-50%) scale(1.05);
+        }
+        .copy-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        .copy-btn.copied {
+            background: #68d391 !important;
+            transform: translateY(-50%) scale(1.1);
+        }
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            color: #718096;
+        }
+        .links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        .links a {
+            color: #4299e1;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem;
+        }
+        .links a:hover { text-decoration: underline; }
+
+        /* Large Desktop Optimization */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1400px;
+                padding: 4rem;
+            }
+            .platform-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 3rem;
+                max-width: none;
+            }
+            .platform-card {
+                min-height: 320px;
+                padding: 2.5rem;
+            }
+            .header h1 { font-size: 3.5rem; }
+            .header p { font-size: 1.3rem; }
+        }
+
+        /* Medium Desktop */
+        @media (min-width: 1024px) and (max-width: 1399px) {
+            .platform-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2.5rem;
+            }
+        }
+
+        /* Tablet */
+        @media (max-width: 1023px) {
+            .container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+            .platform-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.5rem;
+            }
+            .platform-card {
+                min-height: auto;
+                padding: 1.5rem;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 1.5rem; }
+            .platform-grid { grid-template-columns: 1fr; }
+            .install-cmd { font-size: 0.9rem; }
+            .footer .links { flex-direction: column; gap: 1rem; }
+
+            .logo-title {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            body { padding: 0.5rem; }
+            .container {
+                padding: 1.5rem;
+                margin: 0.5rem;
+            }
+            .platform-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .platform-card {
+                padding: 1rem;
+                min-height: auto;
+                display: block;
+            }
+            .download-btn {
+                display: block;
+                margin: 0.5rem 0;
+                text-align: center;
+            }
+            .command-line {
+                font-size: 0.75rem;
+                padding: 0.75rem;
+                line-height: 1.3;
+            }
+            .links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .copy-btn {
+                position: static;
+                transform: none;
+                margin-top: 0.5rem;
+                display: block;
+                width: 100%;
+            }
+            .install-cmd {
+                padding-bottom: 3rem;
+            }
+        }
+
+        /* Small Mobile */
+        @media (max-width: 480px) {
+            .command-line {
+                font-size: 0.7rem;
+                word-break: break-all;
+            }
+            .header h1 { font-size: 1.8rem; }
+            .header p { font-size: 0.9rem; }
+        }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <div class="logo-title">
+          <img src="./logo.svg" alt="TiLoKit Logo" class="logo">
+          <h1>TiLoKit</h1>
+        </div>
+        <p>Universal CLI Toolkit for Multi-Framework Project Generation</p>
+        <p><strong>Version:</strong> {{VERSION}} | <strong>Build:</strong>
+          {{BUILD_DATE}}</p>
+      </header>
+
+      <div class="install-section">
+        <h2>⚡ Quick Installation</h2>
+        <p>The easiest way to install TiLoKit on macOS and Linux:</p>
+        <div class="install-cmd" id="install-cmd">
+          curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
+          <button class="copy-btn"
+            onclick="copyInstallCommand('curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash')">Copy</button>
+        </div>
+      </div>
+
+      <div class="platform-section">
+        <h2>💾 Platform-Specific Downloads</h2>
+        <p>Choose your platform for direct binary download:</p>
+
+        <div class="platform-grid">
+          <div class="platform-card">
+            <div class="platform-icon">🐧</div>
+            <h3>Linux</h3>
+            <a href="./tilokit-linux-amd64" class="download-btn"
+              download="tilokit-linux-amd64" rel="nofollow">Download x86-64</a>
+            <a href="./tilokit-linux-arm64" class="download-btn"
+              download="tilokit-linux-arm64" rel="nofollow">Download ARM64</a>
+            <div class="command-line" onclick="copyCommand(this)"
+              onkeydown="handleKeyDown(event, this)" tabindex="0" role="button"
+              aria-label="Copy command to clipboard"
+              data-command="wget https://tienld-0801.github.io/tilokit/tilokit-linux-amd64">wget
+              https://tienld-0801.github.io/tilokit/tilokit-linux-amd64</div>
+            <div class="command-line" onclick="copyCommand(this)"
+              onkeydown="handleKeyDown(event, this)" tabindex="0" role="button"
+              aria-label="Copy command to clipboard"
+              data-command="chmod +x tilokit-linux-amd64 && sudo mv tilokit-linux-amd64 /usr/local/bin/tilokit">chmod
+              +x tilokit-linux-amd64 && sudo mv tilokit-linux-amd64
+              /usr/local/bin/tilokit</div>
+          </div>
+
+          <div class="platform-card">
+            <div class="platform-icon">🍎</div>
+            <h3>macOS</h3>
+            <a href="./tilokit-darwin-amd64" class="download-btn"
+              download="tilokit-darwin-amd64" rel="nofollow">Download Intel</a>
+            <a href="./tilokit-darwin-arm64" class="download-btn"
+              download="tilokit-darwin-arm64" rel="nofollow">Download Apple
+              Silicon</a>
+            <div class="command-line" onclick="copyCommand(this)"
+              onkeydown="handleKeyDown(event, this)" tabindex="0" role="button"
+              aria-label="Copy command to clipboard"
+              data-command="curl -LO https://tienld-0801.github.io/tilokit/tilokit-darwin-arm64">curl
+              -LO
+              https://tienld-0801.github.io/tilokit/tilokit-darwin-arm64</div>
+            <div class="command-line" onclick="copyCommand(this)"
+              onkeydown="handleKeyDown(event, this)" tabindex="0" role="button"
+              aria-label="Copy command to clipboard"
+              data-command="chmod +x tilokit-darwin-arm64 && sudo mv tilokit-darwin-arm64 /usr/local/bin/tilokit">chmod
+              +x tilokit-darwin-arm64 && sudo mv tilokit-darwin-arm64
+              /usr/local/bin/tilokit</div>
+          </div>
+
+          <div class="platform-card">
+            <div class="platform-icon">🪟</div>
+            <h3>Windows</h3>
+            <a href="./tilokit-windows-amd64.exe" class="download-btn"
+              download="tilokit-windows-amd64.exe" rel="nofollow">Download
+              x86-64</a>
+            <a href="./tilokit-windows-arm64.exe" class="download-btn"
+              download="tilokit-windows-arm64.exe" rel="nofollow">Download
+              ARM64</a>
+            <div class="command-line" onclick="copyCommand(this)"
+              onkeydown="handleKeyDown(event, this)" tabindex="0" role="button"
+              aria-label="Copy command to clipboard"
+              data-command="curl -LO https://tienld-0801.github.io/tilokit/tilokit-windows-amd64.exe">curl
+              -LO
+              https://tienld-0801.github.io/tilokit/tilokit-windows-amd64.exe</div>
+            <div class="command-line" onclick="copyCommand(this)"
+              onkeydown="handleKeyDown(event, this)" tabindex="0" role="button"
+              aria-label="Copy command to clipboard"
+              data-command=".\tilokit-windows-amd64.exe"># Add to PATH or run
+              directly: .\tilokit-windows-amd64.exe</div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <nav class="links">
+          <a href="https://github.com/tienld-0801/tilokit" rel="noopener"
+            target="_blank">📚 Documentation</a>
+          <a href="https://github.com/tienld-0801/tilokit/issues" rel="noopener"
+            target="_blank">🐛 Report Issues</a>
+          <a href="https://github.com/tienld-0801/tilokit/discussions"
+            rel="noopener" target="_blank">💬 Discussions</a>
+          <a href="https://github.com/tienld-0801/tilokit/releases"
+            rel="noopener" target="_blank">📦 All Releases</a>
+        </nav>
+        <p>Made with ❤️ by <a href="https://github.com/tienld-0801"
+            rel="noopener" target="_blank">TienLD</a> | Licensed under <a
+            href="https://opensource.org/licenses/MIT" rel="noopener"
+            target="_blank">MIT</a></p>
+      </footer>
+    </main>
+
+    <script>
+        // Enhanced copy functionality with better animations
+        function copyToClipboard(text, btn) {
+            if (!navigator.clipboard) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopyFeedback(btn);
+                return;
+            }
+
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyFeedback(btn);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        function showCopyFeedback(btn) {
+            const originalText = btn.textContent;
+            const originalBg = btn.style.background;
+
+            // Add copied class for animation
+            btn.classList.add('copied');
+            btn.textContent = 'Copied!';
+
+            // Remove animation and restore original state
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.textContent = originalText;
+                btn.style.background = originalBg;
+            }, 2000);
+        }
+
+        // Copy command from command-line elements
+        function copyCommand(element) {
+            const command = element.getAttribute('data-command');
+            if (command) {
+                copyToClipboard(command, element);
+
+                // Visual feedback for command line
+                const originalBg = element.style.background;
+                element.style.background = '#2d3748';
+                element.style.transform = 'translateY(-2px)';
+
+                setTimeout(() => {
+                    element.style.background = originalBg;
+                    element.style.transform = '';
+                }, 300);
+            }
+        }
+
+        // Handle keyboard events for accessibility
+        function handleKeyDown(event, element) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                copyCommand(element);
+            }
+        }
+
+        // Enhanced copy button functionality
+        function copyInstallCommand(text) {
+            const btn = event.target;
+            copyToClipboard(text, btn);
+        }
+
+        // Add focus styles for better accessibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const commandLines = document.querySelectorAll('.command-line');
+            commandLines.forEach(cmd => {
+                cmd.addEventListener('focus', function() {
+                    this.style.outline = '2px solid #4299e1';
+                    this.style.outlineOffset = '2px';
+                });
+
+                cmd.addEventListener('blur', function() {
+                    this.style.outline = '';
+                    this.style.outlineOffset = '';
+                });
+            });
+        });
+    </script>
+  </body>
+</html>
