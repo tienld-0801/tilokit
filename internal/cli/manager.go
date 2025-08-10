@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/ti-lo/tilokit/internal/utils"
-	"github.com/ti-lo/tilokit/pkg/constants"
+	"tilokit/internal/utils"
+	"tilokit/pkg/constants"
 )
 
 // Manager handles all CLI operations
@@ -22,6 +22,7 @@ type Manager struct {
 	Force          bool
 	Update         bool
 	InitProject    bool
+
 }
 
 // NewManager creates a new CLI manager
@@ -48,16 +49,7 @@ func (m *Manager) HandleCommand(cmd *cobra.Command, args []string) error {
 		return ShowVersionInfo()
 	}
 
-	// Handle init flag - this is the only case that shows banner
-	if m.InitProject {
-		return m.RunGenerateWithBanner()
-	}
-
-	// Handle other flags
-	if m.Update {
-		return m.RunUpdate()
-	}
-
+	// Handle list flags
 	if m.ListFrameworks {
 		return m.ListSupportedFrameworks()
 	}

@@ -1,4 +1,4 @@
-module github.com/ti-lo/tilokit
+module tilokit
 
 go 1.24.5
 

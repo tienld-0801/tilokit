@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"github.com/ti-lo/tilokit/internal/core/context"
+	"tilokit/internal/core/context"
 )
 
 // Plugin interface defines the contract for all plugins

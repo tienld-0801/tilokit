@@ -8,8 +8,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
-	"github.com/ti-lo/tilokit/internal/core/registry"
+	tilocontext "tilokit/internal/core/context"
+	"tilokit/internal/core/registry"
 )
 
 // Engine represents the core execution engine for TiLoKit

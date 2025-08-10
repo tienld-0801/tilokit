@@ -208,3 +208,8 @@ validate-commits: ## Validate recent commit messages
 	@echo "🔍 Validating commit messages..."
 	@chmod +x .husky/ci-check-commits.sh
 	@./.husky/ci-check-commits.sh
+
+test-emoji: ## Test emoji validation system
+	@echo "🧪 Testing emoji validation system..."
+	@chmod +x scripts/test-emoji-validation.sh
+	@./scripts/test-emoji-validation.sh

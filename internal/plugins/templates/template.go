@@ -8,8 +8,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ti-lo/tilokit/internal/core/context"
-	"github.com/ti-lo/tilokit/internal/utils"
+	"tilokit/internal/core/context"
+	"tilokit/internal/utils"
 )
 
 // TemplateEngine handles template processing

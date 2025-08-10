@@ -14,8 +14,8 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/ti-lo/tilokit/internal/utils"
-	"github.com/ti-lo/tilokit/pkg/constants"
+	"tilokit/internal/utils"
+	"tilokit/pkg/constants"
 )
 
 // GitHubRelease represents a GitHub release
@@ -63,7 +63,6 @@ func RunUpdateProcess() error {
 	if err := downloadAndInstall(latestRelease); err != nil {
 		return fmt.Errorf("failed to update: %w", err)
 	}
-
 	utils.Success("🎉 Successfully updated to %s!", latestRelease.TagName)
 	utils.Info("Run 'tilokit --version' to verify the update")
 	return nil

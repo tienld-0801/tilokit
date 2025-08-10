@@ -3,8 +3,8 @@ package cli
 import (
 	"fmt"
 
-	"github.com/ti-lo/tilokit/internal/utils"
-	"github.com/ti-lo/tilokit/pkg/constants"
+	"tilokit/internal/utils"
+	"tilokit/pkg/constants"
 )
 
 // ShowVersionInfo displays version information without banner

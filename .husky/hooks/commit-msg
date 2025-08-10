@@ -64,8 +64,8 @@ fi
 # Must be: emoji type: description with exactly one space after colon
 # Must not have leading/trailing whitespace
 # Format: 🚀 release: v1.0.0 or ✨ feat: add new feature
-# Use POSIX-compatible emoji detection
-COMMIT_PATTERN_WITH_EMOJI='^[^[:space:]] [a-z]+: .+'
+# Use pattern that handles both single and composite emojis with EXACTLY one space
+COMMIT_PATTERN_WITH_EMOJI='^[^[:space:]]+ [a-z]+: .+'
 COMMIT_PATTERN_WITHOUT_EMOJI='^[a-z]+: .+'
 
 # Check for leading/trailing whitespace
@@ -155,10 +155,10 @@ if [[ "$VALID_TYPE" == false ]]; then
     echo -e "  ${GREEN}✨ feat${NC}      - new features"
     echo -e "  ${GREEN}🐛 fix${NC}       - bug fixes"
     echo -e "  ${GREEN}📚 docs${NC}      - documentation changes"
-    echo -e "  ${GREEN}♻️  refactor${NC}  - code refactoring"
+    echo -e "  ${GREEN}♻️ refactor${NC}  - code refactoring"
     echo -e "  ${GREEN}⚡ perf${NC}      - performance improvements"
     echo -e "  ${GREEN}🧪 test${NC}      - adding or updating tests"
-    echo -e "  ${GREEN}🛠️  build${NC}     - build system changes"
+    echo -e "  ${GREEN}🛠️ build${NC}     - build system changes"
     echo -e "  ${GREEN}🔄 ci${NC}        - CI/CD changes"
     echo -e "  ${GREEN}🧹 chore${NC}     - maintenance tasks"
     echo -e "  ${GREEN}🎨 style${NC}     - code style changes"
@@ -185,10 +185,10 @@ if [[ "$HAS_EMOJI" == true ]]; then
         echo -e "  ${GREEN}✨ feat${NC}      - new features"
         echo -e "  ${GREEN}🐛 fix${NC}       - bug fixes"
         echo -e "  ${GREEN}📚 docs${NC}      - documentation changes"
-        echo -e "  ${GREEN}♻️  refactor${NC}  - code refactoring"
+        echo -e "  ${GREEN}♻️ refactor${NC}  - code refactoring"
         echo -e "  ${GREEN}⚡ perf${NC}      - performance improvements"
         echo -e "  ${GREEN}🧪 test${NC}      - adding or updating tests"
-        echo -e "  ${GREEN}🛠️  build${NC}     - build system changes"
+        echo -e "  ${GREEN}🛠️ build${NC}     - build system changes"
         echo -e "  ${GREEN}🔄 ci${NC}        - CI/CD changes"
         echo -e "  ${GREEN}🧹 chore${NC}     - maintenance tasks"
         echo -e "  ${GREEN}🎨 style${NC}     - code style changes"

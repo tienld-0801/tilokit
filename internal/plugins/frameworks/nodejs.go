@@ -1,8 +1,8 @@
 package frameworks
 
 import (
-	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
-	"github.com/ti-lo/tilokit/pkg/constants"
+	tilocontext "tilokit/internal/core/context"
+	"tilokit/pkg/constants"
 )
 
 // NodeExpressPlugin implements Express.js framework support

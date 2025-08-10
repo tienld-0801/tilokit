@@ -7,8 +7,8 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/pkg/errors"
-	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
-	"github.com/ti-lo/tilokit/internal/utils"
+	tilocontext "tilokit/internal/core/context"
+	"tilokit/internal/utils"
 )
 
 // GitPlugin implements Git integration

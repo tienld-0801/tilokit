@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
-	"github.com/ti-lo/tilokit/internal/utils"
-	"github.com/ti-lo/tilokit/pkg/constants"
+	tilocontext "tilokit/internal/core/context"
+	"tilokit/internal/utils"
+	"tilokit/pkg/constants"
 )
 
 // VuePlugin implements Vue framework support

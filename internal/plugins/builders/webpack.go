@@ -1,8 +1,8 @@
 package builders
 
 import (
-	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
-	"github.com/ti-lo/tilokit/pkg/constants"
+	tilocontext "tilokit/internal/core/context"
+	"tilokit/pkg/constants"
 )
 
 // WebpackPlugin implements Webpack build tool support

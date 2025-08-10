@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	tilocontext "github.com/ti-lo/tilokit/internal/core/context"
+	tilocontext "tilokit/internal/core/context"
 )
 
 // Config holds the application configuration
