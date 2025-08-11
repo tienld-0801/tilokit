@@ -14,6 +14,8 @@ type Manager struct {
 	ProjectName    string
 	Framework      string
 	BuildTool      string
+	PackageManager string
+	Language       string
 	OutputDir      string
 	ListFrameworks bool
 	ListBuildTools bool
@@ -33,6 +35,7 @@ func NewManager() *Manager {
 // HasAnyFlags checks if any flags are provided
 func (m *Manager) HasAnyFlags(cmd *cobra.Command) bool {
 	return m.ProjectName != "" || m.Framework != "" || m.BuildTool != "" ||
+		m.PackageManager != "" || m.Language != "" ||
 		m.ListFrameworks || m.ListBuildTools || m.Update || m.Quiet ||
 		m.Force || m.ShowVersion || m.InitProject
 }
@@ -49,6 +52,11 @@ func (m *Manager) HandleCommand(cmd *cobra.Command, args []string) error {
 		return ShowVersionInfo()
 	}
 
+	// Handle update flag
+	if m.Update {
+		return m.RunUpdate()
+	}
+
 	// Handle list flags
 	if m.ListFrameworks {
 		return m.ListSupportedFrameworks()
@@ -56,6 +64,11 @@ func (m *Manager) HandleCommand(cmd *cobra.Command, args []string) error {
 
 	if m.ListBuildTools {
 		return m.ListSupportedBuildTools()
+	}
+
+	// Handle init flag (with banner)
+	if m.InitProject {
+		return m.RunGenerateWithBanner()
 	}
 
 	// If project creation flags provided, run generation without banner
@@ -92,6 +105,8 @@ func (m *Manager) SetupFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&m.ProjectName, "name", "n", "", "Project name (required)")
 	cmd.Flags().StringVarP(&m.Framework, "framework", "f", "", "Framework to use (react, vue, svelte, etc.)")
 	cmd.Flags().StringVarP(&m.BuildTool, "build-tool", "b", "", "Build tool to use (vite, webpack, etc.)")
+	cmd.Flags().StringVarP(&m.PackageManager, "package-manager", "p", "", "Package manager to use (npm, yarn, pnpm, bun)")
+	cmd.Flags().StringVarP(&m.Language, "language", "L", "", "Language for templates (ts or js)")
 	cmd.Flags().StringVarP(&m.OutputDir, "output", "o", ".", "Output directory")
 
 	// Information flags

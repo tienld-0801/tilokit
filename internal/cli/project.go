@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/AlecAivazis/survey/v2"
 	"tilokit/internal/config"
 	"tilokit/internal/core/engine"
 	"tilokit/internal/core/registry"
@@ -15,6 +14,8 @@ import (
 	"tilokit/internal/plugins/tools"
 	"tilokit/internal/utils"
 	"tilokit/pkg/constants"
+
+	"github.com/AlecAivazis/survey/v2"
 )
 
 // RunProjectGenerationProcess handles the project generation logic
@@ -43,6 +44,19 @@ func (m *Manager) RunProjectGenerationProcess() error {
 
 	// Create project configuration
 	projectConfig := config.CreateProjectConfig(m.ProjectName, m.Framework, m.BuildTool, m.OutputDir)
+	// Allow CLI override for package manager
+	if m.PackageManager != "" {
+		projectConfig.PackageManager = m.PackageManager
+	}
+	// Language selection to variables (default ts)
+	lang := m.Language
+	if lang == "" {
+		lang = "ts"
+	}
+	if projectConfig.Variables == nil {
+		projectConfig.Variables = make(map[string]interface{})
+	}
+	projectConfig.Variables["language"] = lang
 
 	// Initialize engine and register plugins
 	eng := engine.New()
@@ -66,14 +80,14 @@ func (m *Manager) RunProjectGenerationProcess() error {
 	case "react", "vue", "angular", "svelte":
 		utils.Info("Next steps:")
 		utils.Info("   cd %s", m.ProjectName)
-		utils.Info("   npm install")
-		utils.Info("   npm run dev")
+		installCmd, devCmd := getPMCommands(m.PackageManager)
+		utils.Info("   %s", installCmd)
+		utils.Info("   %s", devCmd)
 	case "django", "flask", "fastapi":
 		utils.Info("Next steps:")
 		utils.Info("   cd %s", m.ProjectName)
 		utils.Info("   python -m venv venv")
 		utils.Info("   source venv/bin/activate")
-		utils.Info("   pip install -r requirements.txt")
 	default:
 		utils.Info("Check the README.md for setup instructions")
 	}
@@ -124,6 +138,39 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 		} else {
 			// Use framework-appropriate default
 			m.BuildTool = m.getDefaultBuildTool(m.Framework)
+		}
+	}
+
+	// Package manager (for JS frameworks)
+	if m.PackageManager == "" {
+		switch m.Framework {
+		case "react", "vue", "svelte", "nextjs", "nuxtjs", "angular":
+			pms := []string{"npm", "yarn", "pnpm", "bun"}
+			prompt := &survey.Select{
+				Message: "📦 Choose package manager:",
+				Options: pms,
+				Default: cfg.DefaultPackageManager,
+			}
+			if err := survey.AskOne(prompt, &m.PackageManager); err != nil {
+				return err
+			}
+		}
+	}
+
+	// Language (TS or JS) for React/Vue/Svelte
+	if m.Language == "" {
+		switch m.Framework {
+		case "react", "vue", "svelte":
+			langs := []string{"ts", "js"}
+			defLang := "ts"
+			prompt := &survey.Select{
+				Message: "🗂  Choose language:",
+				Options: langs,
+				Default: defLang,
+			}
+			if err := survey.AskOne(prompt, &m.Language); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -263,4 +310,19 @@ func (m *Manager) getDefaultBuildTool(framework string) string {
 		return tool
 	}
 	return "vite" // fallback for JS frameworks
+}
+
+// getPMCommands returns install and dev commands for the selected package manager
+func getPMCommands(pm string) (installCmd, devCmd string) {
+	switch pm {
+	case "yarn":
+		return "yarn install", "yarn dev"
+	case "pnpm":
+		return "pnpm install", "pnpm dev"
+	case "bun":
+		return "bun install", "bun run dev"
+	default:
+		// default to npm
+		return "npm install", "npm run dev"
+	}
 }
