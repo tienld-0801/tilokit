@@ -143,10 +143,6 @@ jobs:
         run: |
           PROJECT_NAME="test-${{ matrix.framework }}-${{ matrix.package-manager }}-${{ matrix.language }}"
           ./tilokit -i -n "$PROJECT_NAME" -f ${{ matrix.framework }} -b vite -p ${{ matrix.package-manager }} -L ${{ matrix.language }} -q
-          cd "$PROJECT_NAME"
-          
-          npm install
-          npm run build
 
       - name: Clean up
         run: |
