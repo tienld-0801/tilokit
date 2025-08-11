@@ -37,6 +37,27 @@ const (
 	InvalidFlagGenericMsg = "invalid flag '%s'. Single dash flags must be exactly one character. Use double dash (--) for long form flags"
 )
 
+// CLI FRAMEWORK
+const (
+	ReactFramework      = "react"
+	VueFramework        = "vue"
+	SvelteFramework     = "svelte"
+	AngularFramework    = "angular"
+	NextFramework       = "next"
+	NuxtFramework       = "nuxt"
+	DjangoFramework     = "django"
+	FlaskFramework      = "flask"
+	FastapiFramework    = "fastapi"
+	LaravelFramework    = "laravel"
+	SymfonyFramework    = "symfony"
+	SpringBootFramework = "spring-boot"
+	QuarkusFramework    = "quarkus"
+	GinFramework        = "gin"
+	EchoFramework       = "echo"
+	FiberFramework      = "fiber"
+	RailsFramework      = "rails"
+)
+
 // CLI OS
 const (
 	VERSION = "1.0.0"
