@@ -77,7 +77,7 @@ func (m *Manager) RunProjectGenerationProcess() error {
 
 	// Provide framework-specific next steps
 	switch m.Framework {
-	case "react", "vue", "angular", "svelte":
+	case constants.ReactFramework, constants.VueFramework, constants.AngularFramework, constants.SvelteFramework:
 		utils.Info("Next steps:")
 		utils.Info("   cd %s", m.ProjectName)
 		installCmd, devCmd := getPMCommands(m.PackageManager)
