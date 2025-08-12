@@ -6,6 +6,7 @@ import (
 
 	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/templates/react"
+	"tilokit/internal/templates/common"
 	"tilokit/internal/utils"
 
 	"github.com/pkg/errors"
@@ -103,22 +104,51 @@ func (p *ReactPlugin) createDirectoryStructure(ctx *tilocontext.ExecutionContext
 }
 
 func (p *ReactPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) error {
-	var packageJson string
+	var packageJson, packageJsonFile string
+	var envContent, envFile string
+	var gitIgnoreContent, gitignoreFile string
+	var eslintContent, eslintFile string
+
 	if ctx.Variables["language"].(string) == "js" {
 		packageJson = react.ViteJsPackageJson
+		eslintContent = react.ViteJsEslint
 	} else {
 		packageJson = react.ViteTsPackageJson
+		eslintContent = react.ViteTsEslint
 	}
+
+	envContent = common.Env
+	gitIgnoreContent = common.Gitignore
+
+	packageJsonFile = "package.json"
+	eslintFile = "eslint.config.js"
+	envFile = ".env"
+	gitignoreFile = ".gitignore"
 
 	packageJson = strings.ReplaceAll(packageJson, "{{.ProjectName}}", ctx.Config.ProjectName)
 
-	packageJsonPath := filepath.Join(ctx.ProjectPath, "package.json")
-	return utils.WriteFile(packageJsonPath, packageJson)
+	files := map[string]string{
+		packageJsonFile: packageJson,
+		envFile:         envContent,
+		gitignoreFile:   gitIgnoreContent,
+		eslintFile:      eslintContent,
+	}
+
+	for filename, content := range files {
+		fullPath := filepath.Join(ctx.ProjectPath, filename)
+		if err := utils.WriteFile(fullPath, content); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (p *ReactPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error {
 	var mainContent, appContent string
 	var mainFile, appFile string
+
+
 	if ctx.Variables["language"].(string) == "js" {
 		mainContent = react.ViteJsMainFile
 		appContent = react.ViteJsAppFile
