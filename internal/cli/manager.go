@@ -16,6 +16,7 @@ type Manager struct {
 	BuildTool      string
 	PackageManager string
 	Language       string
+	RouterType     string // For Next.js: "app" or "pages"
 	OutputDir      string
 	ListFrameworks bool
 	ListBuildTools bool
@@ -35,7 +36,7 @@ func NewManager() *Manager {
 // HasAnyFlags checks if any flags are provided
 func (m *Manager) HasAnyFlags(cmd *cobra.Command) bool {
 	return m.ProjectName != "" || m.Framework != "" || m.BuildTool != "" ||
-		m.PackageManager != "" || m.Language != "" ||
+		m.PackageManager != "" || m.Language != "" || m.RouterType != "" ||
 		m.ListFrameworks || m.ListBuildTools || m.Update || m.Quiet ||
 		m.Force || m.ShowVersion || m.InitProject
 }
@@ -156,6 +157,8 @@ func (m *Manager) ListSupportedBuildTools() error {
 	utils.Info("🔧 Supported Build Tools:")
 	buildTools := map[string][]string{
 		"JavaScript":       {"vite", "webpack", "rollup", "parcel"},
+		"React Frameworks": {"next"},
+		"Vue Frameworks":   {"nuxt"},
 		"Package Managers": {"npm", "yarn", "pnpm"},
 		"Python":           {"pip", "poetry", "pipenv"},
 		"PHP":              {"composer"},
