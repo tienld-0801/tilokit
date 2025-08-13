@@ -37,6 +37,20 @@ frameworks:
     typescript: true
     testing: "vitest"
     
+  next:
+    default_build_tool: "next"
+    typescript: true
+    testing: "jest"
+    linting: true
+    formatting: true
+    
+  nuxt:
+    default_build_tool: "nuxt"
+    typescript: true
+    testing: "vitest"
+    linting: true
+    formatting: true
+    
   # Backend Frameworks
   django:
     default_build_tool: "pip"

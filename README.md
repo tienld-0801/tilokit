@@ -161,6 +161,12 @@ tilokit -i -n my-react-app -f react -b vite
 # Create Vue project
 tilokit -i -n my-vue-app -f vue -b vite
 
+# Create Next.js project
+tilokit -i -n my-nextjs-app -f next
+
+# Create Nuxt.js project
+tilokit -i -n my-nuxtjs-app -f nuxt
+
 # Create Laravel project
 tilokit -i -n my-api -f laravel -b composer
 

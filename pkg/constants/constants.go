@@ -58,6 +58,12 @@ const (
 	RailsFramework      = "rails"
 )
 
+//CLI NextJS
+const (
+	AppRouter = "app"
+	PagesRouter = "pages"
+)
+
 // CLI OS
 const (
 	VERSION = "1.0.0"
