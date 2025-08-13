@@ -3,7 +3,7 @@ version: "2"
 
 run:
   timeout: 5m
-  go: '1.24.5'
+  go: '1.24.6'
 
 # Linters configuration
 linters:

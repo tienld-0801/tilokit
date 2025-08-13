@@ -1,0 +1,25 @@
+# Git attributes for TiLoKit project
+
+# Prevent .versions file from being treated as YAML
+.versions linguist-language=Shell
+
+# Ensure shell scripts are properly detected
+*.sh linguist-language=Shell
+
+# Ensure Go files are properly detected
+*.go linguist-language=Go
+
+# Ensure YAML files are properly detected
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML
+
+# Ensure Markdown files are properly detected
+*.md linguist-language=Markdown
+
+# Line ending normalization
+* text=auto
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.go text eol=lf
+*.md text eol=lf

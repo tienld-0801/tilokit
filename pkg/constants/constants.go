@@ -5,7 +5,7 @@ var (
 	Version   = "v0.1.4-dev"
 	BuildDate = "unknown"
 	GitCommit = "unknown"
-	GoVersion = "1.24.5"
+	GoVersion = "1.24.6"
 )
 
 // Known long flags for validation
@@ -56,6 +56,12 @@ const (
 	EchoFramework       = "echo"
 	FiberFramework      = "fiber"
 	RailsFramework      = "rails"
+)
+
+//CLI NextJS
+const (
+	AppRouter = "app"
+	PagesRouter = "pages"
 )
 
 // CLI OS

@@ -5,9 +5,10 @@ import (
 	"strings"
 
 	tilocontext "tilokit/internal/core/context"
-	"tilokit/internal/templates/react"
 	"tilokit/internal/templates/common"
+	"tilokit/internal/templates/react"
 	"tilokit/internal/utils"
+	"tilokit/pkg/constants"
 
 	"github.com/pkg/errors"
 )
@@ -25,7 +26,7 @@ func (p *ReactPlugin) Name() string {
 }
 
 func (p *ReactPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *ReactPlugin) Description() string {

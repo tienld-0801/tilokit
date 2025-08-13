@@ -58,6 +58,15 @@ func (m *Manager) RunProjectGenerationProcess() error {
 	}
 	projectConfig.Variables["language"] = lang
 
+	// Router type for Next.js (default app router)
+	if m.Framework == "next" {
+		routerType := m.RouterType
+		if routerType == "" {
+			routerType = "app"
+		}
+		projectConfig.Variables["router_type"] = routerType
+	}
+
 	// Initialize engine and register plugins
 	eng := engine.New()
 	if err := m.registerPlugins(eng); err != nil {
@@ -83,6 +92,20 @@ func (m *Manager) RunProjectGenerationProcess() error {
 		installCmd, devCmd := getPMCommands(m.PackageManager)
 		utils.Info("   %s", installCmd)
 		utils.Info("   %s", devCmd)
+	case constants.NextFramework:
+		utils.Info("Next steps:")
+		utils.Info("   cd %s", m.ProjectName)
+		installCmd, devCmd := getPMCommands(m.PackageManager)
+		utils.Info("   %s", installCmd)
+		utils.Info("   %s", devCmd)
+		utils.Info("   Open http://localhost:3000 to view your Next.js app")
+	case constants.NuxtFramework:
+		utils.Info("Next steps:")
+		utils.Info("   cd %s", m.ProjectName)
+		installCmd, devCmd := getPMCommands(m.PackageManager)
+		utils.Info("   %s", installCmd)
+		utils.Info("   %s", devCmd)
+		utils.Info("   Open http://localhost:3000 to view your Nuxt.js app")
 	case "django", "flask", "fastapi":
 		utils.Info("Next steps:")
 		utils.Info("   cd %s", m.ProjectName)
@@ -174,6 +197,20 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 		}
 	}
 
+	// Router type for Next.js
+	if m.RouterType == "" && m.Framework == "next" {
+		routers := []string{"app", "pages"}
+		prompt := &survey.Select{
+			Message: "🛣️  Choose Next.js router:",
+			Options: routers,
+			Default: "app",
+			Help:    "App Router (recommended) uses the new app directory structure. Pages Router uses the traditional pages directory.",
+		}
+		if err := survey.AskOne(prompt, &m.RouterType); err != nil {
+			return err
+		}
+	}
+
 	// Output directory
 	if m.OutputDir == "" {
 		m.OutputDir = "."
@@ -206,6 +243,8 @@ func (m *Manager) registerPlugins(eng *engine.Engine) error {
 		// JavaScript/TypeScript Frameworks
 		frameworks.NewReactPlugin(),
 		frameworks.NewVuePlugin(),
+		frameworks.NewNextjsPlugin(),
+		frameworks.NewNuxtjsPlugin(),
 		// More JS frameworks can be added here
 
 		// Backend Frameworks
@@ -303,6 +342,8 @@ func (m *Manager) getDefaultBuildTool(framework string) string {
 		"fiber":       "go-modules",
 		"laravel":     "composer",
 		"symfony":     "composer",
+		"next":        "next",
+		"nuxt":        "nuxt",
 		// JavaScript frameworks default to vite
 	}
 
