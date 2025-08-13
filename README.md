@@ -4,7 +4,7 @@
   <img src="./assets/banner.png" alt="TiLoKit CLI Banner" width="850"/>
 </p>
 
-[![Go Version](https://img.shields.io/badge/Go-1.24.5-blue)](https://go.dev/dl/)
+[![Go Version](https://img.shields.io/badge/Go-1.24.6-blue)](https://go.dev/dl/)
 [![License](https://img.shields.io/badge/license-Custom-red)](./LICENSE)
 [![Release](https://img.shields.io/badge/release-v0.1.3--dev-green)](https://github.com/tienld-0801/tilokit/releases)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/tienld-0801/tilokit/actions)
@@ -99,7 +99,7 @@ Download from [GitHub Releases](https://github.com/tienld-0801/tilokit/releases)
 
 #### **Build from Source**
 ```bash
-# Requires Go 1.24.5+
+# Requires Go 1.24.6+
 go install github.com/tienld-0801/tilokit@latest
 
 # Add $GOPATH/bin (or $HOME/go/bin) to your PATH if needed:
@@ -309,7 +309,7 @@ go test ./...
 
 ### 📝 **Development Guidelines**
 - Follow [Conventional Commits](https://conventionalcommits.org/)
-- Use Go 1.24.5+ for development
+- Use Go 1.24.6+ for development
 - All PRs must pass CI/CD checks
 - Add tests for new features
 - Update documentation as needed
