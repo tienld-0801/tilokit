@@ -19,7 +19,7 @@
 # TECHNOLOGY COLOPHON
 
     ## Language
-    Go 1.24.6
+    Go 1.25.0
 
     ## Frameworks & Libraries
     Cobra CLI Framework
