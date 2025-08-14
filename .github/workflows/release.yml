@@ -158,10 +158,56 @@ jobs:
           cp scripts/install.sh pages/
           cp .github/logo.svg pages/
 
+          # Copy SEO files
+          echo "📄 Copying SEO files..."
+          cp .github/robots.txt pages/
+          cp .github/sitemap.xml pages/
+          cp .github/manifest.json pages/
+          cp .github/browserconfig.xml pages/
+          cp .github/humans.txt pages/
+          cp .github/schema.json pages/
+          
+          # Create .well-known directory for security.txt
+          mkdir -p pages/.well-known
+          cp .github/security.txt pages/.well-known/
+
+          # Process sitemap.xml with build date
+          sed -i.bak "s/{{BUILD_DATE}}/$BUILD_DATE/g" pages/sitemap.xml
+          sed -i.bak "s/{{VERSION}}/$VERSION/g" pages/sitemap.xml
+          rm -f pages/sitemap.xml.bak
+
+          # Process manifest.json with version
+          sed -i.bak "s/{{VERSION}}/$VERSION/g" pages/manifest.json
+          rm -f pages/manifest.json.bak
+          
+          # Process humans.txt with build info
+          sed -i.bak "s/{{BUILD_DATE}}/$BUILD_DATE/g" pages/humans.txt
+          sed -i.bak "s/{{VERSION}}/$VERSION/g" pages/humans.txt
+          rm -f pages/humans.txt.bak
+          
+          # Process schema.json with build info
+          sed -i.bak "s/{{BUILD_DATE}}/$BUILD_DATE/g" pages/schema.json
+          sed -i.bak "s/{{VERSION}}/$VERSION/g" pages/schema.json
+          rm -f pages/schema.json.bak
+
           # Generate release page from HTML template
           echo "🎨 Generating release page from template..."
           chmod +x .github/scripts/generate-release-page.sh
           ./.github/scripts/generate-release-page.sh $VERSION pages/
+
+          # Verify SEO files are deployed
+          echo "✅ SEO files deployed:"
+          ls -la pages/ | grep -E '(robots.txt|sitemap.xml|manifest.json|browserconfig.xml|humans.txt|schema.json)' || true
+          echo "📁 .well-known directory:"
+          ls -la pages/.well-known/ || true
+          
+          # Generate additional SEO metadata
+          echo "🔍 Generating SEO metadata..."
+          echo "# TiLoKit Release $VERSION" > pages/RELEASE_INFO.md
+          echo "Build Date: $BUILD_DATE" >> pages/RELEASE_INFO.md
+          echo "Git Commit: $GIT_COMMIT" >> pages/RELEASE_INFO.md
+          echo "Platforms: Linux, macOS, Windows" >> pages/RELEASE_INFO.md
+          echo "Architectures: amd64, arm64" >> pages/RELEASE_INFO.md
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-github-pages@v3.1.12

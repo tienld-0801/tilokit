@@ -1,0 +1,61 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Developer: TienLD
+    Contact: tienld0801 [at] gmail.com
+    Twitter: @tienld0801
+    From: Vietnam
+
+# THANKS
+
+    Go Community
+    GitHub Community
+    Open Source Contributors
+    CLI Tool Enthusiasts
+    Multi-Framework Developers
+
+# TECHNOLOGY COLOPHON
+
+    ## Language
+    Go 1.24.6
+
+    ## Frameworks & Libraries
+    Cobra CLI Framework
+    Viper Configuration
+    Go Standard Library
+
+    ## Tools
+    GitHub Actions
+    GitHub Pages
+    golangci-lint
+    Conventional Commits
+    Git Hooks
+
+    ## Supported Frameworks
+    React, Vue, Angular, Svelte
+    Django, Flask, FastAPI
+    Spring Boot, Quarkus
+    Laravel, Symfony
+    Rails, Sinatra
+    Gin, Echo, Fiber
+    Express, Nest, Next
+    And 20+ more...
+
+    ## Build Tools
+    Vite, Webpack, Rollup
+    Maven, Gradle
+    npm, yarn, pnpm
+    pip, poetry
+    bundler, gem
+    go modules
+    composer
+
+# SITE
+
+    Last update: {{BUILD_DATE}}
+    Version: {{VERSION}}
+    Standards: HTML5, CSS3, ES6+
+    Components: Responsive Design, PWA Ready
+    Software: TiLoKit CLI Toolkit

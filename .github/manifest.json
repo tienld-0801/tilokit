@@ -1,0 +1,48 @@
+{
+  "name": "TiLoKit - Universal CLI Toolkit",
+  "short_name": "TiLoKit",
+  "description": "Universal CLI toolkit for generating multi-framework projects including React, Vue, Angular, Django, Flask, Spring Boot and more.",
+  "version": "{{VERSION}}",
+  "start_url": "/tilokit/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "categories": ["developer", "productivity", "utilities"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "./logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ],
+  "scope": "/tilokit/",
+  "id": "/tilokit/",
+  "launch_handler": {
+    "client_mode": "navigate-new"
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "related_applications": [
+    {
+      "platform": "web",
+      "url": "https://tienld-0801.github.io/tilokit/"
+    },
+    {
+      "platform": "github",
+      "url": "https://github.com/tienld-0801/tilokit"
+    }
+  ]
+}

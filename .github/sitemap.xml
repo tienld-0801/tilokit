@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Main TiLoKit Release Page -->
+  <url>
+    <loc>https://tienld-0801.github.io/tilokit/</loc>
+    <lastmod>{{BUILD_DATE}}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Install Script -->
+  <url>
+    <loc>https://tienld-0801.github.io/tilokit/install.sh</loc>
+    <lastmod>{{BUILD_DATE}}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Binary Downloads -->
+  <url>
+    <loc>https://tienld-0801.github.io/tilokit/tilokit-linux-amd64</loc>
+    <lastmod>{{BUILD_DATE}}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tienld-0801.github.io/tilokit/tilokit-linux-arm64</loc>
+    <lastmod>{{BUILD_DATE}}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tienld-0801.github.io/tilokit/tilokit-darwin-amd64</loc>
+    <lastmod>{{BUILD_DATE}}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tienld-0801.github.io/tilokit/tilokit-darwin-arm64</loc>
+    <lastmod>{{BUILD_DATE}}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tienld-0801.github.io/tilokit/tilokit-windows-amd64.exe</loc>
+    <lastmod>{{BUILD_DATE}}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tienld-0801.github.io/tilokit/tilokit-windows-arm64.exe</loc>
+    <lastmod>{{BUILD_DATE}}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- GitHub Repository (external but important) -->
+  <url>
+    <loc>https://github.com/tienld-0801/tilokit</loc>
+    <lastmod>{{BUILD_DATE}}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Documentation -->
+  <url>
+    <loc>https://github.com/tienld-0801/tilokit#readme</loc>
+    <lastmod>{{BUILD_DATE}}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Releases -->
+  <url>
+    <loc>https://github.com/tienld-0801/tilokit/releases</loc>
+    <lastmod>{{BUILD_DATE}}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>

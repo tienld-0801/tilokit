@@ -1,0 +1,53 @@
+# Robots.txt for TiLoKit - Universal CLI Toolkit
+# https://tienld-0801.github.io/tilokit/
+
+User-agent: *
+Allow: /
+
+# Allow all search engines to crawl the site
+Allow: /install.sh
+Allow: /tilokit-*
+Allow: /*.html
+Allow: /*.css
+Allow: /*.js
+Allow: /*.svg
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.ico
+
+# Disallow sensitive files
+Disallow: /*.sha256
+Disallow: /*.log
+Disallow: /.*
+Disallow: /_*
+
+# Sitemap location
+Sitemap: https://tienld-0801.github.io/tilokit/sitemap.xml
+
+# Crawl delay (optional - be respectful to search engines)
+Crawl-delay: 1
+
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+# Block common bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
