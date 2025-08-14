@@ -6,7 +6,7 @@
 
 [![Go Version](https://img.shields.io/badge/Go-1.25.0-blue)](https://go.dev/dl/)
 [![License](https://img.shields.io/badge/license-Custom-red)](./LICENSE)
-[![Release](https://img.shields.io/badge/release-v0.1.6-dev-green)](https://github.com/tienld-0801/tilokit/releases)
+[![Release](https://img.shields.io/badge/release-v0.1.7-dev-green)](https://github.com/tienld-0801/tilokit/releases)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/tienld-0801/tilokit/actions)
 
 > 🚀 **Production Ready**: TiLoKit is a powerful, production-ready CLI tool for bootstrapping projects across multiple programming languages and frameworks.
@@ -280,6 +280,7 @@ TiLoKit is optimized for developers searching for:
 ---
 
 ## 🤝 **Contributing**
+
 
 
 <a href="https://github.com/tienld-0801"><img src="https://github.com/tienld-0801.png" width="50" height="50" alt="tienld-0801" style="border-radius: 50%; margin-right: 10px; margin-bottom: 5px; border: 2px solid #e1e8ed; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;"/></a><a href="https://github.com/tienld-tgl"><img src="https://github.com/tienld-tgl.png" width="50" height="50" alt="tienld-tgl" style="border-radius: 50%; margin-right: 10px; margin-bottom: 5px; border: 2px solid #e1e8ed; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;"/></a><a href="https://github.com/hoangsinh0601"><img src="https://github.com/hoangsinh0601.png" width="50" height="50" alt="hoangsinh0601" style="border-radius: 50%; margin-right: 10px; margin-bottom: 5px; border: 2px solid #e1e8ed; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;"/></a>
