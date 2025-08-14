@@ -1,11 +1,13 @@
 package constants
 
+import "runtime"
+
 // Version information - set during build time
 var (
 	Version   = "v0.1.5-dev"
 	BuildDate = "unknown"
 	GitCommit = "unknown"
-	GoVersion = "1.25.0"
+	GoVersion = runtime.Version()
 )
 
 // Known long flags for validation
@@ -58,9 +60,9 @@ const (
 	RailsFramework      = "rails"
 )
 
-//CLI NextJS
+// CLI NextJS
 const (
-	AppRouter = "app"
+	AppRouter   = "app"
 	PagesRouter = "pages"
 )
 
