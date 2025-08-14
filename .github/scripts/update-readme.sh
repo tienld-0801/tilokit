@@ -159,9 +159,9 @@ if [[ -n "$NEW_CONTRIBUTORS" ]]; then
             if [[ $CONTRIBUTOR_COUNT -eq 0 ]]; then
                 CONTRIBUTORS_SECTION+="
 
-<a href=\"https://github.com/${github_user}\"><img src=\"https://github.com/${github_user}.png\" width=\"50\" height=\"50\" alt=\"${github_user}\" style=\"border-radius: 50%; margin-right: 10px; margin-bottom: 5px;\"/></a>"
+<a href=\"https://github.com/${github_user}\"><img src=\"https://github.com/${github_user}.png\" width=\"50\" height=\"50\" alt=\"${github_user}\" style=\"border-radius: 50%; margin-right: 10px; margin-bottom: 5px; border: 2px solid #e1e8ed; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;\"/></a>"
             else
-                CONTRIBUTORS_SECTION+="<a href=\"https://github.com/${github_user}\"><img src=\"https://github.com/${github_user}.png\" width=\"50\" height=\"50\" alt=\"${github_user}\" style=\"border-radius: 50%; margin-right: 10px; margin-bottom: 5px;\"/></a>"
+                CONTRIBUTORS_SECTION+="<a href=\"https://github.com/${github_user}\"><img src=\"https://github.com/${github_user}.png\" width=\"50\" height=\"50\" alt=\"${github_user}\" style=\"border-radius: 50%; margin-right: 10px; margin-bottom: 5px; border: 2px solid #e1e8ed; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;\"/></a>"
             fi
             ((CONTRIBUTOR_COUNT++))
         fi
