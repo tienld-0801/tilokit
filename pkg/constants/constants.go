@@ -5,7 +5,7 @@ var (
 	Version   = "v0.1.5-dev"
 	BuildDate = "unknown"
 	GitCommit = "unknown"
-	GoVersion = "1.24.6"
+	GoVersion = "1.25.0"
 )
 
 // Known long flags for validation

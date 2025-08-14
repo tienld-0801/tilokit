@@ -10,7 +10,7 @@ Thank you for your interest in contributing to TiLoKit! This document provides p
 
 ### Prerequisites
 
-- Go 1.24.6 or later
+- Go 1.25.0 or later
 - Git
 - Make (recommended for development)
 - Node.js and npm (for testing JavaScript projects)
