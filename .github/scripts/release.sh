@@ -92,16 +92,39 @@ prepare_release_on_develop() {
     return 0
 }
 
+# Function to update README.md with version and contributors
+update_readme() {
+    local version=$1
+
+    print_info "Updating README.md with version $version and contributors..."
+    
+    # Check if update-readme.sh exists
+    if [[ -f ".github/scripts/update-readme.sh" ]]; then
+        chmod +x .github/scripts/update-readme.sh
+        ./.github/scripts/update-readme.sh "$version"
+        print_success "README.md updated successfully"
+    else
+        print_warning "README update script not found, skipping README update"
+    fi
+}
+
 # Function to commit release changes
 commit_release_changes() {
     local version=$1
 
     print_info "Committing release changes..."
 
+    # Add both constants.go and README.md if updated
     git add pkg/constants/constants.go
+    if [[ -n $(git status --porcelain README.md) ]]; then
+        git add README.md
+        print_info "README.md changes included in commit"
+    fi
+    
     git commit -m "🚀 release: $version
 
-- Update version to $version
+- Update version to $version in constants.go
+- Update README.md version badge and contributors
 - Ready for release process"
 
     print_success "Release changes committed"
@@ -176,6 +199,9 @@ main() {
 
     # Update version in code
     update_version_in_code "$version"
+
+    # Update README.md with version and contributors
+    update_readme "$version"
 
     # Prepare release on develop (no branch creation)
     prepare_release_on_develop "$version"
