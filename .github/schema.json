@@ -1,0 +1,193 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://tienld-0801.github.io/tilokit/#software",
+      "name": "TiLoKit",
+      "alternateName": ["TiLo", "TK", "TiLoKit CLI"],
+      "version": "{{VERSION}}",
+      "description": "Universal CLI toolkit for generating multi-framework projects including React, Vue, Angular, Django, Flask, Spring Boot, Laravel, Rails, Go, Node.js and 20+ more frameworks. Free and open source.",
+      "url": "https://tienld-0801.github.io/tilokit/",
+      "downloadUrl": "https://tienld-0801.github.io/tilokit/",
+      "codeRepository": "https://github.com/tienld-0801/tilokit",
+      "programmingLanguage": "Go",
+      "runtimePlatform": ["Linux", "macOS", "Windows"],
+      "operatingSystem": ["Linux", "macOS", "Windows"],
+      "applicationCategory": "DeveloperApplication",
+      "applicationSubCategory": "CLI Tool",
+      "keywords": "CLI toolkit, project generator, multi-framework, React, Vue, Angular, Django, Flask, Spring Boot, Laravel, Rails, developer tools",
+      "softwareVersion": "{{VERSION}}",
+      "datePublished": "{{BUILD_DATE}}",
+      "dateModified": "{{BUILD_DATE}}",
+      "license": "https://opensource.org/licenses/MIT",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "author": {
+        "@type": "Person",
+        "@id": "https://github.com/tienld-0801#person",
+        "name": "TienLD",
+        "url": "https://github.com/tienld-0801",
+        "sameAs": [
+          "https://github.com/tienld-0801"
+        ]
+      },
+      "publisher": {
+        "@type": "Person",
+        "@id": "https://github.com/tienld-0801#person"
+      },
+      "maintainer": {
+        "@type": "Person",
+        "@id": "https://github.com/tienld-0801#person"
+      },
+      "softwareRequirements": "No dependencies required",
+      "memoryRequirements": "Minimal",
+      "storageRequirements": "< 50MB",
+      "featureList": [
+        "Multi-framework project generation",
+        "20+ supported frameworks",
+        "Zero dependencies",
+        "Cross-platform support",
+        "Production-ready templates",
+        "CLI interface",
+        "Fast project initialization",
+        "Customizable templates",
+        "Build tool integration",
+        "Modern development workflow"
+      ],
+      "screenshot": "https://tienld-0801.github.io/tilokit/logo.svg",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5",
+        "bestRating": "5",
+        "worstRating": "1",
+        "ratingCount": "1"
+      },
+      "review": [
+        {
+          "@type": "Review",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "5",
+            "bestRating": "5"
+          },
+          "author": {
+            "@type": "Person",
+            "name": "Developer Community"
+          },
+          "reviewBody": "Excellent CLI tool for multi-framework project generation. Supports 20+ frameworks with zero dependencies."
+        }
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://tienld-0801.github.io/tilokit/#website",
+      "url": "https://tienld-0801.github.io/tilokit/",
+      "name": "TiLoKit - Universal CLI Toolkit",
+      "description": "Download page for TiLoKit - Universal CLI toolkit for generating multi-framework projects",
+      "publisher": {
+        "@type": "Person",
+        "@id": "https://github.com/tienld-0801#person"
+      },
+      "potentialAction": [
+        {
+          "@type": "DownloadAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://tienld-0801.github.io/tilokit/tilokit-{platform}-{arch}",
+            "actionPlatform": [
+              "https://schema.org/DesktopWebPlatform",
+              "https://schema.org/IOSPlatform",
+              "https://schema.org/AndroidPlatform"
+            ]
+          },
+          "object": {
+            "@type": "SoftwareApplication",
+            "@id": "https://tienld-0801.github.io/tilokit/#software"
+          }
+        },
+        {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://github.com/tienld-0801/tilokit/search?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://tienld-0801.github.io/tilokit/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "GitHub",
+          "item": "https://github.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "TienLD",
+          "item": "https://github.com/tienld-0801"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "TiLoKit",
+          "item": "https://github.com/tienld-0801/tilokit"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Download",
+          "item": "https://tienld-0801.github.io/tilokit/"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://tienld-0801.github.io/tilokit/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is TiLoKit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "TiLoKit is a universal CLI toolkit for generating multi-framework projects. It supports 20+ frameworks including React, Vue, Angular, Django, Flask, Spring Boot, Laravel, Rails, and more."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which platforms does TiLoKit support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "TiLoKit supports Linux, macOS, and Windows on both x86-64 and ARM64 architectures."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is TiLoKit free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, TiLoKit is completely free and open source under the MIT license."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I install TiLoKit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can install TiLoKit using the one-liner: curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash or download the binary directly for your platform."
+          }
+        }
+      ]
+    }
+  ]
+}

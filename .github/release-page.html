@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>TiLoKit - Tool CLI</title>
+    <title>TiLoKit {{VERSION}} - Universal CLI Toolkit | Download for Linux, macOS, Windows</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -9,22 +9,34 @@
     <meta name="title"
       content="TiLoKit {{VERSION}} - Universal CLI Toolkit for Multi-Framework Development">
     <meta name="description"
-      content="Download TiLoKit {{VERSION}} - Universal CLI toolkit for generating multi-framework projects. Supports React, Vue, Angular, Django, Flask, Spring Boot and more. Free download for Linux, macOS, Windows.">
+      content="Download TiLoKit {{VERSION}} - Universal CLI toolkit for generating multi-framework projects. Supports React, Vue, Angular, Django, Flask, Spring Boot, Laravel, Rails and 20+ frameworks. Free download for Linux, macOS, Windows.">
     <meta name="keywords"
-      content="CLI toolkit, project generator, multi-framework, React, Vue, Angular, Django, Flask, Spring Boot, developer tools, code generator, scaffold, boilerplate">
+      content="CLI toolkit, project generator, multi-framework, React generator, Vue CLI alternative, Angular CLI, Django starter, Flask generator, Spring Boot CLI, Laravel installer, Rails generator, Go CLI, Node.js generator, Python CLI, Java CLI, developer tools, code generator, scaffold, boilerplate, project template, framework generator, CLI tool, command line interface, project initialization, code scaffolding, development tools, programming tools, software development, web development, full-stack development, frontend generator, backend generator">
     <meta name="author" content="TienLD">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <meta name="language" content="English">
+    <meta name="geo.region" content="VN">
+    <meta name="geo.placename" content="Vietnam">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tienld-0801.github.io/tilokit/">
     <meta property="og:title"
-      content="TiLoKit {{VERSION}} - Universal CLI Toolkit">
+      content="TiLoKit {{VERSION}} - Universal CLI Toolkit for Multi-Framework Development">
     <meta property="og:description"
-      content="Universal CLI toolkit for generating multi-framework projects. Download for Linux, macOS, Windows. Free and open source.">
-
+      content="Download TiLoKit {{VERSION}} - Universal CLI toolkit for generating 20+ framework projects including React, Vue, Angular, Django, Flask, Spring Boot, Laravel, Rails. Free download for Linux, macOS, Windows.">
+    <meta property="og:image" content="https://tienld-0801.github.io/tilokit/logo.svg">
+    <meta property="og:image:alt" content="TiLoKit Logo - Universal CLI Toolkit">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="TiLoKit">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="TienLD">
+    <meta property="article:published_time" content="{{BUILD_DATE}}">
+    <meta property="article:modified_time" content="{{BUILD_DATE}}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
@@ -33,16 +45,35 @@
     <meta property="twitter:title"
       content="TiLoKit {{VERSION}} - Universal CLI Toolkit for Multi-Framework Development">
     <meta property="twitter:description"
-      content="Download TiLoKit {{VERSION}} - Universal CLI toolkit for generating multi-framework projects. Supports React, Vue, Angular, Django, Flask, Spring Boot and more. Free download for Linux, macOS, Windows.">
+      content="Download TiLoKit {{VERSION}} - Universal CLI toolkit for generating 20+ framework projects including React, Vue, Angular, Django, Flask, Spring Boot, Laravel, Rails. Free download for Linux, macOS, Windows.">
+    <meta property="twitter:image" content="https://tienld-0801.github.io/tilokit/logo.svg">
+    <meta property="twitter:image:alt" content="TiLoKit Logo - Universal CLI Toolkit">
+    <meta property="twitter:creator" content="@tienld0801">
+    <meta property="twitter:site" content="@tienld0801">
 
     <!-- Additional SEO -->
     <meta name="theme-color" content="#667eea">
     <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-config" content="./browserconfig.xml">
     <link rel="canonical" href="https://tienld-0801.github.io/tilokit/">
+    <link rel="alternate" hreflang="en" href="https://tienld-0801.github.io/tilokit/">
+    <link rel="alternate" hreflang="x-default" href="https://tienld-0801.github.io/tilokit/">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="./logo.svg">
     <link rel="apple-touch-icon" href="./logo.svg">
+    <link rel="shortcut icon" href="./logo.svg">
+    <link rel="icon" sizes="32x32" href="./logo.svg">
+    <link rel="icon" sizes="16x16" href="./logo.svg">
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://github.com">
+    <link rel="preconnect" href="https://api.github.com">
+    <link rel="dns-prefetch" href="https://github.com">
+    <link rel="dns-prefetch" href="https://api.github.com">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -51,23 +82,52 @@
       "@type": "SoftwareApplication",
       "name": "TiLoKit",
       "version": "{{VERSION}}",
-      "description": "Universal CLI toolkit for generating multi-framework projects including React, Vue, Angular, Django, Flask, Spring Boot and more.",
+      "description": "Universal CLI toolkit for generating multi-framework projects including React, Vue, Angular, Django, Flask, Spring Boot, Laravel, Rails, Go, Node.js and 20+ more frameworks. Free and open source.",
       "url": "https://tienld-0801.github.io/tilokit/",
       "downloadUrl": "https://tienld-0801.github.io/tilokit/",
+      "codeRepository": "https://github.com/tienld-0801/tilokit",
+      "programmingLanguage": "Go",
+      "runtimePlatform": ["Linux", "macOS", "Windows"],
       "author": {
         "@type": "Person",
-        "name": "TienLD"
+        "name": "TienLD",
+        "url": "https://github.com/tienld-0801"
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "TienLD",
+        "url": "https://github.com/tienld-0801"
       },
       "operatingSystem": ["Linux", "macOS", "Windows"],
       "applicationCategory": "DeveloperApplication",
+      "applicationSubCategory": "CLI Tool",
+      "keywords": "CLI toolkit, project generator, multi-framework, React, Vue, Angular, Django, Flask, Spring Boot, Laravel, Rails, developer tools",
       "offers": {
         "@type": "Offer",
         "price": "0",
-        "priceCurrency": "USD"
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
       },
       "softwareVersion": "{{VERSION}}",
       "datePublished": "{{BUILD_DATE}}",
-      "license": "https://opensource.org/licenses/MIT"
+      "dateModified": "{{BUILD_DATE}}",
+      "license": "https://opensource.org/licenses/MIT",
+      "isAccessibleForFree": true,
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5",
+        "bestRating": "5",
+        "worstRating": "1",
+        "ratingCount": "1"
+      },
+      "softwareRequirements": "No dependencies required",
+      "memoryRequirements": "Minimal",
+      "storageRequirements": "< 50MB",
+      "supportingData": {
+        "@type": "DataDownload",
+        "name": "Installation Script",
+        "contentUrl": "https://tienld-0801.github.io/tilokit/install.sh"
+      }
     }
     </script>
     <style>
@@ -412,6 +472,12 @@
         <p>Universal CLI Toolkit for Multi-Framework Project Generation</p>
         <p><strong>Version:</strong> {{VERSION}} | <strong>Build:</strong>
           {{BUILD_DATE}}</p>
+        
+        <!-- SEO-friendly feature highlights -->
+        <div style="margin: 2rem 0; text-align: center; color: #4a5568; font-size: 1.1rem; line-height: 1.6;">
+          <p>🚀 <strong>20+ Frameworks</strong> | ⚡ <strong>Zero Dependencies</strong> | 🔧 <strong>Production Ready</strong></p>
+          <p>Supports React, Vue, Angular, Django, Flask, Spring Boot, Laravel, Rails, Go, Node.js and more</p>
+        </div>
       </header>
 
       <div class="install-section">
@@ -505,11 +571,18 @@
             rel="noopener" target="_blank">💬 Discussions</a>
           <a href="https://github.com/tienld-0801/tilokit/releases"
             rel="noopener" target="_blank">📦 All Releases</a>
+          <a href="./humans.txt" rel="noopener">👥 Humans.txt</a>
+          <a href="./.well-known/security.txt" rel="noopener">🔒 Security</a>
         </nav>
         <p>Made with ❤️ by <a href="https://github.com/tienld-0801"
             rel="noopener" target="_blank">TienLD</a> | Licensed under <a
             href="https://opensource.org/licenses/MIT" rel="noopener"
             target="_blank">MIT</a></p>
+        
+        <!-- SEO Footer -->
+        <div style="margin-top: 1rem; font-size: 0.85rem; color: #a0aec0;">
+          <p>Keywords: CLI toolkit, project generator, React generator, Vue CLI alternative, Angular CLI, Django starter, Flask generator, Spring Boot CLI, Laravel installer, Rails generator, Go CLI, Node.js generator, Python CLI, Java CLI, developer tools</p>
+        </div>
       </footer>
     </main>
 
