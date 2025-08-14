@@ -17,7 +17,7 @@ on:
         type: boolean
 
 env:
-  GO_VERSION: '1.24.6'
+  GO_VERSION: '1.25.0'
 
 jobs:
   build-and-deploy:
@@ -41,13 +41,18 @@ jobs:
       - name: Cache Go modules
         uses: actions/cache@v4.2.3
         with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ env.GO_VERSION }}-${{ hashFiles('**/go.sum') }}
           restore-keys: |
+            ${{ runner.os }}-go-${{ env.GO_VERSION }}-
             ${{ runner.os }}-go-
 
       - name: Download dependencies
-        run: go mod download
+        run: |
+          go mod download
+          go mod verify
 
       - name: Run tests
         run: go test -v ./...
