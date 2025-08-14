@@ -170,6 +170,8 @@ if [[ -n "$NEW_CONTRIBUTORS" ]]; then
     print_success "Added $CONTRIBUTOR_COUNT new contributors to README"
 else
     print_warning "No new contributors to add (all already exist in README)"
+    # Set empty contributors section to avoid issues in processing
+    CONTRIBUTORS_SECTION=""
 fi
 
 # 5. Find and replace the contributors section in README.md
