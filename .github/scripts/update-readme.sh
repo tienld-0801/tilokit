@@ -148,7 +148,7 @@ if [[ -n "$ALL_USERS" ]]; then
 fi
 
 # Remove trailing newline and convert to proper format
-NEW_CONTRIBUTORS=$(echo -e "$NEW_CONTRIBUTORS" | grep -v '^$')
+NEW_CONTRIBUTORS=$(echo -e "$NEW_CONTRIBUTORS" | grep -v '^$' || true)
 
 # Add GitHub users with avatars (left-aligned, no center div)
 if [[ -n "$NEW_CONTRIBUTORS" ]]; then
