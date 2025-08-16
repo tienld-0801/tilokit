@@ -12,7 +12,7 @@
     <img src="https://img.shields.io/badge/license-Custom-red" alt="License"/>
   </a>
   <a href="https://github.com/tienld-0801/tilokit/releases">
-    <img src="https://img.shields.io/badge/release-v0.1.7--dev-brightgreen" alt="Release"/>
+    <img src="https://img.shields.io/badge/release-v0.1.7-dev-brightgreen" alt="Release"/>
   </a>
   <a href="https://github.com/tienld-0801/tilokit/actions">
     <img src="https://img.shields.io/badge/build-compiler-yellow" alt="Build Status"/>
@@ -290,12 +290,6 @@ TiLoKit is optimized for developers searching for:
 ---
 
 ## 🤝 **Contributing**
-
-
-
-
-
-<a href="https://github.com/tienld-0801"><img src="https://github.com/tienld-0801.png" width="50" height="50" alt="tienld-0801" style="border-radius: 50%; margin-right: 10px; margin-bottom: 5px; border: 2px solid #e1e8ed; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;"/></a><a href="https://github.com/tienld-tgl"><img src="https://github.com/tienld-tgl.png" width="50" height="50" alt="tienld-tgl" style="border-radius: 50%; margin-right: 10px; margin-bottom: 5px; border: 2px solid #e1e8ed; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;"/></a><a href="https://github.com/hoangsinh0601"><img src="https://github.com/hoangsinh0601.png" width="50" height="50" alt="hoangsinh0601" style="border-radius: 50%; margin-right: 10px; margin-bottom: 5px; border: 2px solid #e1e8ed; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;"/></a>
 
 <a href="https://github.com/tienld-0801">
   <img src="https://github.com/tienld-0801.png?size=50&mask=circle" width="50" height="50" alt="tienld-0801"/>

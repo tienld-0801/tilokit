@@ -53,13 +53,13 @@ print_info "Updating version badge..."
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS - escape special characters in version
     ESCAPED_VERSION=$(echo "$VERSION" | sed 's/[[\.\*^$(){}?+|]/\\&/g')
-    sed -i '' "s|release-[^-]*--[^-]*-green|release-${ESCAPED_VERSION}-green|g" "$README_FILE"
-    sed -i '' "s|release-v[0-9]*\.[0-9]*\.[0-9]*-[^-]*-green|release-${ESCAPED_VERSION}-green|g" "$README_FILE"
+    sed -i '' "s|release-[^-]*--[^-]*-brightgreen|release-${ESCAPED_VERSION}-brightgreen|g" "$README_FILE"
+    sed -i '' "s|release-v[0-9]*\.[0-9]*\.[0-9]*-[^-]*-brightgreen|release-${ESCAPED_VERSION}-brightgreen|g" "$README_FILE"
 else
     # Linux - escape special characters in version
     ESCAPED_VERSION=$(echo "$VERSION" | sed 's/[[\.\*^$(){}?+|]/\\&/g')
-    sed -i "s|release-[^-]*--[^-]*-green|release-${ESCAPED_VERSION}-green|g" "$README_FILE"
-    sed -i "s|release-v[0-9]*\.[0-9]*\.[0-9]*-[^-]*-green|release-${ESCAPED_VERSION}-green|g" "$README_FILE"
+    sed -i "s|release-[^-]*--[^-]*-brightgreen|release-${ESCAPED_VERSION}-brightgreen|g" "$README_FILE"
+    sed -i "s|release-v[0-9]*\.[0-9]*\.[0-9]*-[^-]*-brightgreen|release-${ESCAPED_VERSION}-brightgreen|g" "$README_FILE"
 fi
 
 # 2. Get contributors from GitHub API
@@ -115,10 +115,12 @@ print_info "Checking existing contributors in README..."
 EXISTING_CONTRIBUTORS=""
 if [[ -f "$README_FILE" ]]; then
     # Extract existing GitHub usernames from contributor avatar links only
-    # Look for pattern: <a href="https://github.com/username"><img src="https://github.com/username.png"
-    EXISTING_CONTRIBUTORS=$(grep -o '<a href="https://github.com/[^"]*"><img src="https://github.com/[^"]*\.png"' "$README_FILE" | \
-        sed 's|<a href="https://github.com/||' | \
-        sed 's|"><img.*||' | \
+    # Look for pattern: <a href="https://github.com/username"> followed by <img with .png
+    EXISTING_CONTRIBUTORS=$(grep -A1 '<a href="https://github.com/[^/"]*">' "$README_FILE" | \
+        grep -B1 'img src="https://github.com/' | \
+        grep '<a href=' | \
+        sed 's|.*<a href="https://github.com/||' | \
+        sed 's|">.*||' | \
         sort | uniq)
     
     if [[ -n "$EXISTING_CONTRIBUTORS" ]]; then
@@ -159,9 +161,14 @@ if [[ -n "$NEW_CONTRIBUTORS" ]]; then
             if [[ $CONTRIBUTOR_COUNT -eq 0 ]]; then
                 CONTRIBUTORS_SECTION+="
 
-<a href=\"https://github.com/${github_user}\"><img src=\"https://github.com/${github_user}.png\" width=\"50\" height=\"50\" alt=\"${github_user}\" style=\"border-radius: 50%; margin-right: 10px; margin-bottom: 5px; border: 2px solid #e1e8ed; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;\"/></a>"
+<a href=\"https://github.com/${github_user}\">
+  <img src=\"https://github.com/${github_user}.png?size=50&mask=circle\" width=\"50\" height=\"50\" alt=\"${github_user}\"/>
+</a>"
             else
-                CONTRIBUTORS_SECTION+="<a href=\"https://github.com/${github_user}\"><img src=\"https://github.com/${github_user}.png\" width=\"50\" height=\"50\" alt=\"${github_user}\" style=\"border-radius: 50%; margin-right: 10px; margin-bottom: 5px; border: 2px solid #e1e8ed; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;\"/></a>"
+                CONTRIBUTORS_SECTION+="
+<a href=\"https://github.com/${github_user}\">
+  <img src=\"https://github.com/${github_user}.png?size=50&mask=circle\" width=\"50\" height=\"50\" alt=\"${github_user}\"/>
+</a>"
             fi
             ((CONTRIBUTOR_COUNT++))
         fi
@@ -190,8 +197,10 @@ while IFS= read -r line; do
     # Check if we've reached the Contributing section
     if [[ "$line" == "## 🤝 **Contributing**" ]]; then
         echo "$line" >> "$TEMP_FILE"
-        # Add contributors section right after Contributing header
-        echo "$CONTRIBUTORS_SECTION" >> "$TEMP_FILE"
+        # Add contributors section right after Contributing header only if there are new contributors
+        if [[ -n "$CONTRIBUTORS_SECTION" ]]; then
+            echo "$CONTRIBUTORS_SECTION" >> "$TEMP_FILE"
+        fi
         CONTRIBUTORS_ADDED=true
         IN_CONTRIBUTING_SECTION=true
         SKIP_UNTIL_NEXT_SECTION=false
