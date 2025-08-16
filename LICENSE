@@ -1,22 +1,24 @@
-CUSTOM LICENSE – LE DUY TIEN
+TILOKIT LICENSE – LE DUY TIEN
 
 Copyright (c) 2025 Le Duy Tien. All Rights Reserved.
 
-1. PERMITTED USE
-You are allowed to view the source code and contribute to the project (e.g., submit bug reports, suggestions, or pull requests).
-You are NOT allowed to copy, distribute, modify, or use this source code for any purpose other than contributing to the project.
+1. Permitted Use
 
----
+You are allowed to:
+View, use, and modify the source code for non-commercial purposes, including learning, research, and personal projects.
+Fork this repository and submit pull requests to contribute back to the project.
+Share modified versions, provided that you retain this license and give proper credit to the original author.
 
-2. NO COMMERCIAL USE
-You may NOT use, sell, distribute, or integrate any part of this source code into a product or service intended for commercial purposes.
+2. Prohibited Use
 
----
+You are NOT allowed to:
+Use any part of this source code for commercial purposes, including selling, integrating into commercial products or services, or using within a company for profit-oriented activities.
+Remove or alter the copyright and license notice of the original author.
 
-3. NO COPYING OR DERIVATIVE WORKS
-You may not fork, reproduce, or create derivative works based on this source code without prior written permission from the author.
+3. Derivative Works
 
----
+Any derivative works or forks must remain under this license and must be used for non-commercial purposes only.
 
-4. DISCLAIMER
-This source code is provided “as is”, without any warranties, express or implied. The author is not liable for any damages resulting from the use or inability to use the source code.
+4. Disclaimer
+
+This source code is provided “as is”, without any warranties, express or implied. The author is not liable for any damages resulting from the use or inability to use this source code.
