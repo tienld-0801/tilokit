@@ -1,7 +1,7 @@
 # ✨ TiLoKit – Universal Multi-Framework Project Generator
 
 <p align="center">
-  <img src="./assets/logo.svg" alt="TiLoKit CLI Logo" width="400"/>
+  <img src="../assets/logo.svg" alt="TiLoKit CLI Logo" width="400"/>
 </p>
 
 <p align="center">
@@ -12,7 +12,7 @@
     <img src="https://img.shields.io/badge/license-Custom-red" alt="License"/>
   </a>
   <a href="https://github.com/tienld-0801/tilokit/releases">
-    <img src="https://img.shields.io/badge/release-v0.2.5-dev-brightgreen" alt="Release"/>
+    <img src="https://img.shields.io/badge/release-v0.2.5--dev-green" alt="Release"/>
   </a>
   <a href="https://github.com/tienld-0801/tilokit/actions">
     <img src="https://img.shields.io/badge/build-compiler-yellow" alt="Build Status"/>

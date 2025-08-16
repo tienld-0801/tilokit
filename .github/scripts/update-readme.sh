@@ -38,7 +38,7 @@ if [[ -z "$VERSION" ]]; then
     exit 1
 fi
 
-README_FILE="README.md"
+README_FILE=".github/README.md"
 
 # Check if README.md exists
 if [[ ! -f "$README_FILE" ]]; then
@@ -53,13 +53,11 @@ print_info "Updating version badge..."
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS - escape special characters in version
     ESCAPED_VERSION=$(echo "$VERSION" | sed 's/[[\.\*^$(){}?+|]/\\&/g')
-    sed -i '' "s|release-[^-]*--[^-]*-brightgreen|release-${ESCAPED_VERSION}-brightgreen|g" "$README_FILE"
-    sed -i '' "s|release-v[0-9]*\.[0-9]*\.[0-9]*-[^-]*-brightgreen|release-${ESCAPED_VERSION}-brightgreen|g" "$README_FILE"
+    sed -i '' "s|release-v[^-]*--[^-]*-green|release-${ESCAPED_VERSION}--green|g" "$README_FILE"
 else
     # Linux - escape special characters in version
     ESCAPED_VERSION=$(echo "$VERSION" | sed 's/[[\.\*^$(){}?+|]/\\&/g')
-    sed -i "s|release-[^-]*--[^-]*-brightgreen|release-${ESCAPED_VERSION}-brightgreen|g" "$README_FILE"
-    sed -i "s|release-v[0-9]*\.[0-9]*\.[0-9]*-[^-]*-brightgreen|release-${ESCAPED_VERSION}-brightgreen|g" "$README_FILE"
+    sed -i "s|release-v[^-]*--[^-]*-green|release-${ESCAPED_VERSION}--green|g" "$README_FILE"
 fi
 
 # 2. Get contributors from GitHub API
@@ -122,7 +120,7 @@ if [[ -f "$README_FILE" ]]; then
         sed 's|.*<a href="https://github.com/||' | \
         sed 's|">.*||' | \
         sort | uniq)
-    
+
     if [[ -n "$EXISTING_CONTRIBUTORS" ]]; then
         print_info "Found existing contributors in README:"
         echo "$EXISTING_CONTRIBUTORS"
