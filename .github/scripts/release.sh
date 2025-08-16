@@ -116,9 +116,9 @@ commit_release_changes() {
 
     # Add both constants.go and README.md if updated
     git add pkg/constants/constants.go
-    if [[ -n $(git status --porcelain README.md) ]]; then
-        git add README.md
-        print_info "README.md changes included in commit"
+    if [[ -n $(git status --porcelain .github/README.md) ]]; then
+        git add .github/README.md
+        print_info ".github/README.md changes included in commit"
     fi
     
     git commit -m "🚀 release: $version

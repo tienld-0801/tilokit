@@ -1,20 +1,24 @@
 # ✨ TiLoKit – Universal Multi-Framework Project Generator
 
 <p align="center">
-  <img src="./assets/logo.svg" alt="TiLoKit CLI Logo" width="400"/>
+  <img src="../assets/logo.svg" alt="TiLoKit CLI Logo" width="400"/>
 </p>
 
+<style>
+#style {text-decoration: none}
+</style>
+
 <p align="center">
-  <a href="https://go.dev/dl/">
+  <a id="style" href="https://go.dev/dl/">
     <img src="https://img.shields.io/badge/Go-1.25.0-blue" alt="Go Version"/>
   </a>
-  <a href="./LICENSE">
+  <a id="style" href="./LICENSE">
     <img src="https://img.shields.io/badge/license-Custom-red" alt="License"/>
   </a>
-  <a href="https://github.com/tienld-0801/tilokit/releases">
-    <img src="https://img.shields.io/badge/release-v0.2.5-dev-brightgreen" alt="Release"/>
+  <a id="style" href="https://github.com/tienld-0801/tilokit/releases">
+    <img src="https://img.shields.io/badge/release-v0.2.5--dev-green" alt="Release"/>
   </a>
-  <a href="https://github.com/tienld-0801/tilokit/actions">
+  <a id="style" href="https://github.com/tienld-0801/tilokit/actions">
     <img src="https://img.shields.io/badge/build-compiler-yellow" alt="Build Status"/>
   </a>
 </p>
