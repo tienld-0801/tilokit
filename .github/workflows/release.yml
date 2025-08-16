@@ -33,7 +33,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "stable"
+          go-version: 'stable'
           check-latest: true
           cache: false
 
@@ -214,26 +214,13 @@ jobs:
           echo "Platforms: Linux, macOS, Windows" >> pages/RELEASE_INFO.md
           echo "Architectures: amd64, arm64" >> pages/RELEASE_INFO.md
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
-        with:
-          path: ./pages
-
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        uses: peaceiris/actions-github-pages@v3.1.12
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          timeout: 600000
-          error_count: 10
-          reporting_interval: 5000
-          artifact_name: github-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./pages
+          force_orphan: true
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2.3.2
