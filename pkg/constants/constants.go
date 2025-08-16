@@ -4,7 +4,7 @@ import "runtime"
 
 // Version information - set during build time
 var (
-	Version   = "v0.2.4-dev"
+	Version   = "v0.2.5-dev"
 	BuildDate = "unknown"
 	GitCommit = "unknown"
 	GoVersion = runtime.Version()
