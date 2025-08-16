@@ -214,13 +214,20 @@ jobs:
           echo "Platforms: Linux, macOS, Windows" >> pages/RELEASE_INFO.md
           echo "Architectures: amd64, arm64" >> pages/RELEASE_INFO.md
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-github-pages@v3.1.12
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        if: startsWith(github.ref, 'refs/tags/')
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./pages
-          force_orphan: true
+          path: ./pages
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        if: startsWith(github.ref, 'refs/tags/')
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2.3.2
