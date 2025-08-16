@@ -166,7 +166,7 @@ jobs:
           cp .github/browserconfig.xml pages/
           cp .github/humans.txt pages/
           cp .github/schema.json pages/
-          
+
           # Create .well-known directory for security.txt
           mkdir -p pages/.well-known
           cp .github/security.txt pages/.well-known/
@@ -179,16 +179,21 @@ jobs:
           # Process manifest.json with version
           sed -i.bak "s/{{VERSION}}/$VERSION/g" pages/manifest.json
           rm -f pages/manifest.json.bak
-          
+
           # Process humans.txt with build info
           sed -i.bak "s/{{BUILD_DATE}}/$BUILD_DATE/g" pages/humans.txt
           sed -i.bak "s/{{VERSION}}/$VERSION/g" pages/humans.txt
           rm -f pages/humans.txt.bak
-          
+
           # Process schema.json with build info
           sed -i.bak "s/{{BUILD_DATE}}/$BUILD_DATE/g" pages/schema.json
           sed -i.bak "s/{{VERSION}}/$VERSION/g" pages/schema.json
           rm -f pages/schema.json.bak
+
+          # Update README.md with new version
+          echo "📝 Updating README.md version badge..."
+          chmod +x .github/scripts/update-readme.sh
+          ./.github/scripts/update-readme.sh $VERSION
 
           # Generate release page from HTML template
           echo "🎨 Generating release page from template..."
@@ -200,7 +205,7 @@ jobs:
           ls -la pages/ | grep -E '(robots.txt|sitemap.xml|manifest.json|browserconfig.xml|humans.txt|schema.json)' || true
           echo "📁 .well-known directory:"
           ls -la pages/.well-known/ || true
-          
+
           # Generate additional SEO metadata
           echo "🔍 Generating SEO metadata..."
           echo "# TiLoKit Release $VERSION" > pages/RELEASE_INFO.md
@@ -210,8 +215,8 @@ jobs:
           echo "Architectures: amd64, arm64" >> pages/RELEASE_INFO.md
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-github-pages@v3.1.12
-        if: startsWith(github.ref, 'refs/tags/')
+        uses: peaceiris/actions-gh-pages@v4
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./pages
