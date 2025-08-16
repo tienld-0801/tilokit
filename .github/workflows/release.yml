@@ -166,10 +166,7 @@ jobs:
           cp .github/browserconfig.xml pages/
           cp .github/humans.txt pages/
           cp .github/schema.json pages/
-
-          # Create .well-known directory for security.txt
-          mkdir -p pages/.well-known
-          cp .github/security.txt pages/.well-known/
+          cp .github/security.txt pages/
 
           # Process sitemap.xml with build date
           sed -i.bak "s/{{BUILD_DATE}}/$BUILD_DATE/g" pages/sitemap.xml
