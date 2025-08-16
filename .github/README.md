@@ -358,32 +358,25 @@ go test ./...
 - 🔜 **IDE Integration**: VSCode, IntelliJ plugins
 - 🔜 **Docker Support**: Containerized development environments
 
----
-
-## 📄 **License & Legal**
-
-### 📜 **Custom License**
-TiLoKit is licensed under a Custom License by Le Duy Tien. See [LICENSE](../LICENSE) for details.
-
-```
-CUSTOM LICENSE – LE DUY TIEN
-Copyright (c) 2025 Le Duy Tien. All Rights Reserved.
-
-1. PERMITTED USE
-   - View source code and contribute to the project
-   - Submit bug reports, suggestions, or pull requests
-   - NOT allowed to copy, distribute, modify for other purposes
-
-2. NO COMMERCIAL USE
-   - No commercial use, selling, or distribution allowed
-
-3. NO COPYING OR DERIVATIVE WORKS
-   - No forking or derivative works without written permission
-```
-
 ### 🙏 **Acknowledgments**
 - Built with ❤️ using [Go](https://golang.org/)
 - CLI framework powered by [Cobra](https://github.com/spf13/cobra)
 - Configuration management with [Viper](https://github.com/spf13/viper)
 - Interactive prompts via [Survey](https://github.com/AlecAivazis/survey)
 - Colorful output with [Fatih Color](https://github.com/fatih/color)
+
+---
+
+## 📄 **License & Legal**
+
+### 📜 **TiLoKit License**
+TiLoKit is licensed under a Custom License by Le Duy Tien. See [LICENSE](../LICENSE) for details.
+
+```
+TILOKIT LICENSE – LE DUY TIEN
+Copyright (c) 2025 Le Duy Tien. All Rights Reserved.
+
+✅ Permitted: View, use, modify for non-commercial purposes, fork & contribute
+❌ Prohibited: Commercial use, selling, integrating into commercial products
+📝 Derivative works must remain under this license for non-commercial use only
+```
