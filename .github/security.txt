@@ -1,9 +1,9 @@
 Contact: https://github.com/tienld-0801/tilokit/security/advisories/new
-Contact: mailto:tienld0801@gmail.com
+Contact: mailto:taylortien99@gmail.com
 Expires: 2025-12-31T23:59:59.000Z
 Encryption: https://github.com/tienld-0801.gpg
 Preferred-Languages: en, vi
-Canonical: https://tienld-0801.github.io/tilokit/.well-known/security.txt
+Canonical: https://tienld-0801.github.io/tilokit/security.txt
 Policy: https://github.com/tienld-0801/tilokit/blob/main/SECURITY.md
 Acknowledgments: https://github.com/tienld-0801/tilokit#acknowledgments
 Hiring: https://github.com/tienld-0801
