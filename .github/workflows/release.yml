@@ -228,6 +228,12 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         if: startsWith(github.ref, 'refs/tags/')
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          timeout: 600000
+          error_count: 10
+          reporting_interval: 5000
+          artifact_name: github-pages
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2.3.2
