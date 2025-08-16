@@ -8,7 +8,7 @@
   <a href="https://go.dev/dl/">
     <img src="https://img.shields.io/badge/Go-1.25.0-blue" alt="Go Version"/>
   </a>
-  <a href="./LICENSE">
+  <a href="../LICENSE">
     <img src="https://img.shields.io/badge/license-Custom-red" alt="License"/>
   </a>
   <a href="https://github.com/tienld-0801/tilokit/releases">
@@ -363,7 +363,7 @@ go test ./...
 ## 📄 **License & Legal**
 
 ### 📜 **Custom License**
-TiLoKit is licensed under a Custom License by Le Duy Tien. See [LICENSE](./LICENSE) for details.
+TiLoKit is licensed under a Custom License by Le Duy Tien. See [LICENSE](../LICENSE) for details.
 
 ```
 CUSTOM LICENSE – LE DUY TIEN
@@ -387,25 +387,3 @@ Copyright (c) 2025 Le Duy Tien. All Rights Reserved.
 - Configuration management with [Viper](https://github.com/spf13/viper)
 - Interactive prompts via [Survey](https://github.com/AlecAivazis/survey)
 - Colorful output with [Fatih Color](https://github.com/fatih/color)
-
----
-
-<div align="center">
-
-## 🚀 **Ready to boost your development productivity?**
-
-### Install TiLoKit now and generate your next project in seconds
-
-```bash
-curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash
-```
-
-**[⬇️ Download](https://github.com/tienld-0801/tilokit/releases) • [📖 Documentation](https://github.com/tienld-0801/tilokit/wiki) • [🐛 Report Issues](https://github.com/tienld-0801/tilokit/issues) • [💡 Discussions](https://github.com/tienld-0801/tilokit/discussions)**
-
----
-
-### Made with ❤️ by developers, for developers
-
-**TiLoKit** - *The Universal Multi-Framework Project Generator*
-
-</div>
