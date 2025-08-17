@@ -27,7 +27,7 @@ createApp(App).mount('#app')`
 
 	ViteTsAppFile = `<template>
   <div id="app">
-    <h1>{{.WelcomeMessage}}</h1>
+    <h1>{{.welcome_message}}</h1>
   </div>
 </template>
 

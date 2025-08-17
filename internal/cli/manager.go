@@ -106,6 +106,7 @@ func (m *Manager) SetupFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&m.Framework, "framework", "f", "", "Framework to use (react, vue, svelte, etc.)")
 	cmd.Flags().StringVarP(&m.BuildTool, "build-tool", "b", "", "Build tool to use (vite, webpack, etc.)")
 	cmd.Flags().StringVarP(&m.Language, "language", "L", "", "Language for templates (ts or js)")
+	cmd.Flags().StringVarP(&m.RouterType, "router-type", "r", "", "Router type for Next.js (app or pages)")
 	cmd.Flags().StringVarP(&m.OutputDir, "output", "o", ".", "Output directory")
 
 	// Information flags

@@ -57,6 +57,7 @@ func LoadEnvConfig() *EnvConfig {
 // ToVariables converts EnvConfig to a map for template variables
 func (e *EnvConfig) ToVariables() map[string]interface{} {
 	return map[string]interface{}{
+		// snake_case (preferred)
 		"welcome_message":      e.WelcomeMessage,
 		"project_author":       e.ProjectAuthor,
 		"project_email":        e.ProjectEmail,
@@ -65,8 +66,11 @@ func (e *EnvConfig) ToVariables() map[string]interface{} {
 		"enable_typescript":    e.EnableTypeScript,
 		"enable_testing":       e.EnableTesting,
 		"enable_linting":       e.EnableLinting,
-		"dev_mode":            e.DevMode,
-		"verbose_mode":        e.VerboseMode,
+		"dev_mode":             e.DevMode,
+		"verbose_mode":         e.VerboseMode,
+
+		// PascalCase alias for WelcomeMessage compatibility
+		"WelcomeMessage":      e.WelcomeMessage,
 	}
 }
 

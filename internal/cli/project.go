@@ -78,6 +78,7 @@ func (m *Manager) RunProjectGenerationProcess() error {
 	case constants.NextFramework:
 		logrus.Infof("ℹ️  Next steps:")
 		logrus.Infof("ℹ️     cd %s", m.ProjectName)
+		logrus.Infof("ℹ️     npm install")
 		logrus.Infof("ℹ️     npm run dev")
 		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Next.js app")
 	case constants.NuxtFramework:

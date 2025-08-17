@@ -25,7 +25,6 @@
                 "-n", "test-react",
                 "-f", "react",
                 "-b", "vite",
-                "-p", "npm",
                 "-L", "js",
                 "-q"
             ],
@@ -43,7 +42,6 @@
                 "-n", "test-vue",
                 "-f", "vue",
                 "-b", "vite",
-                "-p", "npm",
                 "-L", "js",
                 "-q"
             ],
@@ -60,7 +58,6 @@
             "args": [
                 "-n", "test-nextjs",
                 "-f", "nextjs",
-                "-p", "npm",
                 "-L", "js",
                 "-q"
             ],

@@ -41,8 +41,14 @@ if [[ "$WHITESPACE_ISSUES" == *"trailing whitespace"* ]]; then
     # Auto-fix trailing whitespace (only for existing files)
     git diff --cached --name-only | while read file; do
         if [[ -f "$file" ]]; then
-            # macOS sed requires backup extension, use empty string for no backup
-            sed -i '' 's/[[:space:]]*$//' "$file"
+            # Cross-platform sed in-place edit
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                # macOS/BSD sed requires explicit empty suffix
+                sed -i '' 's/[[:space:]]*$//' "$file"
+            else
+                # GNU sed works without a suffix
+                sed -i 's/[[:space:]]*$//' "$file"
+            fi
         fi
     done
     echo -e "${GREEN}✅ Trailing whitespace cleaned${NC}"

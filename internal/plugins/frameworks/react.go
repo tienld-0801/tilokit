@@ -2,7 +2,6 @@ package frameworks
 
 import (
 	"path/filepath"
-	"strings"
 
 	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/plugins/templates"
@@ -126,18 +125,23 @@ func (p *ReactPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) err
 	envFile = ".env"
 	gitignoreFile = ".gitignore"
 
-	packageJson = strings.ReplaceAll(packageJson, "{{.ProjectName}}", ctx.Config.ProjectName)
+	templateEngine := templates.NewTemplateEngine()
 
-	files := map[string]string{
+	for filename, content := range map[string]string{
 		packageJsonFile: packageJson,
 		envFile:         envContent,
 		gitignoreFile:   gitIgnoreContent,
 		eslintFile:      eslintContent,
-	}
-
-	for filename, content := range files {
+	} {
 		fullPath := filepath.Join(ctx.ProjectPath, filename)
-		if err := utils.WriteFile(fullPath, content); err != nil {
+		
+		// Process template content
+		processedContent, err := templateEngine.ProcessTemplate(content, ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process template for %s", filename)
+		}
+		
+		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
 	}
@@ -193,15 +197,20 @@ func (p *ReactPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) err
 		indexHtml = react.ViteTsIndexHtml
 	}
 
-	indexHtml = strings.ReplaceAll(indexHtml, "{{.ProjectName}}", ctx.Config.ProjectName)
+	templateEngine := templates.NewTemplateEngine()
 
-	configs := map[string]string{
+	for path, content := range map[string]string{
 		"index.html": indexHtml,
-	}
-
-	for path, content := range configs {
+	} {
 		fullPath := filepath.Join(ctx.ProjectPath, path)
-		if err := utils.WriteFile(fullPath, content); err != nil {
+		
+		// Process template content
+		processedContent, err := templateEngine.ProcessTemplate(content, ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process template for %s", path)
+		}
+		
+		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
 	}
