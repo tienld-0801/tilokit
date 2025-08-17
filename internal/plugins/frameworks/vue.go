@@ -98,7 +98,14 @@ func (p *VuePlugin) createDirectoryStructure(ctx *tilocontext.ExecutionContext) 
 }
 
 func (p *VuePlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) error {
-	packageJson := vue.ViteTsPackageJson
+	language, _ := ctx.Variables["language"].(string)
+	isJS := language == "js"
+	var packageJson string
+	if isJS {
+		packageJson = vue.ViteJsPackageJson
+	} else {
+		packageJson = vue.ViteTsPackageJson
+	}
 	packageJson = strings.ReplaceAll(packageJson, "{{.ProjectName}}", ctx.Config.ProjectName)
 
 	packageJsonPath := filepath.Join(ctx.ProjectPath, "package.json")
@@ -106,8 +113,13 @@ func (p *VuePlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) error
 }
 
 func (p *VuePlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error {
-	language := ctx.Variables["language"].(string)
-	isJS := language == "js"
+	// Safely extract language, default to "ts" on error
+	rawLang, exists := ctx.Variables["language"]
+	langStr, ok := rawLang.(string)
+	if !exists || !ok {
+		langStr = "ts"
+	}
+	isJS := langStr == "js"
 
 	// Define file templates based on language
 	var templates map[string]string
@@ -118,7 +130,8 @@ func (p *VuePlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error
 	}
 
 	// Write all files
-	for relativePath, content := range templates {
+	for relativePath, raw := range templates {
+		content := p.renderTemplate(raw, ctx)
 		fullPath := filepath.Join(ctx.ProjectPath, relativePath)
 		if err := utils.WriteFile(fullPath, content); err != nil {
 			return err
@@ -128,11 +141,23 @@ func (p *VuePlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error
 	return nil
 }
 
+func (p *VuePlugin) renderTemplate(s string, ctx *tilocontext.ExecutionContext) string {
+	// ProjectName is widely used
+	out := strings.ReplaceAll(s, "{{.ProjectName}}", ctx.Config.ProjectName)
+	// Optional welcome message
+	if v, ok := ctx.Variables["welcome_message"].(string); ok && v != "" {
+		out = strings.ReplaceAll(out, "{{.welcome_message}}", v)
+	} else {
+		out = strings.ReplaceAll(out, "{{.welcome_message}}", "Welcome to "+ctx.Config.ProjectName)
+	}
+	return out
+}
+
 func (p *VuePlugin) getJavaScriptTemplates() map[string]string {
 	return map[string]string{
 		"src/main.js":                                vue.ViteJsMainFile,
 		"src/App.vue":                                vue.ViteJsAppFile,
-		"src/components/HelloWorld.vue":              vue.ViteHelloWordVue,
+		"src/components/HelloWorld.vue":              vue.ViteJsHelloWorldVue,
 		"src/components/WelcomeItem.vue":             vue.ViteJsWelcomeItem,
 		"src/components/TheWelcome.vue":              vue.ViteJsTheWelcome,
 		"src/components/icons/IconDocumentation.vue": vue.ViteIconDocumentation,
@@ -152,7 +177,7 @@ func (p *VuePlugin) getTypeScriptTemplates() map[string]string {
 	return map[string]string{
 		"src/main.ts":                                vue.ViteTsMainFile,
 		"src/App.vue":                                vue.ViteTsAppFile,
-		"src/components/HelloWorld.vue":              vue.ViteHelloWordVue,
+		"src/components/HelloWorld.vue":              vue.ViteTSHelloWordVue,
 		"src/components/WelcomeItem.vue":             vue.ViteTsWelcomeItem,
 		"src/components/TheWelcome.vue":              vue.ViteTsTheWelcome,
 		"src/components/icons/IconDocumentation.vue": vue.ViteIconDocumentation,
