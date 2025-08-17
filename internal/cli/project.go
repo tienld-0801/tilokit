@@ -1,4 +1,5 @@
 package cli
+
 import (
 	"context"
 	"fmt"
@@ -12,9 +13,11 @@ import (
 	"tilokit/internal/plugins/tools"
 	"tilokit/internal/utils"
 	"tilokit/pkg/constants"
+
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/sirupsen/logrus"
 )
+
 // RunProjectGenerationProcess handles the project generation logic
 func (m *Manager) RunProjectGenerationProcess() error {
 	// Load configuration
@@ -74,16 +77,18 @@ func (m *Manager) RunProjectGenerationProcess() error {
 	case constants.ReactFramework, constants.VueFramework, constants.AngularFramework, constants.SvelteFramework:
 		logrus.Infof("ℹ️  Next steps:")
 		logrus.Infof("ℹ️     cd %s", m.ProjectName)
+		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
 		logrus.Infof("ℹ️     npm run dev")
 	case constants.NextFramework:
 		logrus.Infof("ℹ️  Next steps:")
 		logrus.Infof("ℹ️     cd %s", m.ProjectName)
-		logrus.Infof("ℹ️     npm install")
+		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
 		logrus.Infof("ℹ️     npm run dev")
 		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Next.js app")
 	case constants.NuxtFramework:
 		logrus.Infof("ℹ️  Next steps:")
 		logrus.Infof("ℹ️     cd %s", m.ProjectName)
+		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
 		logrus.Infof("ℹ️     npm run dev")
 		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Nuxt.js app")
 	case "django", "flask", "fastapi":
