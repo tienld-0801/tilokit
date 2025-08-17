@@ -76,9 +76,31 @@ jobs:
           go mod verify
 
       - name: Build binary
+        env:
+          TILOKIT_WELCOME_MESSAGE: ${{ vars.TILOKIT_WELCOME_MESSAGE }}
+          TILOKIT_PROJECT_AUTHOR: ${{ vars.TILOKIT_PROJECT_AUTHOR }}
+          TILOKIT_PROJECT_EMAIL: ${{ vars.TILOKIT_PROJECT_EMAIL }}
+          TILOKIT_NODE_VERSION: ${{ vars.TILOKIT_NODE_VERSION }}
+          TILOKIT_GO_VERSION: ${{ vars.TILOKIT_GO_VERSION }}
+          TILOKIT_ENABLE_TYPESCRIPT: ${{ vars.TILOKIT_ENABLE_TYPESCRIPT }}
+          TILOKIT_ENABLE_TESTING: ${{ vars.TILOKIT_ENABLE_TESTING }}
+          TILOKIT_ENABLE_LINTING: ${{ vars.TILOKIT_ENABLE_LINTING }}
+          TILOKIT_DEV_MODE: ${{ vars.TILOKIT_DEV_MODE }}
+          TILOKIT_VERBOSE: ${{ vars.TILOKIT_VERBOSE }}
         run: go build -v -o tilokit .
 
       - name: Test binary
+        env:
+          TILOKIT_WELCOME_MESSAGE: ${{ vars.TILOKIT_WELCOME_MESSAGE }}
+          TILOKIT_PROJECT_AUTHOR: ${{ vars.TILOKIT_PROJECT_AUTHOR }}
+          TILOKIT_PROJECT_EMAIL: ${{ vars.TILOKIT_PROJECT_EMAIL }}
+          TILOKIT_NODE_VERSION: ${{ vars.TILOKIT_NODE_VERSION }}
+          TILOKIT_GO_VERSION: ${{ vars.TILOKIT_GO_VERSION }}
+          TILOKIT_ENABLE_TYPESCRIPT: ${{ vars.TILOKIT_ENABLE_TYPESCRIPT }}
+          TILOKIT_ENABLE_TESTING: ${{ vars.TILOKIT_ENABLE_TESTING }}
+          TILOKIT_ENABLE_LINTING: ${{ vars.TILOKIT_ENABLE_LINTING }}
+          TILOKIT_DEV_MODE: ${{ vars.TILOKIT_DEV_MODE }}
+          TILOKIT_VERBOSE: ${{ vars.TILOKIT_VERBOSE }}
         run: |
           ./tilokit -v
           ./tilokit -l
@@ -123,6 +145,17 @@ jobs:
         run: go build -v -o tilokit .
 
       - name: Test project generation
+        env:
+          TILOKIT_WELCOME_MESSAGE: ${{ vars.TILOKIT_WELCOME_MESSAGE }}
+          TILOKIT_PROJECT_AUTHOR: ${{ vars.TILOKIT_PROJECT_AUTHOR }}
+          TILOKIT_PROJECT_EMAIL: ${{ vars.TILOKIT_PROJECT_EMAIL }}
+          TILOKIT_NODE_VERSION: ${{ vars.TILOKIT_NODE_VERSION }}
+          TILOKIT_GO_VERSION: ${{ vars.TILOKIT_GO_VERSION }}
+          TILOKIT_ENABLE_TYPESCRIPT: ${{ vars.TILOKIT_ENABLE_TYPESCRIPT }}
+          TILOKIT_ENABLE_TESTING: ${{ vars.TILOKIT_ENABLE_TESTING }}
+          TILOKIT_ENABLE_LINTING: ${{ vars.TILOKIT_ENABLE_LINTING }}
+          TILOKIT_DEV_MODE: ${{ vars.TILOKIT_DEV_MODE }}
+          TILOKIT_VERBOSE: ${{ vars.TILOKIT_VERBOSE }}
         run: |
           PROJECT_NAME="test-${{ matrix.framework }}-${{ matrix.language }}"
           ./tilokit -i -n "$PROJECT_NAME" -f ${{ matrix.framework }} -b vite -L ${{ matrix.language }} -q
