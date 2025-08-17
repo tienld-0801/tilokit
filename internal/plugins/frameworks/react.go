@@ -135,8 +135,8 @@ func (p *ReactPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) err
 	} {
 		fullPath := filepath.Join(ctx.ProjectPath, filename)
 
-		// Process template content
-		processedContent, err := templateEngine.ProcessTemplate(content, ctx)
+		// Process template content with TILOKit delimiters
+		processedContent, err := templateEngine.ProcessTemplateWithDelims(content, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 		if err != nil {
 			return errors.Wrapf(err, "failed to process template for %s", filename)
 		}
@@ -175,8 +175,8 @@ func (p *ReactPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) err
 	for path, content := range files {
 		fullPath := filepath.Join(ctx.ProjectPath, "src", path)
 
-		// Process template content
-		processedContent, err := templateEngine.ProcessTemplate(content, ctx)
+		// Process template content with TILOKit delimiters
+		processedContent, err := templateEngine.ProcessTemplateWithDelims(content, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 		if err != nil {
 			return errors.Wrapf(err, "failed to process template for %s", path)
 		}
@@ -204,8 +204,8 @@ func (p *ReactPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) err
 	} {
 		fullPath := filepath.Join(ctx.ProjectPath, path)
 
-		// Process template content
-		processedContent, err := templateEngine.ProcessTemplate(content, ctx)
+		// Process template content with TILOKit delimiters
+		processedContent, err := templateEngine.ProcessTemplateWithDelims(content, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 		if err != nil {
 			return errors.Wrapf(err, "failed to process template for %s", path)
 		}

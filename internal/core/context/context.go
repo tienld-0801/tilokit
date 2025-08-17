@@ -49,6 +49,7 @@ func NewExecutionContext(config *ProjectConfig) *ExecutionContext {
 	ctx.Variables["build_tool"] = config.BuildTool
 	ctx.Variables["package_manager"] = config.PackageManager
 	ctx.Variables["timestamp"] = ctx.StartTime.Format("2006-01-02 15:04:05")
+	ctx.Variables["welcome_message"] = config.ProjectName
 
 	// Load all environment variables
 	envConfig := utils.LoadEnvConfig()

@@ -2,7 +2,7 @@ package vue
 
 const (
 	ViteJsPackageJson = `{
-  "name": "{{.ProjectName}}",
+  "name": "<<TILO:.project_name>>",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -18,17 +18,14 @@ const (
   }
 }`
 
-	ViteJsMainFile = `import { createApp } from 'vue'
+ViteJsMainFile = `import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import './assets/main.css'
 
 const app = createApp(App)
 app.use(router)
-app.mount('#app')'
-
-createApp(App).mount('#app')`
-
+app.mount('#app')`
 	ViteJsHelloWorldVue = `<script setup>
 const props = defineProps({
   msg: {
@@ -70,13 +67,18 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <template>
   <header>
-    <nav>
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
-    </nav>
+    <div class="wrapper">
+      <HelloWorld msg="<<TILO:.welcome_message>>" />
+
+      <nav>
+        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/about">About</RouterLink>
+      </nav>
+    </div>
   </header>
+
   <RouterView />
- </template>
+</template>
 
 <style scoped>
 header { line-height: 1.5; max-height: 100vh; }
@@ -93,7 +95,7 @@ nav a:first-of-type { border: 0; }
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{.ProjectName}}</title>
+    <title><<TILO:.project_name>></title>
   </head>
   <body>
     <div id="app"></div>

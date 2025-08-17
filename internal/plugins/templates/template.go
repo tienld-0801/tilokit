@@ -26,7 +26,12 @@ func NewTemplateEngine() *TemplateEngine {
 
 // ProcessTemplate processes a template string with context variables
 func (te *TemplateEngine) ProcessTemplate(templateContent string, ctx *tilocontext.ExecutionContext) (string, error) {
-	tmpl, err := template.New("template").Parse(templateContent)
+	return te.ProcessTemplateWithDelims(templateContent, "{{", "}}", ctx)
+}
+
+// ProcessTemplateWithDelims processes a template string with custom delimiters
+func (te *TemplateEngine) ProcessTemplateWithDelims(templateContent, leftDelim, rightDelim string, ctx *tilocontext.ExecutionContext) (string, error) {
+	tmpl, err := template.New("template").Delims(leftDelim, rightDelim).Parse(templateContent)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to parse template")
 	}

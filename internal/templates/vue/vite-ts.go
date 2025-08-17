@@ -21,7 +21,7 @@ const (
 	ViteEnvDTs = `/// <reference types="vite/client" />`
 
 	ViteTsPackageJson = `{
-    "name": "{{.ProjectName}}",
+    "name": "<<TILO:.project_name>>",
     "private": true,
     "version": "0.0.0",
     "type": "module",
@@ -77,7 +77,7 @@ import HelloWorld from './components/HelloWorld.vue'
 <template>
   <header>
     <div class="wrapper">
-      <HelloWorld msg="Welcome to {{.ProjectName}}" />
+      <HelloWorld msg="<<TILO:.welcome_message>>" />
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
@@ -197,7 +197,7 @@ h3 {
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{.ProjectName}}</title>
+    <title><<TILO:.project_name>></title>
   </head>
   <body>
     <div id="app"></div>

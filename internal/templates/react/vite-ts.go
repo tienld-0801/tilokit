@@ -2,7 +2,7 @@ package react
 
 const (
 	ViteTsPackageJson = `{
-  "name": "{{.ProjectName}}",
+  "name": "<<TILO:.project_name>>",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -37,7 +37,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 function App() {
   return (
     <div className="App">
-      <h1>{{.welcome_message}}</h1>
+      <h1><<TILO:.welcome_message>></h1>
     </div>
   )
 }
@@ -50,7 +50,7 @@ export default App`
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{.ProjectName}}</title>
+    <title><<TILO:.project_name>></title>
   </head>
   <body>
     <div id="root"></div>

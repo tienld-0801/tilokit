@@ -2,9 +2,9 @@ package frameworks
 
 import (
 	"path/filepath"
-	"strings"
 
 	tilocontext "tilokit/internal/core/context"
+	"tilokit/internal/plugins/templates"
 	"tilokit/internal/templates/common"
 	"tilokit/internal/templates/vue"
 	"tilokit/internal/utils"
@@ -106,10 +106,16 @@ func (p *VuePlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) error
 	} else {
 		packageJson = vue.ViteTsPackageJson
 	}
-	packageJson = strings.ReplaceAll(packageJson, "{{.ProjectName}}", ctx.Config.ProjectName)
+
+	// Use template engine for consistent processing with TILOKit delimiters
+	templateEngine := templates.NewTemplateEngine()
+	processedContent, err := templateEngine.ProcessTemplateWithDelims(packageJson, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to process package.json template")
+	}
 
 	packageJsonPath := filepath.Join(ctx.ProjectPath, "package.json")
-	return utils.WriteFile(packageJsonPath, packageJson)
+	return utils.WriteFile(packageJsonPath, processedContent)
 }
 
 func (p *VuePlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error {
@@ -122,35 +128,30 @@ func (p *VuePlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error
 	isJS := langStr == "js"
 
 	// Define file templates based on language
-	var templates map[string]string
+	var fileTemplates map[string]string
 	if isJS {
-		templates = p.getJavaScriptTemplates()
+		fileTemplates = p.getJavaScriptTemplates()
 	} else {
-		templates = p.getTypeScriptTemplates()
+		fileTemplates = p.getTypeScriptTemplates()
 	}
 
-	// Write all files
-	for relativePath, raw := range templates {
-		content := p.renderTemplate(raw, ctx)
+	// Write all files using template engine with custom delimiters
+	templateEngine := templates.NewTemplateEngine()
+
+	for relativePath, raw := range fileTemplates {
+		// Process template content with TILOKit delimiters
+		processedContent, err := templateEngine.ProcessTemplateWithDelims(raw, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process template for %s", relativePath)
+		}
+
 		fullPath := filepath.Join(ctx.ProjectPath, relativePath)
-		if err := utils.WriteFile(fullPath, content); err != nil {
+		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-func (p *VuePlugin) renderTemplate(s string, ctx *tilocontext.ExecutionContext) string {
-	// ProjectName is widely used
-	out := strings.ReplaceAll(s, "{{.ProjectName}}", ctx.Config.ProjectName)
-	// Optional welcome message
-	if v, ok := ctx.Variables["welcome_message"].(string); ok && v != "" {
-		out = strings.ReplaceAll(out, "{{.welcome_message}}", v)
-	} else {
-		out = strings.ReplaceAll(out, "{{.welcome_message}}", "Welcome to "+ctx.Config.ProjectName)
-	}
-	return out
 }
 
 func (p *VuePlugin) getJavaScriptTemplates() map[string]string {
@@ -204,10 +205,18 @@ func (p *VuePlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error
 		configs = p.getTypeScriptConfigs()
 	}
 
-	// Write all config files
+	// Write all config files using template engine
+	templateEngine := templates.NewTemplateEngine()
+
 	for relativePath, content := range configs {
+		// Process template content with TILOKit delimiters
+		processedContent, err := templateEngine.ProcessTemplateWithDelims(content, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process config template for %s", relativePath)
+		}
+
 		fullPath := filepath.Join(ctx.ProjectPath, relativePath)
-		if err := utils.WriteFile(fullPath, content); err != nil {
+		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
 	}
