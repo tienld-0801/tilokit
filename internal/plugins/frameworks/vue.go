@@ -65,7 +65,6 @@ func (p *VuePlugin) Generate(ctx *tilocontext.ExecutionContext) error {
 
 func (p *VuePlugin) PostGenerate(ctx *tilocontext.ExecutionContext) error {
 	ctx.SetMetadata("framework_generated", true)
-	ctx.SetMetadata("install_command", "npm install")
 	ctx.SetMetadata("start_command", "npm run dev")
 	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	tilocontext "tilokit/internal/core/context"
+	"tilokit/internal/plugins/templates"
 	"tilokit/internal/templates/common"
 	"tilokit/internal/templates/react"
 	"tilokit/internal/utils"
@@ -77,7 +78,6 @@ func (p *ReactPlugin) Generate(ctx *tilocontext.ExecutionContext) error {
 func (p *ReactPlugin) PostGenerate(ctx *tilocontext.ExecutionContext) error {
 	// Set post-generation metadata
 	ctx.SetMetadata("framework_generated", true)
-	ctx.SetMetadata("install_command", "npm install")
 	ctx.SetMetadata("start_command", "npm run dev")
 
 	return nil
@@ -149,7 +149,6 @@ func (p *ReactPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) err
 	var mainContent, appContent string
 	var mainFile, appFile string
 
-
 	if ctx.Variables["language"].(string) == "js" {
 		mainContent = react.ViteJsMainFile
 		appContent = react.ViteJsAppFile
@@ -167,9 +166,18 @@ func (p *ReactPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) err
 		appFile:  appContent,
 	}
 
+	templateEngine := templates.NewTemplateEngine()
+
 	for path, content := range files {
 		fullPath := filepath.Join(ctx.ProjectPath, "src", path)
-		if err := utils.WriteFile(fullPath, content); err != nil {
+
+		// Process template content
+		processedContent, err := templateEngine.ProcessTemplate(content, ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process template for %s", path)
+		}
+
+		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
 	}

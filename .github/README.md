@@ -96,7 +96,7 @@ bash install.sh
 # Install specific version
 curl -fsSLo install.sh https://tienld-0801.github.io/tilokit/install.sh
 # Verify checksum, then:
-bash install.sh v0.1.3-dev
+bash install.sh v0.2.5-dev
 ```
 
 ### 📥 **Manual Installation**
@@ -120,7 +120,7 @@ go install github.com/tienld-0801/tilokit@latest
 ### 🔍 **Verify Installation**
 ```bash
 tilokit -v
-# Output: TiLoKit v0.1.3-dev
+# Output: TiLoKit v0.2.5-dev
 ```
 
 ---
@@ -222,7 +222,7 @@ Currently supported frameworks include:
 
 ### 🔧 **Build Tools**
 Supported build tools:
-- **Frontend**: Vite, Webpack, npm, yarn, pnpm
+- **Frontend**: Vite, Webpack
 - **Backend**: pip, composer, maven, gradle, bundler, go-modules
 
 ---
@@ -241,7 +241,7 @@ TiLoKit is built with a modular architecture supporting multiple programming lan
 - 💎 **Ruby** - Rails
 
 #### **Build System Integration**
-- 🔧 **Frontend**: Vite, Webpack, npm, yarn, pnpm
+- 🔧 **Frontend**: Vite, Webpack
 - 🐍 **Python**: pip, poetry, pipenv
 - 🐘 **PHP**: Composer
 - ☕ **Java**: Maven, Gradle

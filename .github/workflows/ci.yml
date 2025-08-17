@@ -93,7 +93,6 @@ jobs:
       matrix:
         framework: [react, vue]
         language: [js]
-        package-manager: [npm]
 
     steps:
       - name: Checkout code
@@ -125,8 +124,8 @@ jobs:
 
       - name: Test project generation
         run: |
-          PROJECT_NAME="test-${{ matrix.framework }}-${{ matrix.package-manager }}-${{ matrix.language }}"
-          ./tilokit -i -n "$PROJECT_NAME" -f ${{ matrix.framework }} -b vite -p ${{ matrix.package-manager }} -L ${{ matrix.language }} -q
+          PROJECT_NAME="test-${{ matrix.framework }}-${{ matrix.language }}"
+          ./tilokit -i -n "$PROJECT_NAME" -f ${{ matrix.framework }} -b vite -L ${{ matrix.language }} -q
 
       - name: Clean up
         run: |

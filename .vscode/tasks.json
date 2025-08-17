@@ -1,0 +1,181 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build TiLoKit",
+            "type": "shell",
+            "command": "go",
+            "args": ["build", "-v", "-o", "tilokit", "."],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "Test All",
+            "type": "shell",
+            "command": "go",
+            "args": ["test", "-v", "-race", "-coverprofile=coverage.out", "./..."],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "Test Current Package",
+            "type": "shell",
+            "command": "go",
+            "args": ["test", "-v", "-race", "${fileDirname}"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "Lint",
+            "type": "shell",
+            "command": "golangci-lint",
+            "args": ["run", "--timeout=5m"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "go",
+            "args": ["clean", "-modcache"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "Download Dependencies",
+            "type": "shell",
+            "command": "go",
+            "args": ["mod", "download"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "Tidy Dependencies",
+            "type": "shell",
+            "command": "go",
+            "args": ["mod", "tidy"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "Run TiLoKit - Interactive",
+            "type": "shell",
+            "command": "./tilokit",
+            "args": ["-i"],
+            "group": "build",
+            "dependsOn": "Build TiLoKit",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": false,
+                "clear": true
+            }
+        },
+        {
+            "label": "Run TiLoKit - Version",
+            "type": "shell",
+            "command": "./tilokit",
+            "args": ["-v"],
+            "group": "build",
+            "dependsOn": "Build TiLoKit",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "Run TiLoKit - List Templates",
+            "type": "shell",
+            "command": "./tilokit",
+            "args": ["-l"],
+            "group": "build",
+            "dependsOn": "Build TiLoKit",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "Generate Coverage Report",
+            "type": "shell",
+            "command": "go",
+            "args": ["tool", "cover", "-html=coverage.out", "-o", "coverage.html"],
+            "group": "test",
+            "dependsOn": "Test All",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        }
+    ]
+}

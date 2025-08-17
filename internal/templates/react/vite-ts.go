@@ -37,7 +37,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 function App() {
   return (
     <div className="App">
-      <h1>Hello World</h1>
+      <h1>{{.welcome_message}}</h1>
     </div>
   )
 }

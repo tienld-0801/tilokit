@@ -41,7 +41,8 @@ if [[ "$WHITESPACE_ISSUES" == *"trailing whitespace"* ]]; then
     # Auto-fix trailing whitespace (only for existing files)
     git diff --cached --name-only | while read file; do
         if [[ -f "$file" ]]; then
-            sed -i 's/[[:space:]]*$//' "$file"
+            # macOS sed requires backup extension, use empty string for no backup
+            sed -i '' 's/[[:space:]]*$//' "$file"
         fi
     done
     echo -e "${GREEN}✅ Trailing whitespace cleaned${NC}"
@@ -93,14 +94,37 @@ SENSITIVE_PATTERNS=(
     ".env"
 )
 
+# Files to exclude from sensitive check (templates and utilities)
+EXCLUDE_SENSITIVE=(
+    ".env.example"
+    "internal/utils/env.go"
+)
+
 for pattern in "${SENSITIVE_PATTERNS[@]}"; do
     SENSITIVE_FILES=$(git diff --cached --name-only | grep -i "$pattern" || true)
     if [[ -n "$SENSITIVE_FILES" ]]; then
-        echo -e "${RED}❌ Potentially sensitive files detected:${NC}"
-        echo "$SENSITIVE_FILES"
-        echo -e "${YELLOW}💡 Make sure these files don't contain secrets${NC}"
-        echo -e "${YELLOW}💡 Consider adding them to .gitignore if they're sensitive${NC}"
-        exit 1
+        # Filter out excluded files
+        FILTERED_FILES=""
+        for file in $SENSITIVE_FILES; do
+            EXCLUDED=false
+            for exclude in "${EXCLUDE_SENSITIVE[@]}"; do
+                if [[ "$file" == "$exclude" ]]; then
+                    EXCLUDED=true
+                    break
+                fi
+            done
+            if [[ "$EXCLUDED" == false ]]; then
+                FILTERED_FILES="$FILTERED_FILES$file\n"
+            fi
+        done
+        
+        if [[ -n "$FILTERED_FILES" ]]; then
+            echo -e "${RED}❌ Potentially sensitive files detected:${NC}"
+            echo -e "$FILTERED_FILES"
+            echo -e "${YELLOW}💡 Make sure these files don't contain secrets${NC}"
+            echo -e "${YELLOW}💡 Consider adding them to .gitignore if they're sensitive${NC}"
+            exit 1
+        fi
     fi
 done
 
