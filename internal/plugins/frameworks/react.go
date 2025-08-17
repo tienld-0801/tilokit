@@ -134,13 +134,13 @@ func (p *ReactPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) err
 		eslintFile:      eslintContent,
 	} {
 		fullPath := filepath.Join(ctx.ProjectPath, filename)
-		
+
 		// Process template content
 		processedContent, err := templateEngine.ProcessTemplate(content, ctx)
 		if err != nil {
 			return errors.Wrapf(err, "failed to process template for %s", filename)
 		}
-		
+
 		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
@@ -203,13 +203,13 @@ func (p *ReactPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) err
 		"index.html": indexHtml,
 	} {
 		fullPath := filepath.Join(ctx.ProjectPath, path)
-		
+
 		// Process template content
 		processedContent, err := templateEngine.ProcessTemplate(content, ctx)
 		if err != nil {
 			return errors.Wrapf(err, "failed to process template for %s", path)
 		}
-		
+
 		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
