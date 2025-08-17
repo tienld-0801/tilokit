@@ -117,7 +117,7 @@ for pattern in "${SENSITIVE_PATTERNS[@]}"; do
                 FILTERED_FILES="$FILTERED_FILES$file\n"
             fi
         done
-        
+
         if [[ -n "$FILTERED_FILES" ]]; then
             echo -e "${RED}❌ Potentially sensitive files detected:${NC}"
             echo -e "$FILTERED_FILES"
