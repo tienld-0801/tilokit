@@ -24,6 +24,16 @@ dev: ## Run in development mode
 	@./.husky/check-hooks.sh 2>/dev/null || true
 	go run . --help
 
+run: test lint markdown-lint ## Run interactive mode for development (with full validation)
+	@./.husky/check-hooks.sh 2>/dev/null || true
+	@echo "🚀 Starting TiLoKit in interactive mode..."
+	go run . -i
+
+demo: ## Quick demo - create a React project
+	@./.husky/check-hooks.sh 2>/dev/null || true
+	@echo "🎯 Creating demo React project..."
+	go run . -n demo-react -f react -b vite -L js -q
+
 build: ## Build the project
 	@./.husky/check-hooks.sh 2>/dev/null || true
 	@echo "Building $(BINARY_NAME)..."
@@ -37,6 +47,17 @@ lint: ## Run linter
 test: ## Run tests
 	@echo "Running tests..."
 	go test -v ./...
+
+markdown-lint: ## Run markdownlint on all .md files
+	@echo "Running markdownlint..."
+	@if command -v markdownlint-cli2 >/dev/null 2>&1; then \
+		markdownlint-cli2 "**/*.md" "#vendor"; \
+	elif command -v npx >/dev/null 2>&1; then \
+		npx markdownlint-cli2 "**/*.md" "#vendor"; \
+	else \
+		echo "❌ markdownlint-cli2 not found. Install with: npm install -g markdownlint-cli2"; \
+		exit 1; \
+	fi
 
 ##@ Installation
 

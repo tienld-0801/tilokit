@@ -1,0 +1,82 @@
+{
+    // Disable problematic schema validation
+    "json.schemaDownload.enable": false,
+
+    // Go extension settings
+    "go.useLanguageServer": true,
+    "go.toolsManagement.autoUpdate": true,
+    "go.lintTool": "golangci-lint",
+    "go.lintFlags": [
+        "--fast"
+    ],
+    "go.vetOnSave": "package",
+    "go.buildOnSave": "package",
+    "go.testOnSave": false,
+    "go.coverOnSave": false,
+    "go.useCodeSnippetsOnFunctionSuggest": true,
+    "go.formatTool": "goimports",
+    "go.generateTestsFlags": ["-all"],
+    "go.addTags": {
+        "tags": "json",
+        "options": "json=omitempty",
+        "promptForTags": false,
+        "transform": "camelcase"
+    },
+
+    // Test settings
+    "go.testFlags": ["-v", "-race"],
+    "go.testTimeout": "30s",
+    "go.coverMode": "atomic",
+
+    // Build settings
+    "go.buildFlags": ["-v"],
+    "go.installDependenciesWhenBuilding": true,
+
+    // Editor settings for Go
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": false
+    },
+
+    // File associations
+    "files.associations": {
+        "*.go": "go",
+        "go.mod": "go.mod",
+        "go.sum": "go.sum"
+    },
+
+    // Exclude patterns
+    "files.exclude": {
+        "**/dist": true,
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true
+    },
+
+    // Search exclude patterns
+    "search.exclude": {
+        "**/dist": true,
+        "**/vendor": true,
+        "**/*.generated.go": true
+    },
+
+    // Terminal settings
+    "terminal.integrated.env.osx": {
+        "GO111MODULE": "on",
+        "GOPROXY": "https://proxy.golang.org,direct",
+        "GOSUMDB": "sum.golang.org"
+    },
+
+    // Debug settings
+    "go.delveConfig": {
+        "dlvLoadConfig": {
+            "followPointers": true,
+            "maxVariableRecurse": 1,
+            "maxStringLen": 64,
+            "maxArrayValues": 64,
+            "maxStructFields": -1
+        },
+        "apiVersion": 2,
+        "showGlobalVariables": false
+    }
+}

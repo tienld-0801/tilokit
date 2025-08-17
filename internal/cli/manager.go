@@ -3,9 +3,10 @@ package cli
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
 	"tilokit/internal/utils"
 	"tilokit/pkg/constants"
+
+	"github.com/spf13/cobra"
 )
 
 // Manager handles all CLI operations
@@ -14,9 +15,8 @@ type Manager struct {
 	ProjectName    string
 	Framework      string
 	BuildTool      string
-	PackageManager string
 	Language       string
-	RouterType     string // For Next.js: "app" or "pages"
+	RouterType     string
 	OutputDir      string
 	ListFrameworks bool
 	ListBuildTools bool
@@ -25,7 +25,6 @@ type Manager struct {
 	Force          bool
 	Update         bool
 	InitProject    bool
-
 }
 
 // NewManager creates a new CLI manager
@@ -36,7 +35,7 @@ func NewManager() *Manager {
 // HasAnyFlags checks if any flags are provided
 func (m *Manager) HasAnyFlags(cmd *cobra.Command) bool {
 	return m.ProjectName != "" || m.Framework != "" || m.BuildTool != "" ||
-		m.PackageManager != "" || m.Language != "" || m.RouterType != "" ||
+		m.Language != "" || m.RouterType != "" ||
 		m.ListFrameworks || m.ListBuildTools || m.Update || m.Quiet ||
 		m.Force || m.ShowVersion || m.InitProject
 }
@@ -106,8 +105,8 @@ func (m *Manager) SetupFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&m.ProjectName, "name", "n", "", "Project name (required)")
 	cmd.Flags().StringVarP(&m.Framework, "framework", "f", "", "Framework to use (react, vue, svelte, etc.)")
 	cmd.Flags().StringVarP(&m.BuildTool, "build-tool", "b", "", "Build tool to use (vite, webpack, etc.)")
-	cmd.Flags().StringVarP(&m.PackageManager, "package-manager", "p", "", "Package manager to use (npm, yarn, pnpm, bun)")
 	cmd.Flags().StringVarP(&m.Language, "language", "L", "", "Language for templates (ts or js)")
+	cmd.Flags().StringVarP(&m.RouterType, "router-type", "r", "", "Router type for Next.js (app or pages)")
 	cmd.Flags().StringVarP(&m.OutputDir, "output", "o", ".", "Output directory")
 
 	// Information flags

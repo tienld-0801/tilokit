@@ -4,36 +4,37 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"tilokit/internal/utils"
 )
 
 // ProjectConfig holds the configuration for project generation
 type ProjectConfig struct {
-	ProjectName   string            `yaml:"project_name" mapstructure:"project_name"`
-	Framework     string            `yaml:"framework" mapstructure:"framework"`
-	BuildTool     string            `yaml:"build_tool" mapstructure:"build_tool"`
-	PackageManager string           `yaml:"package_manager" mapstructure:"package_manager"`
-	OutputDir     string            `yaml:"output_dir" mapstructure:"output_dir"`
-	Template      string            `yaml:"template" mapstructure:"template"`
-	Features      []string          `yaml:"features" mapstructure:"features"`
-	Variables     map[string]interface{} `yaml:"variables" mapstructure:"variables"`
-	GitInit       bool              `yaml:"git_init" mapstructure:"git_init"`
-	InstallDeps   bool              `yaml:"install_deps" mapstructure:"install_deps"`
+	ProjectName    string                 `yaml:"project_name" mapstructure:"project_name"`
+	Framework      string                 `yaml:"framework" mapstructure:"framework"`
+	BuildTool      string                 `yaml:"build_tool" mapstructure:"build_tool"`
+	PackageManager string                 `yaml:"package_manager" mapstructure:"package_manager"`
+	OutputDir      string                 `yaml:"output_dir" mapstructure:"output_dir"`
+	Template       string                 `yaml:"template" mapstructure:"template"`
+	Features       []string               `yaml:"features" mapstructure:"features"`
+	Variables      map[string]interface{} `yaml:"variables" mapstructure:"variables"`
+	GitInit        bool                   `yaml:"git_init" mapstructure:"git_init"`
 }
 
 // ExecutionContext provides runtime context for plugin execution
 type ExecutionContext struct {
-	Config        *ProjectConfig
-	ProjectPath   string
-	TempDir       string
-	StartTime     time.Time
-	Variables     map[string]interface{}
-	Metadata      map[string]interface{}
+	Config      *ProjectConfig
+	ProjectPath string
+	TempDir     string
+	StartTime   time.Time
+	Variables   map[string]interface{}
+	Metadata    map[string]interface{}
 }
 
 // NewExecutionContext creates a new execution context
 func NewExecutionContext(config *ProjectConfig) *ExecutionContext {
 	projectPath := filepath.Join(config.OutputDir, config.ProjectName)
-	
+
 	ctx := &ExecutionContext{
 		Config:      config,
 		ProjectPath: projectPath,
@@ -48,7 +49,16 @@ func NewExecutionContext(config *ProjectConfig) *ExecutionContext {
 	ctx.Variables["build_tool"] = config.BuildTool
 	ctx.Variables["package_manager"] = config.PackageManager
 	ctx.Variables["timestamp"] = ctx.StartTime.Format("2006-01-02 15:04:05")
-	
+
+	// Load all environment variables
+	envConfig := utils.LoadEnvConfig()
+	envVars := envConfig.ToVariables()
+
+	// Merge environment variables into context
+	for k, v := range envVars {
+		ctx.Variables[k] = v
+	}
+
 	// Merge user variables
 	for k, v := range config.Variables {
 		ctx.Variables[k] = v

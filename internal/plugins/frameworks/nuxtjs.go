@@ -76,7 +76,6 @@ func (p *NuxtjsPlugin) Generate(ctx *tilocontext.ExecutionContext) error {
 func (p *NuxtjsPlugin) PostGenerate(ctx *tilocontext.ExecutionContext) error {
 	// Set post-generation metadata
 	ctx.SetMetadata("framework_generated", true)
-	ctx.SetMetadata("install_command", "npm install")
 	ctx.SetMetadata("start_command", "npm run dev")
 
 	return nil

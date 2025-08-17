@@ -2,9 +2,9 @@ package frameworks
 
 import (
 	"path/filepath"
-	"strings"
 
 	tilocontext "tilokit/internal/core/context"
+	"tilokit/internal/plugins/templates"
 	"tilokit/internal/templates/common"
 	"tilokit/internal/templates/react"
 	"tilokit/internal/utils"
@@ -77,7 +77,6 @@ func (p *ReactPlugin) Generate(ctx *tilocontext.ExecutionContext) error {
 func (p *ReactPlugin) PostGenerate(ctx *tilocontext.ExecutionContext) error {
 	// Set post-generation metadata
 	ctx.SetMetadata("framework_generated", true)
-	ctx.SetMetadata("install_command", "npm install")
 	ctx.SetMetadata("start_command", "npm run dev")
 
 	return nil
@@ -126,18 +125,23 @@ func (p *ReactPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) err
 	envFile = ".env"
 	gitignoreFile = ".gitignore"
 
-	packageJson = strings.ReplaceAll(packageJson, "{{.ProjectName}}", ctx.Config.ProjectName)
+	templateEngine := templates.NewTemplateEngine()
 
-	files := map[string]string{
+	for filename, content := range map[string]string{
 		packageJsonFile: packageJson,
 		envFile:         envContent,
 		gitignoreFile:   gitIgnoreContent,
 		eslintFile:      eslintContent,
-	}
-
-	for filename, content := range files {
+	} {
 		fullPath := filepath.Join(ctx.ProjectPath, filename)
-		if err := utils.WriteFile(fullPath, content); err != nil {
+
+		// Process template content
+		processedContent, err := templateEngine.ProcessTemplate(content, ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process template for %s", filename)
+		}
+
+		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
 	}
@@ -148,7 +152,6 @@ func (p *ReactPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) err
 func (p *ReactPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error {
 	var mainContent, appContent string
 	var mainFile, appFile string
-
 
 	if ctx.Variables["language"].(string) == "js" {
 		mainContent = react.ViteJsMainFile
@@ -167,9 +170,18 @@ func (p *ReactPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) err
 		appFile:  appContent,
 	}
 
+	templateEngine := templates.NewTemplateEngine()
+
 	for path, content := range files {
 		fullPath := filepath.Join(ctx.ProjectPath, "src", path)
-		if err := utils.WriteFile(fullPath, content); err != nil {
+
+		// Process template content
+		processedContent, err := templateEngine.ProcessTemplate(content, ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process template for %s", path)
+		}
+
+		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
 	}
@@ -185,15 +197,20 @@ func (p *ReactPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) err
 		indexHtml = react.ViteTsIndexHtml
 	}
 
-	indexHtml = strings.ReplaceAll(indexHtml, "{{.ProjectName}}", ctx.Config.ProjectName)
+	templateEngine := templates.NewTemplateEngine()
 
-	configs := map[string]string{
+	for path, content := range map[string]string{
 		"index.html": indexHtml,
-	}
-
-	for path, content := range configs {
+	} {
 		fullPath := filepath.Join(ctx.ProjectPath, path)
-		if err := utils.WriteFile(fullPath, content); err != nil {
+
+		// Process template content
+		processedContent, err := templateEngine.ProcessTemplate(content, ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process template for %s", path)
+		}
+
+		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
 	}

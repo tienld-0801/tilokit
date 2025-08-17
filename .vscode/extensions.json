@@ -1,0 +1,16 @@
+{
+    "recommendations": [
+        "golang.go",
+        "ms-vscode.vscode-json",
+        "redhat.vscode-yaml",
+        "ms-vscode.test-adapter-converter",
+        "hbenl.vscode-test-explorer",
+        "formulahendry.code-runner",
+        "streetsidesoftware.code-spell-checker",
+        "ms-vscode.vscode-github-issue-notebooks",
+        "github.vscode-pull-request-github"
+    ],
+    "unwantedRecommendations": [
+        "ms-vscode.vscode-typescript-next"
+    ]
+}

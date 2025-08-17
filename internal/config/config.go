@@ -4,10 +4,11 @@ import (
 	"os"
 	"path/filepath"
 
+	tilocontext "tilokit/internal/core/context"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	tilocontext "tilokit/internal/core/context"
 )
 
 // Config holds the application configuration
@@ -39,7 +40,6 @@ func CreateProjectConfig(projectName, framework, buildTool, outputDir string) *t
 		OutputDir:   outputDir,
 		Variables:   make(map[string]interface{}),
 		GitInit:     true,
-		InstallDeps: true,
 	}
 
 	// Set defaults if not provided
@@ -87,12 +87,11 @@ func getDefaultConfig() *Config {
 		Templates:             map[string]string{},
 		Plugins:               []string{},
 		Features: map[string]bool{
-			"typescript":   true,
-			"eslint":       true,
-			"prettier":     true,
-			"testing":      true,
-			"git_init":     true,
-			"install_deps": true,
+			"typescript": true,
+			"eslint":     true,
+			"prettier":   true,
+			"testing":    true,
+			"git_init":   true,
 		},
 	}
 }

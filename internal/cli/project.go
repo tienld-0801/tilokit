@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
 	"tilokit/internal/config"
 	"tilokit/internal/core/engine"
 	"tilokit/internal/core/registry"
@@ -16,6 +15,7 @@ import (
 	"tilokit/pkg/constants"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/sirupsen/logrus"
 )
 
 // RunProjectGenerationProcess handles the project generation logic
@@ -31,23 +31,16 @@ func (m *Manager) RunProjectGenerationProcess() error {
 			return fmt.Errorf("failed to load config: %w", err)
 		}
 	}
-
 	// Interactive prompts if values not provided
 	if err := m.promptForMissingValues(cfg); err != nil {
 		return err
 	}
-
 	// Validate inputs
 	if err := m.validateInputs(); err != nil {
 		return err
 	}
-
 	// Create project configuration
 	projectConfig := config.CreateProjectConfig(m.ProjectName, m.Framework, m.BuildTool, m.OutputDir)
-	// Allow CLI override for package manager
-	if m.PackageManager != "" {
-		projectConfig.PackageManager = m.PackageManager
-	}
 	// Language selection to variables (default ts)
 	lang := m.Language
 	if lang == "" {
@@ -57,7 +50,6 @@ func (m *Manager) RunProjectGenerationProcess() error {
 		projectConfig.Variables = make(map[string]interface{})
 	}
 	projectConfig.Variables["language"] = lang
-
 	// Router type for Next.js (default app router)
 	if m.Framework == "next" {
 		routerType := m.RouterType
@@ -66,59 +58,50 @@ func (m *Manager) RunProjectGenerationProcess() error {
 		}
 		projectConfig.Variables["router_type"] = routerType
 	}
-
 	// Initialize engine and register plugins
 	eng := engine.New()
 	if err := m.registerPlugins(eng); err != nil {
 		return err
 	}
-
 	// Execute project generation
 	ctx := context.Background()
 	if err := eng.Execute(ctx, projectConfig); err != nil {
-		utils.Error("Project generation failed: %v", err)
+		logrus.Errorf("Project generation failed: %v", err)
 		return err
 	}
-
 	// Success message
-	utils.Success("%s project '%s' created successfully!", m.Framework, m.ProjectName)
-	utils.Info("Project location: %s", m.OutputDir)
-
+	logrus.Infof("✅ %s project '%s' created successfully!", m.Framework, m.ProjectName)
+	logrus.Infof("ℹ️  Project location: %s", m.OutputDir)
 	// Provide framework-specific next steps
 	switch m.Framework {
 	case constants.ReactFramework, constants.VueFramework, constants.AngularFramework, constants.SvelteFramework:
-		utils.Info("Next steps:")
-		utils.Info("   cd %s", m.ProjectName)
-		installCmd, devCmd := getPMCommands(m.PackageManager)
-		utils.Info("   %s", installCmd)
-		utils.Info("   %s", devCmd)
+		logrus.Infof("ℹ️  Next steps:")
+		logrus.Infof("ℹ️     cd %s", m.ProjectName)
+		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
+		logrus.Infof("ℹ️     npm run dev")
 	case constants.NextFramework:
-		utils.Info("Next steps:")
-		utils.Info("   cd %s", m.ProjectName)
-		installCmd, devCmd := getPMCommands(m.PackageManager)
-		utils.Info("   %s", installCmd)
-		utils.Info("   %s", devCmd)
-		utils.Info("   Open http://localhost:3000 to view your Next.js app")
+		logrus.Infof("ℹ️  Next steps:")
+		logrus.Infof("ℹ️     cd %s", m.ProjectName)
+		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
+		logrus.Infof("ℹ️     npm run dev")
+		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Next.js app")
 	case constants.NuxtFramework:
-		utils.Info("Next steps:")
-		utils.Info("   cd %s", m.ProjectName)
-		installCmd, devCmd := getPMCommands(m.PackageManager)
-		utils.Info("   %s", installCmd)
-		utils.Info("   %s", devCmd)
-		utils.Info("   Open http://localhost:3000 to view your Nuxt.js app")
+		logrus.Infof("ℹ️  Next steps:")
+		logrus.Infof("ℹ️     cd %s", m.ProjectName)
+		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
+		logrus.Infof("ℹ️     npm run dev")
+		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Nuxt.js app")
 	case "django", "flask", "fastapi":
-		utils.Info("Next steps:")
-		utils.Info("   cd %s", m.ProjectName)
-		utils.Info("   python -m venv venv")
-		utils.Info("   source venv/bin/activate")
+		logrus.Infof("ℹ️  Next steps:")
+		logrus.Infof("ℹ️     cd %s", m.ProjectName)
+		logrus.Infof("ℹ️     python -m venv venv")
+		logrus.Infof("ℹ️     source venv/bin/activate")
 	default:
-		utils.Info("Check the README.md for setup instructions")
+		logrus.Infof("ℹ️  Check the README.md for setup instructions")
 	}
-
-	utils.Info("Happy coding!")
+	logrus.Infof("Happy coding!")
 	return nil
 }
-
 func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 	// Project name
 	if m.ProjectName == "" {
@@ -130,7 +113,6 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 			return err
 		}
 	}
-
 	// Framework
 	if m.Framework == "" {
 		supportedFrameworks := constants.SupportedFrameworks
@@ -143,7 +125,6 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 			return err
 		}
 	}
-
 	// Build tool
 	if m.BuildTool == "" {
 		supportedBuildTools := m.getBuildToolsForFramework(m.Framework)
@@ -163,23 +144,7 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 			m.BuildTool = m.getDefaultBuildTool(m.Framework)
 		}
 	}
-
-	// Package manager (for JS frameworks)
-	if m.PackageManager == "" {
-		switch m.Framework {
-		case "react", "vue", "svelte", "nextjs", "nuxtjs", "angular":
-			pms := []string{"npm", "yarn", "pnpm", "bun"}
-			prompt := &survey.Select{
-				Message: "📦 Choose package manager:",
-				Options: pms,
-				Default: cfg.DefaultPackageManager,
-			}
-			if err := survey.AskOne(prompt, &m.PackageManager); err != nil {
-				return err
-			}
-		}
-	}
-
+	// Set default
 	// Language (TS or JS) for React/Vue/Svelte
 	if m.Language == "" {
 		switch m.Framework {
@@ -187,7 +152,7 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 			langs := []string{"ts", "js"}
 			defLang := "ts"
 			prompt := &survey.Select{
-				Message: "🗂  Choose language:",
+				Message: "🗂 Choose language:",
 				Options: langs,
 				Default: defLang,
 			}
@@ -196,12 +161,11 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 			}
 		}
 	}
-
 	// Router type for Next.js
 	if m.RouterType == "" && m.Framework == "next" {
 		routers := []string{"app", "pages"}
 		prompt := &survey.Select{
-			Message: "🛣️  Choose Next.js router:",
+			Message: "🛣️ Choose Next.js router:",
 			Options: routers,
 			Default: "app",
 			Help:    "App Router (recommended) uses the new app directory structure. Pages Router uses the traditional pages directory.",
@@ -210,33 +174,26 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 			return err
 		}
 	}
-
 	// Output directory
 	if m.OutputDir == "" {
 		m.OutputDir = "."
 	}
-
 	return nil
 }
-
 func (m *Manager) validateInputs() error {
 	if err := utils.ValidateProjectName(m.ProjectName); err != nil {
 		return err
 	}
-
 	// Check if project directory already exists
 	projectPath := m.ProjectName
 	if m.OutputDir != "." {
 		projectPath = filepath.Join(m.OutputDir, m.ProjectName)
 	}
-
 	if utils.DirExists(projectPath) && !m.Force {
 		return fmt.Errorf("directory '%s' already exists. Use --force to overwrite", projectPath)
 	}
-
 	return nil
 }
-
 func (m *Manager) registerPlugins(eng *engine.Engine) error {
 	// Register plugins with error handling
 	plugins := []registry.Plugin{
@@ -246,73 +203,58 @@ func (m *Manager) registerPlugins(eng *engine.Engine) error {
 		frameworks.NewNextjsPlugin(),
 		frameworks.NewNuxtjsPlugin(),
 		// More JS frameworks can be added here
-
 		// Backend Frameworks
 		// Python
 		frameworks.NewPythonDjangoPlugin(),
 		frameworks.NewPythonFlaskPlugin(),
 		frameworks.NewPythonFastAPIPlugin(),
-
 		// PHP
 		frameworks.NewPHPLaravelPlugin(),
 		frameworks.NewPHPSymfonyPlugin(),
-
 		// Java
 		frameworks.NewJavaSpringBootPlugin(),
 		frameworks.NewJavaQuarkusPlugin(),
-
 		// Go
 		frameworks.NewGoGinPlugin(),
 		frameworks.NewGoEchoPlugin(),
 		frameworks.NewGoFiberPlugin(),
-
 		// Rust
 		frameworks.NewRustActixPlugin(),
 		frameworks.NewRustRocketPlugin(),
 		frameworks.NewRustAxumPlugin(),
-
 		// C#
 		frameworks.NewCSharpASPNetCorePlugin(),
 		frameworks.NewCSharpBlazorPlugin(),
-
 		// Ruby
 		frameworks.NewRubyRailsPlugin(),
 		frameworks.NewRubySinatraPlugin(),
-
 		// Node.js
 		frameworks.NewNodeExpressPlugin(),
 		frameworks.NewNodeNestJSPlugin(),
 		frameworks.NewNodeFastifyPlugin(),
-
 		// Mobile Frameworks
 		frameworks.NewReactNativePlugin(),
 		frameworks.NewFlutterPlugin(),
 		frameworks.NewIonicPlugin(),
-
 		// Desktop Frameworks
 		frameworks.NewElectronPlugin(),
 		frameworks.NewTauriPlugin(),
 		frameworks.NewWailsPlugin(),
-
 		// Build Tools
 		builders.NewVitePlugin(),
 		builders.NewWebpackPlugin(),
 		builders.NewRollupPlugin(),
-
 		// Tools
 		tools.NewGitPlugin(),
 	}
-
 	// Register all plugins with error handling
 	for _, plugin := range plugins {
 		if err := eng.RegisterPlugin(plugin); err != nil {
 			return fmt.Errorf("failed to register plugin %s: %w", plugin.Name(), err)
 		}
 	}
-
 	return nil
 }
-
 func (m *Manager) getBuildToolsForFramework(framework string) []string {
 	buildToolMap := map[string][]string{
 		"react":   {"vite", "webpack", "rollup"},
@@ -322,13 +264,11 @@ func (m *Manager) getBuildToolsForFramework(framework string) []string {
 		"next":    {"next"},
 		"nuxt":    {"nuxt"},
 	}
-
 	if tools, exists := buildToolMap[framework]; exists {
 		return tools
 	}
 	return []string{"vite"}
 }
-
 func (m *Manager) getDefaultBuildTool(framework string) string {
 	defaults := map[string]string{
 		"django":      "pip",
@@ -344,26 +284,9 @@ func (m *Manager) getDefaultBuildTool(framework string) string {
 		"symfony":     "composer",
 		"next":        "next",
 		"nuxt":        "nuxt",
-		// JavaScript frameworks default to vite
 	}
-
 	if tool, exists := defaults[framework]; exists {
 		return tool
 	}
-	return "vite" // fallback for JS frameworks
-}
-
-// getPMCommands returns install and dev commands for the selected package manager
-func getPMCommands(pm string) (installCmd, devCmd string) {
-	switch pm {
-	case "yarn":
-		return "yarn install", "yarn dev"
-	case "pnpm":
-		return "pnpm install", "pnpm dev"
-	case "bun":
-		return "bun install", "bun run dev"
-	default:
-		// default to npm
-		return "npm install", "npm run dev"
-	}
+	return "vite"
 }
