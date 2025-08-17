@@ -35,7 +35,7 @@
     // Editor settings for Go
     "editor.formatOnSave": false,
     "editor.codeActionsOnSave": {
-        "source.organizeImports": "never"
+        "source.organizeImports": false
     },
 
     // File associations
