@@ -13,7 +13,6 @@
     "go.buildOnSave": "package",
     "go.testOnSave": false,
     "go.coverOnSave": false,
-    "go.useCodeSnippetsOnFunctionSuggest": true,
     "go.formatTool": "goimports",
     "go.generateTestsFlags": ["-all"],
     "go.addTags": {
@@ -34,10 +33,6 @@
 
     // Editor settings for Go
     "editor.formatOnSave": false,
-    "editor.codeActionsOnSave": {
-        "source.organizeImports": false
-    },
-
     // File associations
     "files.associations": {
         "*.go": "go",

@@ -66,6 +66,12 @@ const (
 	PagesRouter = "pages"
 )
 
+// Template Delimiters
+const (
+	TiloLeftDelim  = "<<TILO:"
+	TiloRightDelim = ">>"
+)
+
 // CLI OS
 const (
 	VERSION = "1.0.0"
