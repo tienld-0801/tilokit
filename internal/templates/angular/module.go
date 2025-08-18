@@ -121,8 +121,8 @@ import { AppServerModule } from './src/app/app.server.module';
 const app = express();
 const PORT = process.env['PORT'] || 4000;
 const DIST_FOLDER = join(process.cwd(), 'dist');
-const indexHtml = existsSync(join(DIST_FOLDER, 'index.original.html')) 
-  ? 'index.original.html' 
+const indexHtml = existsSync(join(DIST_FOLDER, 'index.original.html'))
+  ? 'index.original.html'
   : 'index';
 
 app.engine('html', ngExpressEngine({
@@ -139,9 +139,9 @@ app.get('*.*', express.static(DIST_FOLDER, {
 
 // All regular routes use the Universal engine
 app.get('*', (req, res) => {
-  res.render(indexHtml, { 
-    req, 
-    providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] 
+  res.render(indexHtml, {
+    req,
+    providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }]
   });
 });
 
