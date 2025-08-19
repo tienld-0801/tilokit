@@ -154,12 +154,12 @@ func (p *AngularPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) e
 	if mode == constants.AngularSsrMode {
 		if archStr == constants.AngularArchitectureStandalone {
 			fileTemplates = map[string]string{
-				"src/app/app.component.ts":    angular.StandaloneSSRAppComponent,
-				"src/app/app.component.html":  angular.AngularAppComponentHtml,
-				"src/app/app.component.css":   angular.AngularAppComponentCss,
-				"src/main.ts":                 angular.StandaloneSSRMainTs,
-				"src/main.server.ts":          angular.StandaloneSSRMainServerTs,
-				"server.ts":                   angular.StandaloneSSRServerTs,
+				"src/app/app.component.ts":   angular.StandaloneSSRAppComponent,
+				"src/app/app.component.html": angular.AngularAppComponentHtml,
+				"src/app/app.component.css":  angular.AngularAppComponentCss,
+				"src/main.ts":                angular.StandaloneSSRMainTs,
+				"src/main.server.ts":         angular.StandaloneSSRMainServerTs,
+				"server.ts":                  angular.StandaloneSSRServerTs,
 			}
 		} else {
 			fileTemplates = map[string]string{
@@ -167,6 +167,7 @@ func (p *AngularPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) e
 				"src/app/app.component.html":   angular.AngularAppComponentHtml,
 				"src/app/app.component.css":    angular.AngularAppComponentCss,
 				"src/app/app.module.ts":        angular.ModuleSSRAppModule,
+				"src/app/app.server.module.ts": angular.ModuleSSRAppServerModule,
 				"src/main.ts":                  angular.ModuleSSRMainTs,
 				"src/main.server.ts":           angular.ModuleSSRMainServerTs,
 				"server.ts":                    angular.ModuleSSRServerTs,
@@ -175,18 +176,18 @@ func (p *AngularPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) e
 	} else { // CSR
 		if archStr == constants.AngularArchitectureStandalone {
 			fileTemplates = map[string]string{
-				"src/app/app.component.ts":    angular.StandaloneAppComponent,
-				"src/app/app.component.html":  angular.AngularAppComponentHtml,
-				"src/app/app.component.css":   angular.AngularAppComponentCss,
-				"src/main.ts":                 angular.StandaloneMainTs,
+				"src/app/app.component.ts":   angular.StandaloneAppComponent,
+				"src/app/app.component.html": angular.AngularAppComponentHtml,
+				"src/app/app.component.css":  angular.AngularAppComponentCss,
+				"src/main.ts":                angular.StandaloneMainTs,
 			}
 		} else {
 			fileTemplates = map[string]string{
-				"src/app/app.component.ts":    angular.ModuleAppComponent,
-				"src/app/app.component.html":  angular.AngularAppComponentHtml,
-				"src/app/app.component.css":   angular.AngularAppComponentCss,
-				"src/app/app.module.ts":       angular.ModuleAppModule,
-				"src/main.ts":                 angular.ModuleMainTs,
+				"src/app/app.component.ts":   angular.ModuleAppComponent,
+				"src/app/app.component.html": angular.AngularAppComponentHtml,
+				"src/app/app.component.css":  angular.AngularAppComponentCss,
+				"src/app/app.module.ts":      angular.ModuleAppModule,
+				"src/main.ts":                angular.ModuleMainTs,
 			}
 		}
 	}
