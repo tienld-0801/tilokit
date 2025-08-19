@@ -76,7 +76,14 @@ func (p *AngularPlugin) Generate(ctx *tilocontext.ExecutionContext) error {
 func (p *AngularPlugin) PostGenerate(ctx *tilocontext.ExecutionContext) error {
 	// Set post-generation metadata
 	ctx.SetMetadata("framework_generated", true)
-	ctx.SetMetadata("start_command", "ng serve")
+
+	mode, _ := ctx.GetVariable("rendering_mode")
+	start := "ng serve"
+	if v, ok := mode.(string); ok && v == constants.AngularSsrMode {
+		// Matches AngularSSRPackageJson scripts
+		start = "npm run serve:ssr"
+	}
+	ctx.SetMetadata("start_command", start)
 
 	return nil
 }
@@ -104,7 +111,12 @@ func (p *AngularPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) e
 	renderingMode, _ := ctx.GetVariable("rendering_mode")
 
 	var packageTemplate string
-	if renderingMode != nil && renderingMode.(string) == "ssr" {
+	mode := constants.AngularCsrMode
+	if v, ok := renderingMode.(string); ok && v != "" {
+		mode = v
+	}
+
+	if mode == constants.AngularSsrMode {
 		packageTemplate = angular.AngularSSRPackageJson
 	} else {
 		packageTemplate = angular.AngularPackageJson
@@ -126,32 +138,56 @@ func (p *AngularPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) e
 	architecture, _ := ctx.GetVariable("architecture")
 	renderingMode, _ := ctx.GetVariable("rendering_mode")
 
-	// Default values
+	// Resolve architecture/mode safely
 	archStr := constants.AngularArchitectureStandalone
-	if architecture != nil {
-		archStr = architecture.(string)
+	if v, ok := architecture.(string); ok && v != "" {
+		archStr = v
 	}
 
-	_ = renderingMode // avoid unused variable error for now
+	mode := constants.AngularCsrMode
+	if v, ok := renderingMode.(string); ok && v != "" {
+		mode = v
+	}
 
 	// Define file templates based on architecture and rendering mode
 	var fileTemplates map[string]string
-
-	// For now, only support CSR mode to avoid undefined template errors
-	if archStr == constants.AngularArchitectureStandalone {
-		fileTemplates = map[string]string{
-			"src/app/app.component.ts":    angular.StandaloneAppComponent,
-			"src/app/app.component.html":  angular.AngularAppComponentHtml,
-			"src/app/app.component.css":   angular.AngularAppComponentCss,
-			"src/main.ts":                 angular.StandaloneMainTs,
+	if mode == constants.AngularSsrMode {
+		if archStr == constants.AngularArchitectureStandalone {
+			fileTemplates = map[string]string{
+				"src/app/app.component.ts":    angular.StandaloneSSRAppComponent,
+				"src/app/app.component.html":  angular.AngularAppComponentHtml,
+				"src/app/app.component.css":   angular.AngularAppComponentCss,
+				"src/main.ts":                 angular.StandaloneSSRMainTs,
+				"src/main.server.ts":          angular.StandaloneSSRMainServerTs,
+				"server.ts":                   angular.StandaloneSSRServerTs,
+			}
+		} else {
+			fileTemplates = map[string]string{
+				"src/app/app.component.ts":     angular.ModuleSSRAppComponent,
+				"src/app/app.component.html":   angular.AngularAppComponentHtml,
+				"src/app/app.component.css":    angular.AngularAppComponentCss,
+				"src/app/app.module.ts":        angular.ModuleSSRAppModule,
+				"src/main.ts":                  angular.ModuleSSRMainTs,
+				"src/main.server.ts":           angular.ModuleSSRMainServerTs,
+				"server.ts":                    angular.ModuleSSRServerTs,
+			}
 		}
-	} else { // module architecture
-		fileTemplates = map[string]string{
-			"src/app/app.component.ts":    angular.ModuleAppComponent,
-			"src/app/app.component.html":  angular.AngularAppComponentHtml,
-			"src/app/app.component.css":   angular.AngularAppComponentCss,
-			"src/app/app.module.ts":       angular.ModuleAppModule,
-			"src/main.ts":                 angular.ModuleMainTs,
+	} else { // CSR
+		if archStr == constants.AngularArchitectureStandalone {
+			fileTemplates = map[string]string{
+				"src/app/app.component.ts":    angular.StandaloneAppComponent,
+				"src/app/app.component.html":  angular.AngularAppComponentHtml,
+				"src/app/app.component.css":   angular.AngularAppComponentCss,
+				"src/main.ts":                 angular.StandaloneMainTs,
+			}
+		} else {
+			fileTemplates = map[string]string{
+				"src/app/app.component.ts":    angular.ModuleAppComponent,
+				"src/app/app.component.html":  angular.AngularAppComponentHtml,
+				"src/app/app.component.css":   angular.AngularAppComponentCss,
+				"src/app/app.module.ts":       angular.ModuleAppModule,
+				"src/main.ts":                 angular.ModuleMainTs,
+			}
 		}
 	}
 
@@ -179,16 +215,30 @@ func (p *AngularPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) e
 	renderingMode, _ := ctx.GetVariable("rendering_mode")
 	architecture, _ := ctx.GetVariable("architecture")
 
-	_ = renderingMode // avoid unused variable error for now
+	// Resolve mode/arch safely
+	mode := constants.AngularCsrMode
+	if v, ok := renderingMode.(string); ok && v != "" {
+		mode = v
+	}
 
-	archStr := "standalone"
-	if architecture != nil {
-		archStr = architecture.(string)
+	arch := constants.AngularArchitectureStandalone
+	if v, ok := architecture.(string); ok && v != "" {
+		arch = v
+	}
+
+	// Select angular.json
+	angularJson := angular.AngularJson
+	if mode == constants.AngularSsrMode {
+		if arch == constants.AngularArchitectureStandalone {
+			angularJson = angular.StandaloneSSRAngularJson
+		} else {
+			angularJson = angular.ModuleSSRAngularJson
+		}
 	}
 
 	// Define config templates
 	configs := map[string]string{
-		"angular.json":       angular.AngularJson,
+		"angular.json":       angularJson,
 		"tsconfig.json":      angular.AngularTsConfig,
 		"tsconfig.app.json":  angular.AngularTsConfigApp,
 		"tsconfig.spec.json": angular.AngularTsConfigSpec,
@@ -197,8 +247,16 @@ func (p *AngularPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) e
 		".env":               common.Env,
 	}
 
-	// For now, only support CSR mode - SSR templates will be added later
-	_ = archStr // avoid unused variable error
+	if mode == constants.AngularSsrMode {
+		configs["tsconfig.server.json"] = angular.AngularTsConfigServer
+		if arch == constants.AngularArchitectureStandalone {
+			configs["src/main.server.ts"] = angular.StandaloneSSRMainServerTs
+			configs["server.ts"] = angular.StandaloneSSRServerTs
+		} else {
+			configs["src/main.server.ts"] = angular.ModuleSSRMainServerTs
+			configs["server.ts"] = angular.ModuleSSRServerTs
+		}
+	}
 
 	// Write all config files using template engine
 	templateEngine := templates.NewTemplateEngine()

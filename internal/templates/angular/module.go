@@ -111,6 +111,7 @@ const bootstrap = () => platformServer().bootstrapModule(AppServerModule);
 export default bootstrap;`
 
 	ModuleSSRServerTs = `import express from 'express';
+import 'zone.js/node';
 import { ngExpressEngine } from '@nguniversal/express-engine';
 import { APP_BASE_HREF } from '@angular/common';
 import { existsSync } from 'fs';
@@ -120,7 +121,7 @@ import { AppServerModule } from './src/app/app.server.module';
 
 const app = express();
 const PORT = process.env['PORT'] || 4000;
-const DIST_FOLDER = join(process.cwd(), 'dist');
+const DIST_FOLDER = join(process.cwd(), 'dist', '<<TILO:.project_name>>', 'browser');
 const indexHtml = existsSync(join(DIST_FOLDER, 'index.original.html'))
   ? 'index.original.html'
   : 'index';
@@ -247,8 +248,8 @@ app.listen(PORT, () => {
         "server": {
           "builder": "@angular-devkit/build-angular:server",
           "options": {
-            "outputPath": "dist/<<TILO:.project_name>>",
-            "main": "server.ts",
+            "outputPath": "dist/<<TILO:.project_name>>/server",
+            "main": "src/main.server.ts",
             "tsConfig": "tsconfig.server.json"
           },
           "configurations": {
