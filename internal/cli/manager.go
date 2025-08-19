@@ -17,6 +17,8 @@ type Manager struct {
 	BuildTool      string
 	Language       string
 	RouterType     string
+	RenderingMode  string
+	Architecture   string
 	OutputDir      string
 	ListFrameworks bool
 	ListBuildTools bool
@@ -35,7 +37,7 @@ func NewManager() *Manager {
 // HasAnyFlags checks if any flags are provided
 func (m *Manager) HasAnyFlags(cmd *cobra.Command) bool {
 	return m.ProjectName != "" || m.Framework != "" || m.BuildTool != "" ||
-		m.Language != "" || m.RouterType != "" ||
+		m.Language != "" || m.RouterType != "" || m.RenderingMode != "" || m.Architecture != "" ||
 		m.ListFrameworks || m.ListBuildTools || m.Update || m.Quiet ||
 		m.Force || m.ShowVersion || m.InitProject
 }
@@ -107,6 +109,8 @@ func (m *Manager) SetupFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&m.BuildTool, "build-tool", "b", "", "Build tool to use (vite, webpack, etc.)")
 	cmd.Flags().StringVarP(&m.Language, "language", "L", "", "Language for templates (ts or js)")
 	cmd.Flags().StringVarP(&m.RouterType, "router-type", "r", "", "Router type for Next.js (app or pages)")
+	cmd.Flags().StringVarP(&m.RenderingMode, "rendering", "R", "", "Rendering mode for Angular (csr or ssr)")
+	cmd.Flags().StringVarP(&m.Architecture, "architecture", "A", "", "Architecture for Angular (standalone or module)")
 	cmd.Flags().StringVarP(&m.OutputDir, "output", "o", ".", "Output directory")
 
 	// Information flags

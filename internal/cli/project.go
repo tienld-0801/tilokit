@@ -58,6 +58,21 @@ func (m *Manager) RunProjectGenerationProcess() error {
 		}
 		projectConfig.Variables["router_type"] = routerType
 	}
+
+	// Angular options
+	if m.Framework == "angular" {
+		renderingMode := m.RenderingMode
+		if renderingMode == "" {
+			renderingMode = "csr"
+		}
+		projectConfig.Variables["rendering_mode"] = renderingMode
+
+		architecture := m.Architecture
+		if architecture == "" {
+			architecture = "standalone"
+		}
+		projectConfig.Variables["architecture"] = architecture
+	}
 	// Initialize engine and register plugins
 	eng := engine.New()
 	if err := m.registerPlugins(eng); err != nil {
@@ -174,6 +189,37 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 			return err
 		}
 	}
+
+	// Angular options
+	if m.Framework == "angular" {
+		// Rendering mode
+		if m.RenderingMode == "" {
+			renderingModes := []string{"csr", "ssr"}
+			prompt := &survey.Select{
+				Message: "🎨 Choose rendering mode:",
+				Options: renderingModes,
+				Default: "csr",
+				Help:    "CSR (Client-Side Rendering) for SPA. SSR (Server-Side Rendering) for better SEO and performance.",
+			}
+			if err := survey.AskOne(prompt, &m.RenderingMode); err != nil {
+				return err
+			}
+		}
+
+		// Architecture
+		if m.Architecture == "" {
+			architectures := []string{"standalone", "module"}
+			prompt := &survey.Select{
+				Message: "🏗️ Choose architecture:",
+				Options: architectures,
+				Default: "standalone",
+				Help:    "Standalone (Angular 17+) uses modern standalone components. Module uses traditional NgModule architecture.",
+			}
+			if err := survey.AskOne(prompt, &m.Architecture); err != nil {
+				return err
+			}
+		}
+	}
 	// Output directory
 	if m.OutputDir == "" {
 		m.OutputDir = "."
@@ -200,6 +246,7 @@ func (m *Manager) registerPlugins(eng *engine.Engine) error {
 		// JavaScript/TypeScript Frameworks
 		frameworks.NewReactPlugin(),
 		frameworks.NewVuePlugin(),
+		frameworks.NewAngularPlugin(),
 		frameworks.NewNextjsPlugin(),
 		frameworks.NewNuxtjsPlugin(),
 		// More JS frameworks can be added here

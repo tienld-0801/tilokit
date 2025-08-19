@@ -66,6 +66,14 @@ const (
 	PagesRouter = "pages"
 )
 
+// CLI Angular
+const (
+	AngularCsrMode                = "csr"
+	AngularSsrMode                = "ssr"
+	AngularArchitectureStandalone = "standalone"
+	AngularArchitectureModule     = "module"
+)
+
 // Template Delimiters
 const (
 	TiloLeftDelim  = "<<TILO:"
