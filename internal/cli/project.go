@@ -106,6 +106,12 @@ func (m *Manager) RunProjectGenerationProcess() error {
 		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
 		logrus.Infof("ℹ️     npm run dev")
 		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Nuxt.js app")
+	case constants.NestFramework, constants.ExpressFramework, constants.FastifyFramework:
+		logrus.Infof("ℹ️  Next steps:")
+		logrus.Infof("ℹ️     cd %s", m.ProjectName)
+		logrus.Infof("ℹ️     npm install or yarn install or pnpm install")
+		logrus.Infof("ℹ️     npm run dev")
+		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Node.js app")
 	case "django", "flask", "fastapi":
 		logrus.Infof("ℹ️  Next steps:")
 		logrus.Infof("ℹ️     cd %s", m.ProjectName)
@@ -140,23 +146,28 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 			return err
 		}
 	}
-	// Build tool
+	// Build tool (skip for backend frameworks)
 	if m.BuildTool == "" {
-		supportedBuildTools := m.getBuildToolsForFramework(m.Framework)
-		if len(supportedBuildTools) > 1 {
-			prompt := &survey.Select{
-				Message: "🔧 Choose build tool:",
-				Options: supportedBuildTools,
-				Default: supportedBuildTools[0],
-			}
-			if err := survey.AskOne(prompt, &m.BuildTool); err != nil {
-				return err
-			}
-		} else if len(supportedBuildTools) == 1 {
-			m.BuildTool = supportedBuildTools[0]
+		// Backend frameworks don't need build tools
+		if m.Framework == constants.ExpressFramework || m.Framework == constants.NestFramework || m.Framework == constants.FastifyFramework {
+			m.BuildTool = "" // No build tool needed for backend frameworks
 		} else {
-			// Use framework-appropriate default
-			m.BuildTool = m.getDefaultBuildTool(m.Framework)
+			supportedBuildTools := m.getBuildToolsForFramework(m.Framework)
+			if len(supportedBuildTools) > 1 {
+				prompt := &survey.Select{
+					Message: "🔧 Choose build tool:",
+					Options: supportedBuildTools,
+					Default: supportedBuildTools[0],
+				}
+				if err := survey.AskOne(prompt, &m.BuildTool); err != nil {
+					return err
+				}
+			} else if len(supportedBuildTools) == 1 {
+				m.BuildTool = supportedBuildTools[0]
+			} else {
+				// Use framework-appropriate default
+				m.BuildTool = m.getDefaultBuildTool(m.Framework)
+			}
 		}
 	}
 	// Set default
