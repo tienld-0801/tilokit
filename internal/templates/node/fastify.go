@@ -45,18 +45,20 @@ const (
 }`
 
 	FastifyIndexTS = `import Fastify from 'fastify';
+import cors from '@fastify/cors';
+import env from '@fastify/env';
 
 const fastify = Fastify({
   logger: true
 });
 
 // Register CORS plugin
-fastify.register(require('@fastify/cors'), {
+fastify.register(cors, {
   origin: true
 });
 
 // Register env plugin
-fastify.register(require('@fastify/env'), {
+fastify.register(env, {
   schema: {
     type: 'object',
     required: ['PORT'],

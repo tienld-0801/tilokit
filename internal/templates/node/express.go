@@ -61,7 +61,7 @@ app.use(express.json());
 
 // Routes
 app.get('/', (req, res) => {
-  res.json({ message: 'Hello World from <<TILO:>>!' });
+  res.json({ message: 'Hello World from <<TILO:.project_name>>!' });
 });
 
 app.get('/health', (req, res) => {

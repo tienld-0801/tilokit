@@ -80,12 +80,12 @@ const (
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.js\" \"test/**/*.js\"",
+    "format": "prettier --write \"src/**/*.js\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.js\" --fix",
+    "lint": "eslint \"src/**/*.js\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -152,12 +152,11 @@ export class AppModule {}`
 const { AppController } = require('./app.controller');
 const { AppService } = require('./app.service');
 
-@Module({
+const AppModule = Module({
   imports: [],
   controllers: [AppController],
   providers: [AppService],
-})
-class AppModule {}
+})(class AppModule {});
 
 module.exports = { AppModule };`
 
@@ -182,24 +181,30 @@ export class AppController {
 	NestJSAppControllerJS = `const { Controller, Get } = require('@nestjs/common');
 const { AppService } = require('./app.service');
 
-@Controller()
 class AppController {
   constructor(appService) {
     this.appService = appService;
   }
 
-  @Get()
   getHello() {
     return this.appService.getHello();
   }
 
-  @Get('health')
   getHealth() {
     return { status: 'ok', service: '<<TILO:.project_name>>' };
   }
 }
 
-module.exports = { AppController };`
+// Apply decorators
+const AppControllerDecorated = Controller()(AppController);
+Object.defineProperty(AppControllerDecorated.prototype, 'getHello', {
+  value: Get()(AppControllerDecorated.prototype.getHello)
+});
+Object.defineProperty(AppControllerDecorated.prototype, 'getHealth', {
+  value: Get('health')(AppControllerDecorated.prototype.getHealth)
+});
+
+module.exports = { AppController: AppControllerDecorated };`
 
 	NestJSAppServiceTS = `import { Injectable } from '@nestjs/common';
 

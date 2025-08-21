@@ -2,6 +2,7 @@ package frameworks
 
 import (
 	"path/filepath"
+	"strings"
 
 	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/plugins/templates"
@@ -41,9 +42,19 @@ func (p *NodeExpressPlugin) SupportedBuildTools() []string {
 }
 
 func (p *NodeExpressPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
-	// Express starts with JavaScript only
-	ctx.SetVariable("language", "js")
-	ctx.SetVariable("express_version", "^4.21.2")
+	// Default to JavaScript if not provided by the caller
+	if _, ok := ctx.Variables["language"]; !ok {
+		ctx.SetVariable("language", "js")
+	}
+	// Don't override an explicitly provided version
+	if _, ok := ctx.Variables["express_version"]; !ok {
+		ctx.SetVariable("express_version", "^4.21.2")
+	}
+
+	// Set required template variables
+	ctx.SetVariable("project_name", ctx.Config.ProjectName)
+	ctx.SetVariable("package_manager", ctx.Config.PackageManager)
+
 	return nil
 }
 
@@ -124,8 +135,16 @@ func (p *NodeExpressPlugin) generatePackageJson(ctx *tilocontext.ExecutionContex
 }
 
 func (p *NodeExpressPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error {
-	files := map[string]string{
-		"index.js": nodejs.ExpressIndexJS,
+	lang := "js"
+	if v, ok := ctx.Variables["language"].(string); ok && v != "" {
+		lang = strings.ToLower(v)
+	}
+	
+	files := map[string]string{}
+	if lang == "ts" {
+		files["index.ts"] = nodejs.ExpressIndexTS
+	} else {
+		files["index.js"] = nodejs.ExpressIndexJS
 	}
 
 	templateEngine := templates.NewTemplateEngine()

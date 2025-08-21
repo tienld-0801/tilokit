@@ -2,6 +2,7 @@ package frameworks
 
 import (
 	"path/filepath"
+	"strings"
 
 	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/plugins/templates"
@@ -41,9 +42,19 @@ func (p *NodeFastifyPlugin) SupportedBuildTools() []string {
 }
 
 func (p *NodeFastifyPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
-	// Fastify starts with JavaScript only
-	ctx.SetVariable("language", "js")
-	ctx.SetVariable("fastify_version", "^5.2.0")
+	// Default to JavaScript if not provided by the caller
+	if _, ok := ctx.Variables["language"]; !ok {
+		ctx.SetVariable("language", "js")
+	}
+	// Don't override an explicitly provided version
+	if _, ok := ctx.Variables["fastify_version"]; !ok {
+		ctx.SetVariable("fastify_version", "^5.2.0")
+	}
+	
+	// Set required template variables
+	ctx.SetVariable("project_name", ctx.Config.ProjectName)
+	ctx.SetVariable("package_manager", ctx.Config.PackageManager)
+	
 	return nil
 }
 
@@ -98,7 +109,8 @@ func (p *NodeFastifyPlugin) createDirectoryStructure(ctx *tilocontext.ExecutionC
 
 func (p *NodeFastifyPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) error {
 	var packageJson string
-	if ctx.Variables["language"].(string) == "js" {
+	lang, ok := ctx.Variables["language"].(string)
+	if !ok || lang == "js" {
 		packageJson = nodejs.FastifyPackageJsonJS
 	} else {
 		packageJson = nodejs.FastifyPackageJsonTS
@@ -123,8 +135,16 @@ func (p *NodeFastifyPlugin) generatePackageJson(ctx *tilocontext.ExecutionContex
 }
 
 func (p *NodeFastifyPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error {
-	files := map[string]string{
-		"index.js": nodejs.FastifyIndexJS,
+	lang := "js"
+	if v, ok := ctx.Variables["language"].(string); ok && v != "" {
+		lang = strings.ToLower(v)
+	}
+	
+	files := map[string]string{}
+	if lang == "ts" {
+		files["index.ts"] = nodejs.FastifyIndexTS
+	} else {
+		files["index.js"] = nodejs.FastifyIndexJS
 	}
 
 	templateEngine := templates.NewTemplateEngine()
