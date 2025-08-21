@@ -50,11 +50,11 @@ func (p *NodeFastifyPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error
 	if _, ok := ctx.Variables["fastify_version"]; !ok {
 		ctx.SetVariable("fastify_version", "^5.2.0")
 	}
-	
+
 	// Set required template variables
 	ctx.SetVariable("project_name", ctx.Config.ProjectName)
 	ctx.SetVariable("package_manager", ctx.Config.PackageManager)
-	
+
 	return nil
 }
 
@@ -139,7 +139,7 @@ func (p *NodeFastifyPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContex
 	if v, ok := ctx.Variables["language"].(string); ok && v != "" {
 		lang = strings.ToLower(v)
 	}
-	
+
 	files := map[string]string{}
 	if lang == "ts" {
 		files["index.ts"] = nodejs.FastifyIndexTS

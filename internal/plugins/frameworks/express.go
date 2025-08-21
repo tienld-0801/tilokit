@@ -139,7 +139,7 @@ func (p *NodeExpressPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContex
 	if v, ok := ctx.Variables["language"].(string); ok && v != "" {
 		lang = strings.ToLower(v)
 	}
-	
+
 	files := map[string]string{}
 	if lang == "ts" {
 		files["index.ts"] = nodejs.ExpressIndexTS
