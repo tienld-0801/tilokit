@@ -30,11 +30,11 @@ const (
 	ComposerFileName = "composer.json"
 
 	// Java/Kotlin specific
-	PomXmlFileName        = "pom.xml"
-	BuildGradleFileName   = "build.gradle"
+	PomXmlFileName         = "pom.xml"
+	BuildGradleFileName    = "build.gradle"
 	SettingsGradleFileName = "settings.gradle"
 
-	// C# specific
-	CsprojFileName = "*.csproj"
-	SlnFileName    = "*.sln"
+	// C# specific - Note: These are patterns, not literal filenames
+	CsprojFilePattern = "*.csproj"
+	SlnFilePattern    = "*.sln"
 )
