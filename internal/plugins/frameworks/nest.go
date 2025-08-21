@@ -143,10 +143,10 @@ func (p *NodeNestJSPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext
 
 func (p *NodeNestJSPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error {
 	configs := map[string]string{
-		constants.TsConfigFileName: nodejs.NestJSTsConfig,
-		constants.NestCliFileName: nodejs.NestJSNestCliJson,
-		".env": common.Env,
-		".gitignore": common.Gitignore,
+		constants.TsConfigFileName:  nodejs.NestJSTsConfig,
+		constants.NestCliFileName:   nodejs.NestJSNestCliJson,
+		constants.EnvFileName:       common.Env,
+		constants.GitignoreFileName: common.Gitignore,
 	}
 
 	templateEngine := templates.NewTemplateEngine()

@@ -141,8 +141,12 @@ func (p *NodeFastifyPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContex
 	}
 
 	files := map[string]string{}
-	if lang == "ts" {
-		files["index.ts"] = nodejs.FastifyIndexTS
+	if lang == "ts" || lang == "typescript" {
+		// Add src/ for TypeScript projects (dev script expects src/index.ts)
+		if err := utils.EnsureDir(filepath.Join(ctx.ProjectPath, "src")); err != nil {
+			return err
+		}
+		files["src/index.ts"] = nodejs.FastifyIndexTS
 	} else {
 		files["index.js"] = nodejs.FastifyIndexJS
 	}
@@ -167,10 +171,21 @@ func (p *NodeFastifyPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContex
 }
 
 func (p *NodeFastifyPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error {
+	// Base configs
 	configs := map[string]string{
 		constants.EnvFileName:       common.Env,
 		constants.GitignoreFileName: common.Gitignore,
 	}
+
+	// Add tsconfig.json when TypeScript is selected
+	lang := "js"
+	if v, ok := ctx.Variables["language"].(string); ok && v != "" {
+		lang = strings.ToLower(strings.TrimSpace(v))
+	}
+	if lang == "ts" || lang == "typescript" {
+		configs[constants.TsConfigFileName] = nodejs.FastifyTsConfig
+	}
+
 	templateEngine := templates.NewTemplateEngine()
 
 	for filename, content := range configs {
