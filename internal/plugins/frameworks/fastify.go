@@ -109,11 +109,14 @@ func (p *NodeFastifyPlugin) createDirectoryStructure(ctx *tilocontext.ExecutionC
 
 func (p *NodeFastifyPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) error {
 	var packageJson string
-	lang, ok := ctx.Variables["language"].(string)
-	if !ok || lang == "js" {
-		packageJson = nodejs.FastifyPackageJsonJS
-	} else {
+	lang := "js"
+	if v, ok := ctx.Variables["language"].(string); ok && v != "" {
+		lang = strings.ToLower(v)
+	}
+	if lang == "ts" {
 		packageJson = nodejs.FastifyPackageJsonTS
+	} else {
+		packageJson = nodejs.FastifyPackageJsonJS
 	}
 
 	packageJsonFile := constants.PackageJsonFileName
@@ -141,7 +144,7 @@ func (p *NodeFastifyPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContex
 	}
 
 	files := map[string]string{}
-	if lang == "ts" || lang == "typescript" {
+	if lang == "ts" {
 		// Add src/ for TypeScript projects (dev script expects src/index.ts)
 		if err := utils.EnsureDir(filepath.Join(ctx.ProjectPath, "src")); err != nil {
 			return err
@@ -180,9 +183,9 @@ func (p *NodeFastifyPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContex
 	// Add tsconfig.json when TypeScript is selected
 	lang := "js"
 	if v, ok := ctx.Variables["language"].(string); ok && v != "" {
-		lang = strings.ToLower(strings.TrimSpace(v))
+		lang = strings.ToLower(v)
 	}
-	if lang == "ts" || lang == "typescript" {
+	if lang == "ts" {
 		configs[constants.TsConfigFileName] = nodejs.FastifyTsConfig
 	}
 
