@@ -120,10 +120,10 @@ func (p *ReactPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) err
 	envContent = common.Env
 	gitIgnoreContent = common.Gitignore
 
-	packageJsonFile = "package.json"
-	eslintFile = "eslint.config.js"
-	envFile = ".env"
-	gitignoreFile = ".gitignore"
+	packageJsonFile = constants.PackageJsonFileName
+	eslintFile = constants.EslintConfigFileName
+	envFile = constants.EnvFileName
+	gitignoreFile = constants.GitignoreFileName
 
 	templateEngine := templates.NewTemplateEngine()
 

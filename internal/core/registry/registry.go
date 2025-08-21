@@ -73,8 +73,8 @@ func (r *PluginRegistry) LoadPlugins(framework, buildTool string) ([]Plugin, err
 			continue
 		}
 
-		// Check if plugin supports the build tool
-		if buildTool != "" && !r.supportsBuildTool(plugin, buildTool) {
+		// Check if plugin supports the build tool (skip if plugin doesn't require build tools)
+		if buildTool != "" && len(plugin.SupportedBuildTools()) > 0 && !r.supportsBuildTool(plugin, buildTool) {
 			continue
 		}
 

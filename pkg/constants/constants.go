@@ -20,6 +20,7 @@ var KnownLongFlags = []string{
 // Supported Frameworks - central registry
 var SupportedFrameworks = []string{
 	"react", "vue", "svelte", "angular", "next", "nuxt",
+	"nest", "express", "fastify",
 	"django", "flask", "fastapi",
 	"laravel", "symfony",
 	"spring-boot", "quarkus",
@@ -47,6 +48,9 @@ const (
 	AngularFramework    = "angular"
 	NextFramework       = "next"
 	NuxtFramework       = "nuxt"
+	NestFramework       = "nest"
+	ExpressFramework    = "express"
+	FastifyFramework    = "fastify"
 	DjangoFramework     = "django"
 	FlaskFramework      = "flask"
 	FastapiFramework    = "fastapi"
