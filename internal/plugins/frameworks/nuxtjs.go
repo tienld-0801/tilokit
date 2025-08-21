@@ -5,9 +5,11 @@ import (
 	"strings"
 
 	tilocontext "tilokit/internal/core/context"
-	"tilokit/internal/templates/nuxtjs"
+	"tilokit/internal/plugins/templates"
 	"tilokit/internal/templates/common"
+	"tilokit/internal/templates/nuxtjs"
 	"tilokit/internal/utils"
+	"tilokit/pkg/constants"
 
 	"github.com/pkg/errors"
 )
@@ -41,10 +43,30 @@ func (p *NuxtjsPlugin) SupportedBuildTools() []string {
 }
 
 func (p *NuxtjsPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
-	// Set Nuxt.js-specific variables
-	ctx.SetVariable("nuxt_version", "^3.8.0")
-	ctx.SetVariable("vue_version", "^3.3.0")
-	ctx.SetVariable("typescript_support", true)
+	// Default to TypeScript if not provided
+	if _, ok := ctx.Variables["language"]; !ok {
+		ctx.SetVariable("language", "ts")
+	}
+
+	// Set Nuxt.js-specific variables with latest versions
+	if _, ok := ctx.Variables["nuxt_version"]; !ok {
+		ctx.SetVariable("nuxt_version", "^3.15.0")
+	}
+	if _, ok := ctx.Variables["vue_version"]; !ok {
+		ctx.SetVariable("vue_version", "^3.5.0")
+	}
+
+	// Set project name from config
+	if ctx.Config.ProjectName != "" {
+		ctx.SetVariable("project_name", ctx.Config.ProjectName)
+	}
+
+	// Set package manager
+	if ctx.Config.PackageManager != "" {
+		ctx.SetVariable("package_manager", ctx.Config.PackageManager)
+	} else {
+		ctx.SetVariable("package_manager", "npm")
+	}
 
 	return nil
 }
@@ -106,17 +128,44 @@ func (p *NuxtjsPlugin) createDirectoryStructure(ctx *tilocontext.ExecutionContex
 }
 
 func (p *NuxtjsPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) error {
-	packageJson := nuxtjs.NuxtjsPackageJson
-	envContent := common.Env
-	gitIgnoreContent := common.Gitignore
+	// Get language from context
+	language := "ts"
+	if v, ok := ctx.Variables["language"]; ok {
+		language = strings.ToLower(v.(string))
+	}
 
-	// Replace project name placeholder
-	packageJson = strings.ReplaceAll(packageJson, "{{.ProjectName}}", ctx.Config.ProjectName)
+	// Select appropriate package.json template based on language
+	var packageJson string
+	if language == "js" {
+		packageJson = nuxtjs.NuxtjsPackageJsonJS
+	} else {
+		packageJson = nuxtjs.NuxtjsPackageJsonTS
+	}
+
+	// Use template engine with TiLoKit delimiters
+	templateEngine := templates.NewTemplateEngine()
+
+	// Process template with variables
+	processedPackageJson, err := templateEngine.ProcessTemplateWithDelims(packageJson, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to process package.json template")
+	}
+
+	// Process common templates
+	processedEnv, err := templateEngine.ProcessTemplateWithDelims(common.Env, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to process .env template")
+	}
+
+	processedGitignore, err := templateEngine.ProcessTemplateWithDelims(common.Gitignore, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to process .gitignore template")
+	}
 
 	files := map[string]string{
-		"package.json": packageJson,
-		".env":         envContent,
-		".gitignore":   gitIgnoreContent,
+		"package.json": processedPackageJson,
+		".env":         processedEnv,
+		".gitignore":   processedGitignore,
 	}
 
 	for filename, content := range files {
@@ -130,21 +179,35 @@ func (p *NuxtjsPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) er
 }
 
 func (p *NuxtjsPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error {
-	appContent := nuxtjs.NuxtjsAppVue
-	indexContent := nuxtjs.NuxtjsIndexPage
-	aboutContent := nuxtjs.NuxtjsAboutPage
-	layoutContent := nuxtjs.NuxtjsLayoutDefault
+	// Use template engine with TiLoKit delimiters
+	templateEngine := templates.NewTemplateEngine()
 
-	// Replace project name placeholders
-	indexContent = strings.ReplaceAll(indexContent, "{{.ProjectName}}", ctx.Config.ProjectName)
-	aboutContent = strings.ReplaceAll(aboutContent, "{{.ProjectName}}", ctx.Config.ProjectName)
-	layoutContent = strings.ReplaceAll(layoutContent, "{{.ProjectName}}", ctx.Config.ProjectName)
+	// Process templates with variables
+	processedApp, err := templateEngine.ProcessTemplateWithDelims(nuxtjs.NuxtjsAppVue, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to process app.vue template")
+	}
+
+	processedIndex, err := templateEngine.ProcessTemplateWithDelims(nuxtjs.NuxtjsIndexPage, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to process index page template")
+	}
+
+	processedAbout, err := templateEngine.ProcessTemplateWithDelims(nuxtjs.NuxtjsAboutPage, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to process about page template")
+	}
+
+	processedLayout, err := templateEngine.ProcessTemplateWithDelims(nuxtjs.NuxtjsLayoutDefault, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to process layout template")
+	}
 
 	files := map[string]string{
-		"app.vue":              appContent,
-		"pages/index.vue":      indexContent,
-		"pages/about.vue":      aboutContent,
-		"layouts/default.vue":  layoutContent,
+		"app.vue":             processedApp,
+		"pages/index.vue":     processedIndex,
+		"pages/about.vue":     processedAbout,
+		"layouts/default.vue": processedLayout,
 	}
 
 	for path, content := range files {
@@ -158,8 +221,26 @@ func (p *NuxtjsPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) er
 }
 
 func (p *NuxtjsPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error {
+	// Get language from context
+	language := "ts"
+	if v, ok := ctx.Variables["language"]; ok {
+		language = strings.ToLower(v.(string))
+	}
+
 	// Nuxt.js configuration
-	nuxtConfig := `// https://nuxt.com/docs/api/configuration/nuxt-config
+	var nuxtConfig string
+	if language == "js" {
+		nuxtConfig = `// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  devtools: { enabled: true },
+  modules: [
+    '@nuxtjs/tailwindcss'
+  ],
+  css: ['~/assets/css/main.css']
+})
+`
+	} else {
+		nuxtConfig = `// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
@@ -171,8 +252,9 @@ export default defineNuxtConfig({
   }
 })
 `
+	}
 
-	// TypeScript configuration
+	// TypeScript configuration (only for TypeScript projects)
 	tsConfig := `{
   "extends": "./.nuxt/tsconfig.json"
 }
@@ -207,11 +289,40 @@ body {
 }
 `
 
+	// Use template engine with TiLoKit delimiters
+	templateEngine := templates.NewTemplateEngine()
+
+	// Process templates
+	processedNuxtConfig, err := templateEngine.ProcessTemplateWithDelims(nuxtConfig, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to process nuxt.config template")
+	}
+
+	processedTailwind, err := templateEngine.ProcessTemplateWithDelims(tailwindConfig, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to process tailwind.config template")
+	}
+
+	processedCSS, err := templateEngine.ProcessTemplateWithDelims(mainCSS, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to process main.css template")
+	}
+
 	configs := map[string]string{
-		"nuxt.config.ts":      nuxtConfig,
-		"tsconfig.json":       tsConfig,
-		"tailwind.config.js":  tailwindConfig,
-		"assets/css/main.css": mainCSS,
+		"tailwind.config.js":  processedTailwind,
+		"assets/css/main.css": processedCSS,
+	}
+
+	// Add nuxt.config based on language
+	if language == "js" {
+		configs["nuxt.config.js"] = processedNuxtConfig
+	} else {
+		configs["nuxt.config.ts"] = processedNuxtConfig
+		processedTsConfig, err := templateEngine.ProcessTemplateWithDelims(tsConfig, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+		if err != nil {
+			return errors.Wrap(err, "failed to process tsconfig template")
+		}
+		configs["tsconfig.json"] = processedTsConfig
 	}
 
 	for path, content := range configs {

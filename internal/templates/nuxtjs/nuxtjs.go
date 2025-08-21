@@ -1,8 +1,9 @@
 package nuxtjs
 
 const (
-	NuxtjsPackageJson = `{
-  "name": "{{.ProjectName}}",
+	// TypeScript version of package.json
+	NuxtjsPackageJsonTS = `{
+  "name": "<<TILO:.project_name>>",
   "private": true,
   "scripts": {
     "build": "nuxt build",
@@ -13,11 +14,36 @@ const (
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
-    "nuxt": "^3.8.0"
+    "nuxt": "<<TILO:.nuxt_version>>",
+    "typescript": "^5.6.0",
+    "vue-tsc": "^2.1.0"
   },
   "dependencies": {
-    "@nuxtjs/tailwindcss": "^6.8.4",
-    "vue": "^3.3.0"
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "vue": "<<TILO:.vue_version>>",
+    "vue-router": "^4.4.0"
+  }
+}`
+
+	// JavaScript version of package.json
+	NuxtjsPackageJsonJS = `{
+  "name": "<<TILO:.project_name>>",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "nuxt": "<<TILO:.nuxt_version>>"
+  },
+  "dependencies": {
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "vue": "<<TILO:.vue_version>>",
+    "vue-router": "^4.4.0"
   }
 }`
 
@@ -31,7 +57,7 @@ const (
 	NuxtjsIndexPage = `<template>
   <div class="container mx-auto px-4 py-8">
     <h1 class="text-4xl font-bold text-center mb-8">
-      Welcome to {{.ProjectName}}
+      Welcome to <<TILO:.project_name>>
     </h1>
     <p class="text-lg text-center text-gray-600">
       Get started by editing <code class="bg-gray-100 px-2 py-1 rounded">pages/index.vue</code>
@@ -50,7 +76,7 @@ const (
 <script setup>
 // This is a Nuxt 3 page with auto-imports
 useHead({
-  title: '{{.ProjectName}} - Home'
+  title: '<<TILO:.project_name>> - Home'
 })
 </script>
 `
@@ -58,10 +84,10 @@ useHead({
 	NuxtjsAboutPage = `<template>
   <div class="container mx-auto px-4 py-8">
     <h1 class="text-4xl font-bold text-center mb-8">
-      About {{.ProjectName}}
+      About <<TILO:.project_name>>
     </h1>
     <p class="text-lg text-center text-gray-600 mb-8">
-      This is a Nuxt.js application with TypeScript and Tailwind CSS.
+      This is a Nuxt.js application with Tailwind CSS.
     </p>
     <div class="flex justify-center">
       <NuxtLink 
@@ -76,7 +102,7 @@ useHead({
 
 <script setup>
 useHead({
-  title: '{{.ProjectName}} - About'
+  title: '<<TILO:.project_name>> - About'
 })
 </script>
 `
@@ -87,7 +113,7 @@ useHead({
       <nav class="container mx-auto px-4 py-4">
         <div class="flex justify-between items-center">
           <NuxtLink to="/" class="text-xl font-bold text-gray-800">
-            {{.ProjectName}}
+            <<TILO:.project_name>>
           </NuxtLink>
           <div class="space-x-4">
             <NuxtLink 
@@ -113,7 +139,7 @@ useHead({
     
     <footer class="bg-gray-50 border-t mt-16">
       <div class="container mx-auto px-4 py-8 text-center text-gray-600">
-        <p>&copy; 2024 {{.ProjectName}}. Built with Nuxt.js</p>
+        <p>&copy; 2024 <<TILO:.project_name>>. Built with Nuxt.js</p>
       </div>
     </footer>
   </div>

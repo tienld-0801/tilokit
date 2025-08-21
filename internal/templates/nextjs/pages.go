@@ -2,9 +2,9 @@ package nextjs
 
 // Pages Router Templates (Traditional Next.js with pages directory)
 const (
-	// Package.json with Tailwind CSS for Pages Router
-	NextjsPagesPackageJson = `{
-  "name": "{{.ProjectName}}",
+	// TypeScript version for Pages Router
+	NextjsPagesPackageJsonTS = `{
+  "name": "<<TILO:project_name>>",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,9 +13,9 @@ const (
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "14.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "next": "<<TILO:next_version>>",
+    "react": "<<TILO:react_version>>",
+    "react-dom": "<<TILO:react_dom_version>>"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -23,19 +23,22 @@ const (
     "@types/react-dom": "^18.0.0",
     "autoprefixer": "^10.0.1",
     "eslint": "^8.0.0",
-    "eslint-config-next": "14.0.0",
+    "eslint-config-next": "<<TILO:next_version>>",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.3.0",
     "typescript": "^5.0.0"
   }
 }`
 
+	// JavaScript version removed - Next.js only supports TypeScript
+	NextjsPagesPackageJsonJS = ``
+
 	// Main index page for Pages Router
 	NextjsPagesIndexPage = `export default function Home() {
   return (
     <main className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold text-center mb-8">
-        Welcome to {{.ProjectName}}
+        Welcome to <<TILO:project_name>>
       </h1>
       <p className="text-lg text-center text-gray-600">
         Get started by editing <code className="bg-gray-100 px-2 py-1 rounded">pages/index.tsx</code>
@@ -65,7 +68,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <main className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold text-center mb-8">
-        About {{.ProjectName}}
+        About <<TILO:project_name>>
       </h1>
       <p className="text-lg text-center text-gray-600 mb-8">
         This is a Next.js application using <strong>Pages Router</strong> with TypeScript and Tailwind CSS.
