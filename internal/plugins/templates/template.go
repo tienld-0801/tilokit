@@ -8,7 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"tilokit/internal/core/context"
+	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/utils"
 )
 

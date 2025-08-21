@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	tilocontext "tilokit/internal/core/context"
+	"tilokit/internal/plugins/templates"
 	"tilokit/internal/templates/common"
 	"tilokit/internal/templates/nextjs"
 	"tilokit/internal/utils"
@@ -26,7 +27,7 @@ func (p *NextjsPlugin) Name() string {
 }
 
 func (p *NextjsPlugin) Version() string {
-	return "1.0.0"
+	return constants.VERSION
 }
 
 func (p *NextjsPlugin) Description() string {
@@ -42,17 +43,28 @@ func (p *NextjsPlugin) SupportedBuildTools() []string {
 }
 
 func (p *NextjsPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
-	// Set Next.js-specific variables
-	ctx.SetVariable("next_version", "14.0.0")
-	ctx.SetVariable("react_version", "^18.0.0")
-	ctx.SetVariable("typescript_support", true)
+	// Next.js only supports TypeScript
+	ctx.SetVariable("language", "ts")
+
+	// Set Next.js-specific variables with latest versions
+	if _, ok := ctx.Variables["next_version"]; !ok {
+		ctx.SetVariable("next_version", "^15.5.0")
+	}
+	if _, ok := ctx.Variables["react_version"]; !ok {
+		ctx.SetVariable("react_version", "^19.0.0")
+	}
+	if _, ok := ctx.Variables["react_dom_version"]; !ok {
+		ctx.SetVariable("react_dom_version", "^19.0.0")
+	}
 
 	// Get router type from context (default to app router)
-	routerType, exists := ctx.GetVariable("router_type")
-	if !exists || routerType == nil {
-		routerType = constants.AppRouter
+	if _, ok := ctx.Variables["router_type"]; !ok {
+		ctx.SetVariable("router_type", constants.AppRouter)
 	}
-	ctx.SetVariable("router_type", routerType)
+
+	// Set required template variables
+	ctx.SetVariable("project_name", ctx.Config.ProjectName)
+	ctx.SetVariable("package_manager", ctx.Config.PackageManager)
 
 	return nil
 }
@@ -90,14 +102,16 @@ func (p *NextjsPlugin) PostGenerate(ctx *tilocontext.ExecutionContext) error {
 }
 
 func (p *NextjsPlugin) createDirectoryStructure(ctx *tilocontext.ExecutionContext) error {
-	routerType, _ := ctx.GetVariable("router_type")
-	routerTypeStr := routerType.(string)
+	routerType := constants.AppRouter
+	if v, ok := ctx.Variables["router_type"].(string); ok && v != "" {
+		routerType = v
+	}
 
 	var dirs []string
-	if routerTypeStr == constants.AppRouter {
+	if routerType == constants.AppRouter {
 		// App Router structure
 		dirs = []string{
-			"app",
+			constants.AppRouter,
 			"app/about",
 			"components",
 			"lib",
@@ -128,76 +142,74 @@ func (p *NextjsPlugin) createDirectoryStructure(ctx *tilocontext.ExecutionContex
 }
 
 func (p *NextjsPlugin) generatePackageJson(ctx *tilocontext.ExecutionContext) error {
-	routerType, _ := ctx.GetVariable("router_type")
-	routerTypeStr := routerType.(string)
-	envContent := common.Env
-	gitIgnoreContent := common.Gitignore
+	routerType := constants.AppRouter
+	if v, ok := ctx.Variables["router_type"].(string); ok && v != "" {
+		routerType = v
+	}
 
-	// Choose package.json based on router type
+	// Next.js only supports TypeScript
 	var packageJson string
-	if routerTypeStr == constants.AppRouter {
-		packageJson = nextjs.NextjsAppPackageJson
+	if routerType == constants.AppRouter {
+		packageJson = nextjs.NextjsAppPackageJsonTS
 	} else {
-		packageJson = nextjs.NextjsPagesPackageJson
+		packageJson = nextjs.NextjsPagesPackageJsonTS
 	}
 
-	// Replace project name placeholder
-	packageJson = strings.ReplaceAll(packageJson, "{{.ProjectName}}", ctx.Config.ProjectName)
+	packageJsonFile := constants.PackageJsonFileName
+	templateEngine := templates.NewTemplateEngine()
 
-	files := map[string]string{
-		"package.json": packageJson,
-		".env.local":   envContent,
-		".gitignore":   gitIgnoreContent,
+	fullPath := filepath.Join(ctx.ProjectPath, packageJsonFile)
+
+	// Process template content with TILOKit delimiters
+	processedContent, err := templateEngine.ProcessTemplateWithDelims(packageJson, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return errors.Wrapf(err, "failed to process template for %s", packageJsonFile)
 	}
 
-	for filename, content := range files {
-		fullPath := filepath.Join(ctx.ProjectPath, filename)
-		if err := utils.WriteFile(fullPath, content); err != nil {
-			return err
-		}
+	if err := utils.WriteFile(fullPath, processedContent); err != nil {
+		return err
 	}
 
 	return nil
 }
 
 func (p *NextjsPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error {
-	routerType, _ := ctx.GetVariable("router_type")
-	routerTypeStr := routerType.(string)
-	projectName := ctx.Config.ProjectName
+	routerType := "app"
+	if v, ok := ctx.Variables["router_type"].(string); ok && v != "" {
+		routerType = v
+	}
 
+	templateEngine := templates.NewTemplateEngine()
 	var files map[string]string
 
-	if routerTypeStr == "app" {
-		// App Router files
-		layoutContent := strings.ReplaceAll(nextjs.NextjsAppLayout, "{{.ProjectName}}", projectName)
-		pageContent := strings.ReplaceAll(nextjs.NextjsAppPage, "{{.ProjectName}}", projectName)
-		aboutContent := strings.ReplaceAll(nextjs.NextjsAppAboutPage, "{{.ProjectName}}", projectName)
-		globalCSS := nextjs.NextjsAppGlobalCSS
-
+	if routerType == "app" {
+		// App Router files - TypeScript only
 		files = map[string]string{
-			"app/layout.tsx":     layoutContent,
-			"app/page.tsx":       pageContent,
-			"app/about/page.tsx": aboutContent,
-			"app/globals.css":    globalCSS,
+			"app/layout.tsx":     nextjs.NextjsAppLayoutPage,
+			"app/page.tsx":       nextjs.NextjsAppHomePage,
+			"app/about/page.tsx": nextjs.NextjsAppAboutPage,
+			"app/globals.css":    nextjs.NextjsAppGlobalCSS,
 		}
 	} else {
-		// Pages Router files
-		indexContent := strings.ReplaceAll(nextjs.NextjsPagesIndexPage, "{{.ProjectName}}", projectName)
-		appContent := nextjs.NextjsPagesAppPage
-		aboutContent := strings.ReplaceAll(nextjs.NextjsPagesAboutPage, "{{.ProjectName}}", projectName)
-		globalCSS := nextjs.NextjsPagesGlobalCSS
-
+		// Pages Router files - TypeScript only
 		files = map[string]string{
-			"pages/index.tsx":    indexContent,
-			"pages/_app.tsx":     appContent,
-			"pages/about.tsx":    aboutContent,
-			"styles/globals.css": globalCSS,
+			"pages/index.tsx":    nextjs.NextjsPagesIndexPage,
+			"pages/_app.tsx":     nextjs.NextjsPagesAppPage,
+			"pages/about.tsx":    nextjs.NextjsPagesAboutPage,
+			"styles/globals.css": nextjs.NextjsPagesGlobalCSS,
 		}
 	}
 
-	for path, content := range files {
-		fullPath := filepath.Join(ctx.ProjectPath, path)
-		if err := utils.WriteFile(fullPath, content); err != nil {
+	for filename, content := range files {
+		fullPath := filepath.Join(ctx.ProjectPath, filename)
+
+		// Process template content with TILOKit delimiters
+		processedContent, err := templateEngine.ProcessTemplateWithDelims(content, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process template for %s", filename)
+		}
+
+		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
 	}
@@ -206,8 +218,15 @@ func (p *NextjsPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) er
 }
 
 func (p *NextjsPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error {
-	routerType, _ := ctx.GetVariable("router_type")
-	routerTypeStr := routerType.(string)
+	routerType := constants.AppRouter
+	if v, ok := ctx.Variables["router_type"].(string); ok && v != "" {
+		routerType = v
+	}
+
+	lang := "ts"
+	if v, ok := ctx.Variables["language"].(string); ok && v != "" {
+		lang = strings.ToLower(v)
+	}
 
 	// Next.js configuration
 	nextConfig := `/** @type {import('next').NextConfig} */
@@ -250,26 +269,38 @@ module.exports = nextConfig
 }
 `
 
-	// Choose Tailwind config based on router type
-	var tailwindConfig, postCSSConfig string
-	if routerTypeStr == "app" {
-		tailwindConfig = nextjs.NextjsAppTailwindConfig
-		postCSSConfig = nextjs.NextjsAppPostCSSConfig
-	} else {
-		tailwindConfig = nextjs.NextjsPagesTailwindConfig
-		postCSSConfig = nextjs.NextjsPagesPostCSSConfig
-	}
-
+	// Base configs
 	configs := map[string]string{
-		"next.config.js":     nextConfig,
-		"tsconfig.json":      tsConfig,
-		"tailwind.config.js": tailwindConfig,
-		"postcss.config.js":  postCSSConfig,
+		constants.EnvFileName:       common.Env,
+		constants.GitignoreFileName: common.Gitignore,
+		"next.config.js":            nextConfig,
+		"postcss.config.js":         nextjs.NextjsAppPostCSSConfig,
 	}
 
-	for path, content := range configs {
-		fullPath := filepath.Join(ctx.ProjectPath, path)
-		if err := utils.WriteFile(fullPath, content); err != nil {
+	// Add TypeScript config only if using TypeScript
+	if lang == "ts" {
+		configs[constants.TsConfigFileName] = tsConfig
+	}
+
+	// Choose Tailwind config based on router type
+	if routerType == constants.AppRouter {
+		configs["tailwind.config.js"] = nextjs.NextjsAppTailwindConfig
+	} else {
+		configs["tailwind.config.js"] = nextjs.NextjsPagesTailwindConfig
+	}
+
+	templateEngine := templates.NewTemplateEngine()
+
+	for filename, content := range configs {
+		fullPath := filepath.Join(ctx.ProjectPath, filename)
+
+		// Process template content with TILOKit delimiters
+		processedContent, err := templateEngine.ProcessTemplateWithDelims(content, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process config template for %s", filename)
+		}
+
+		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return err
 		}
 	}
