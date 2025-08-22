@@ -2,7 +2,7 @@ package php
 
 const (
 	LaravelComposer = `{
-    "name": "{{.ProjectName}}",
+    "name": "<<TILO:.project_name>>",
     "type": "project",
     "description": "Laravel application",
     "keywords": ["framework", "laravel"],
@@ -42,7 +42,7 @@ class HomeController extends Controller
     public function index()
     {
         return response()->json([
-            'message' => 'Hello World from {{.ProjectName}}!'
+            'message' => 'Hello World from "<<TILO:.project_name>>"!'
         ]);
     }
 
@@ -62,4 +62,71 @@ use App\Http\Controllers\HomeController;
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/health', [HomeController::class, 'health']);`
+
+	LaravelEnvExample = `APP_NAME="<<TILO:.project_name>>"
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost
+
+LOG_CHANNEL=stack
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=root
+DB_PASSWORD=
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120`
+
+	LaravelArtisan = `#!/usr/bin/env php
+<?php
+
+define('LARAVEL_START', microtime(true));
+
+require __DIR__.'/vendor/autoload.php';
+
+$app = require_once __DIR__.'/bootstrap/app.php';
+
+$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+
+$status = $kernel->handle(
+    $input = new Symfony\Component\Console\Input\ArgvInput,
+    new Symfony\Component\Console\Output\ConsoleOutput
+);
+
+$kernel->terminate($input, $status);
+
+exit($status);`
+
+	LaravelPublicIndex = `<?php
+
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Http\Request;
+
+define('LARAVEL_START', microtime(true));
+
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
+$kernel = $app->make(Kernel::class);
+
+$response = $kernel->handle(
+    $request = Request::capture()
+)->send();
+
+$kernel->terminate($request, $response);`
 )

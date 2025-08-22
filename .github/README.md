@@ -165,29 +165,41 @@ tilokit --help
 
 ### ⚡ **Quick Project Generation**
 ```bash
-# Create React project with Vite
+# Frontend Frameworks
 tilokit -i -n my-react-app -f react -b vite
-
-# Create Vue project
 tilokit -i -n my-vue-app -f vue -b vite
-
-# Create Next.js project
+tilokit -i -n my-svelte-app -f svelte -b vite
+tilokit -i -n my-angular-app -f angular
 tilokit -i -n my-nextjs-app -f next
-
-# Create Nuxt.js project
 tilokit -i -n my-nuxtjs-app -f nuxt
 
-# Create Laravel project
-tilokit -i -n my-api -f laravel -b composer
+# Node.js Backend Frameworks
+tilokit -i -n my-express-api -f express
+tilokit -i -n my-fastify-api -f fastify
+tilokit -i -n my-nest-api -f nest
 
-# Create Django project
-tilokit -i -n my-python-api -f django -b pip
+# PHP Frameworks
+tilokit -i -n my-laravel-api -f laravel -b composer
+tilokit -i -n my-symfony-api -f symfony -b composer
+tilokit -i -n my-cakephp-api -f cakephp -b composer
+tilokit -i -n my-codeigniter-api -f codeigniter -b composer
 
-# Create Spring Boot project
-tilokit -i -n my-java-api -f spring-boot -b maven
+# Python Frameworks
+tilokit -i -n my-django-api -f django -b pip
+tilokit -i -n my-flask-api -f flask -b pip
+tilokit -i -n my-fastapi-api -f fastapi -b pip
 
-# Create Go project with Gin
-tilokit -i -n my-go-api -f gin -b go-modules
+# Java Frameworks
+tilokit -i -n my-springboot-api -f spring-boot -b maven
+tilokit -i -n my-quarkus-api -f quarkus -b maven
+
+# Go Frameworks
+tilokit -i -n my-gin-api -f gin -b go-modules
+tilokit -i -n my-echo-api -f echo -b go-modules
+tilokit -i -n my-fiber-api -f fiber -b go-modules
+
+# Ruby Frameworks
+tilokit -i -n my-rails-api -f rails -b bundler
 ```
 
 ### 🎛️ **Available Flags**
