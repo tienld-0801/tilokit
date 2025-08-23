@@ -33,7 +33,7 @@ func (p *NodeNestJSPlugin) Description() string {
 }
 
 func (p *NodeNestJSPlugin) SupportedFrameworks() []string {
-	return []string{"nestjs", "nest"}
+	return []string{"nestjs"}
 }
 
 func (p *NodeNestJSPlugin) SupportedBuildTools() []string {
@@ -42,8 +42,11 @@ func (p *NodeNestJSPlugin) SupportedBuildTools() []string {
 
 func (p *NodeNestJSPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
 	// NestJS is always TypeScript
-	ctx.SetVariable("language", "ts")
-	ctx.SetVariable("nestjs_version", "^11.1.4")
+	if ctx.Variables == nil {
+		ctx.Variables = make(map[string]interface{})
+	}
+	ctx.Variables["language"] = "ts"
+	ctx.Variables["nestjs_version"] = "^11.1.4"
 	return nil
 }
 
