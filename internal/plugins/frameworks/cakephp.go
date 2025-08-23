@@ -38,13 +38,16 @@ func (p *CakePHPPlugin) SupportedFrameworks() []string {
 }
 
 func (p *CakePHPPlugin) SupportedBuildTools() []string {
-	return []string{"composer", "bake"}
+	return []string{}
 }
 
 func (p *CakePHPPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
 	// Set CakePHP-specific variables
-	ctx.SetVariable("cakephp_version", "^5.0")
-	ctx.SetVariable("php_version", ">=8.1")
+	if ctx.Variables == nil {
+		ctx.Variables = make(map[string]interface{})
+	}
+	ctx.Variables["cakephp_version"] = "^5.0"
+	ctx.Variables["php_version"] = ">=8.1"
 	return nil
 }
 
@@ -57,6 +60,12 @@ func (p *CakePHPPlugin) PostGenerate(ctx *tilocontext.ExecutionContext) error {
 }
 
 func GenerateCakePHP(ctx *tilocontext.ExecutionContext) error {
+	if ctx == nil {
+		return errors.New("execution context is nil")
+	}
+	if ctx.ProjectPath == "" {
+		return errors.New("ProjectPath is empty")
+	}
 	templateEngine := templates.NewTemplateEngine()
 
 	// Create CakePHP project structure
@@ -88,7 +97,11 @@ func GenerateCakePHP(ctx *tilocontext.ExecutionContext) error {
 		"src/Controller/HomeController.php": php.CakePHPController,
 		"src/Controller/AppController.php":  php.CakePHPAppController,
 		"config/routes.php":                 php.CakePHPRoutes,
-		".env":                              php.CakePHPEnv,
+		"webroot/index.php":                 php.CakePHPWebroot,
+		"config/bootstrap.php":              php.CakePHPBootstrap,
+		"config/app.php":                    php.CakePHPAppConfig,
+		"bin/cake":                          php.CakePHPBincake,
+		".env.example":                      php.CakePHPEnvExample,
 	}
 
 	for filePath, content := range files {

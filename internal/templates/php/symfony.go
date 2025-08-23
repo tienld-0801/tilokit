@@ -83,7 +83,7 @@ class Kernel extends BaseKernel
 }`
 
 	SymfonyEnv = `APP_ENV=dev
-APP_SECRET=<<TILO:.project_name>>_secret_key_here
+APP_SECRET=<<TILO:.app_secret>>
 DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"`
 
 	SymfonyPublicIndex = `<?php

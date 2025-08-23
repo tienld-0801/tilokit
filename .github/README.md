@@ -47,6 +47,8 @@
 - 🐍 **FastAPI** - Modern Python API framework
 - 🐘 **Laravel** - PHP web framework
 - 🐘 **Symfony** - PHP enterprise framework
+- 🐘 **CakePHP** - PHP framework
+- 🐘 **CodeIgniter** - PHP lightweight framework
 - ☕ **Spring Boot** - Java enterprise framework
 - ☕ **Quarkus** - Cloud-native Java framework
 - 🐹 **Gin** - Go web framework
@@ -63,7 +65,7 @@
 - 💚 **Nuxt** - Vue-based full-stack *(Coming Soon)*
 
 #### **Backend Frameworks**
-- 🟢 **Node.js** - Express, Fastify, NestJS *(Coming Soon)*
+- 🟢 **Node.js** - Express, Fastify, NestJS
 - 🦀 **Rust** - Actix, Rocket, Axum *(Coming Soon)*
 - 🔷 **C#** - ASP.NET Core, Blazor *(Coming Soon)*
 
@@ -168,10 +170,6 @@ tilokit --help
 # Frontend Frameworks
 tilokit -i -n my-react-app -f react -b vite
 tilokit -i -n my-vue-app -f vue -b vite
-tilokit -i -n my-svelte-app -f svelte -b vite
-tilokit -i -n my-angular-app -f angular
-tilokit -i -n my-nextjs-app -f next
-tilokit -i -n my-nuxtjs-app -f nuxt
 
 # Node.js Backend Frameworks
 tilokit -i -n my-express-api -f express
@@ -228,7 +226,7 @@ TiLoKit uses a simple YAML configuration file located at:
 ### 🎯 **Supported Frameworks**
 Currently supported frameworks include:
 - **Frontend**: React, Vue, Svelte, Angular, Next.js, Nuxt
-- **Backend**: Django, Flask, FastAPI, Laravel, Symfony, Spring Boot, Quarkus
+- **Backend**: Django, Flask, FastAPI, Laravel, Symfony, CakePHP, CodeIgniter, Spring Boot, Quarkus
 - **Go**: Gin, Echo, Fiber
 - **Ruby**: Rails
 
@@ -247,7 +245,7 @@ TiLoKit is built with a modular architecture supporting multiple programming lan
 #### **Currently Supported**
 - 🟨 **JavaScript/TypeScript** - React, Vue, Svelte, Angular, Next.js, Nuxt
 - 🐍 **Python** - Django, Flask, FastAPI
-- 🐘 **PHP** - Laravel, Symfony
+- 🐘 **PHP** - Laravel, Symfony, CakePHP, CodeIgniter
 - ☕ **Java** - Spring Boot, Quarkus
 - 🐹 **Go** - Gin, Echo, Fiber
 - 💎 **Ruby** - Rails

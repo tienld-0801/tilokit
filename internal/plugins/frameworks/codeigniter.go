@@ -1,9 +1,9 @@
 package frameworks
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/plugins/templates"
@@ -39,7 +39,7 @@ func (p *CodeIgniterPlugin) SupportedFrameworks() []string {
 }
 
 func (p *CodeIgniterPlugin) SupportedBuildTools() []string {
-	return []string{"composer"}
+	return []string{}
 }
 
 func (p *CodeIgniterPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
@@ -77,8 +77,15 @@ func GenerateCodeIgniter(ctx *tilocontext.ExecutionContext) error {
 	}
 
 	for _, dir := range dirs {
-		if err := os.MkdirAll(filepath.Join(ctx.ProjectPath, dir), 0750); err != nil {
-			return fmt.Errorf("failed to create directory %s: %w", dir, err)
+		full := filepath.Join(ctx.ProjectPath, dir)
+		mode := os.FileMode(0750)
+		if dir == "public" {
+			mode = 0755
+		} else if strings.HasPrefix(dir, "writable") {
+			mode = 0770
+		}
+		if err := os.MkdirAll(full, mode); err != nil {
+			return errors.Wrapf(err, "failed to create directory %s", full)
 		}
 	}
 
@@ -87,8 +94,11 @@ func GenerateCodeIgniter(ctx *tilocontext.ExecutionContext) error {
 		"composer.json":            php.CodeIgniterComposer,
 		"app/Controllers/Home.php": php.CodeIgniterController,
 		"app/Config/Routes.php":    php.CodeIgniterRoutes,
+		"app/Config/Paths.php":     php.CodeIgniterPaths,
+		"app/Config/App.php":       php.CodeIgniterApp,
 		".env":                     php.CodeIgniterEnv,
 		"public/index.php":         php.CodeIgniterPublicIndex,
+		"public/.htaccess":         php.CodeIgniterPublicHtaccess,
 	}
 
 	for filePath, templateContent := range files {

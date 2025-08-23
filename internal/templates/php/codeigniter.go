@@ -30,19 +30,21 @@ const (
 
 namespace App\Controllers;
 
+use CodeIgniter\HTTP\ResponseInterface;
+
 class Home extends BaseController
 {
-    public function index(): string
+    public function index(): ResponseInterface
     {
-        return json_encode([
+        return $this->response->setJSON([
             'message' => 'Hello World from "<<TILO:.project_name>>"!',
             'framework' => 'CodeIgniter 4'
         ]);
     }
 
-    public function health(): string
+    public function health(): ResponseInterface
     {
-        return json_encode([
+        return $this->response->setJSON([
             'status' => 'ok'
         ]);
     }
@@ -110,31 +112,63 @@ require FCPATH . '../app/Config/Paths.php';
 $paths = new Config\Paths();
 
 // Location of the framework bootstrap file.
-require rtrim($paths->systemDirectory, '\\/ ') . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require rtrim($paths->systemDirectory, '\\/ ') . DIRECTORY_SEPARATOR . 'bootstrap.php';`
 
-// Load environment settings from .env files into $_SERVER and $_ENV
-require_once SYSTEMPATH . 'Config/DotEnv.php';
-(new CodeIgniter\Config\DotEnv(ROOTPATH))->load();
+	CodeIgniterPaths = `<?php
 
-/*
- * ---------------------------------------------------------------
- * GRAB OUR CODEIGNITER INSTANCE
- * ---------------------------------------------------------------
- *
- * The CodeIgniter class contains the core functionality to make
- * the application run, and does all of the dirty work for us.
- */
-$app = Config\Services::codeigniter();
-$app->initialize();
-$context = is_cli() ? 'php-cli' : 'web';
-$app->setContext($context);
+namespace Config;
 
-/*
- *---------------------------------------------------------------
- * LAUNCH THE APPLICATION
- *---------------------------------------------------------------
- * Now that everything is setup, it's time to actually fire
- * up the engines and make this app do its thang.
- */
-$app->run();`
+class Paths
+{
+    public $systemDirectory = __DIR__ . '/../../vendor/codeigniter4/framework/system';
+    public $appDirectory = __DIR__ . '/..';
+    public $writableDirectory = __DIR__ . '/../../writable';
+    public $testsDirectory = __DIR__ . '/../../tests';
+    public $viewDirectory = __DIR__ . '/../Views';
+}`
+
+	CodeIgniterApp = `<?php
+
+namespace Config;
+
+use CodeIgniter\Config\BaseConfig;
+
+class App extends BaseConfig
+{
+    public $baseURL = 'http://localhost:8080/';
+    public $indexPage = '';
+    public $uriProtocol = 'REQUEST_URI';
+    public $defaultLocale = 'en';
+    public $negotiateLocale = false;
+    public $supportedLocales = ['en'];
+    public $appTimezone = 'UTC';
+    public $charset = 'UTF-8';
+    public $forceGlobalSecureRequests = false;
+    public $sessionDriver = 'CodeIgniter\Session\Handlers\FileHandler';
+    public $sessionCookieName = 'ci_session';
+    public $sessionExpiration = 7200;
+    public $sessionSavePath = WRITEPATH . 'session';
+    public $sessionMatchIP = false;
+    public $sessionTimeToUpdate = 300;
+    public $sessionRegenerateDestroy = false;
+    public $cookiePrefix = '';
+    public $cookieDomain = '';
+    public $cookiePath = '/';
+    public $cookieSecure = false;
+    public $cookieHTTPOnly = false;
+    public $cookieSameSite = 'Lax';
+    public $proxyIPs = '';
+    public $CSRFTokenName = 'csrf_test_name';
+    public $CSRFHeaderName = 'X-CSRF-TOKEN';
+    public $CSRFCookieName = 'csrf_cookie_name';
+    public $CSRFExpiration = 7200;
+    public $CSRFRegenerate = true;
+    public $CSRFExcludeURIs = [];
+    public $CSPEnabled = false;
+}`
+
+	CodeIgniterPublicHtaccess = `RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php/$1 [L]`
 )

@@ -37,7 +37,7 @@ func (p *NodeNestJSPlugin) SupportedFrameworks() []string {
 }
 
 func (p *NodeNestJSPlugin) SupportedBuildTools() []string {
-	return []string{} // Backend frameworks don't need build tools
+	return []string{}
 }
 
 func (p *NodeNestJSPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {

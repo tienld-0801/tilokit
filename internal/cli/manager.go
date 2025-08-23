@@ -137,7 +137,7 @@ func (m *Manager) ListSupportedFrameworks() error {
 	frameworks := map[string][]string{
 		"JavaScript/TypeScript": {"react", "vue", "angular", "svelte", "nextjs", "nuxtjs"},
 		"Python":                {"django", "flask", "fastapi"},
-		"PHP":                   {"laravel", "symfony"},
+		"PHP":                   {"laravel", "symfony", "cakephp", "codeigniter"},
 		"Java":                  {"spring-boot", "quarkus"},
 		"Go":                    {"gin", "echo", "fiber"},
 		"Rust":                  {"actix", "rocket", "axum"},

@@ -38,13 +38,21 @@ func (p *LaravelPlugin) SupportedFrameworks() []string {
 }
 
 func (p *LaravelPlugin) SupportedBuildTools() []string {
-	return []string{"composer", "vite", "webpack"}
+	return []string{}
 }
 
 func (p *LaravelPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
 	// Set Laravel-specific variables
 	ctx.SetVariable("laravel_version", "^10.0")
 	ctx.SetVariable("php_version", ">=8.1")
+
+	// Generate random APP_KEY for security (Laravel expects base64 format)
+	appKey, err := utils.GenerateBase64Secret(32)
+	if err != nil {
+		return errors.Wrap(err, "failed to generate APP_KEY")
+	}
+	ctx.SetVariable("app_key", appKey)
+
 	return nil
 }
 
@@ -85,18 +93,17 @@ func GenerateLaravel(ctx *tilocontext.ExecutionContext) error {
 
 	// Generate files using template engine
 	files := map[string]string{
-		"composer.json":                        php.LaravelComposer,
-		"routes/web.php":                       php.LaravelRoutes,
+		"composer.json": php.LaravelComposer,
 		"app/Http/Controllers/HomeController.php": php.LaravelController,
-		".env.example":                         php.LaravelEnvExample,
-		"artisan":                              php.LaravelArtisan,
-		"public/index.php":                     php.LaravelPublicIndex,
+		"routes/web.php":   php.LaravelRoutes,
+		".env.example":     php.LaravelEnvExample,
+		"public/index.php": php.LaravelPublicIndex,
 	}
 
 	for filePath, templateContent := range files {
 		fullPath := filepath.Join(ctx.ProjectPath, filePath)
 
-		// Process template content with TILOKit delimiters
+		// Process template with TILOKit delimiters
 		processedContent, err := templateEngine.ProcessTemplateWithDelims(templateContent, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 		if err != nil {
 			return errors.Wrapf(err, "failed to process template for %s", filePath)

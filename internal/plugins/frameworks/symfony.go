@@ -10,6 +10,7 @@ import (
 	"tilokit/internal/templates/php"
 	"tilokit/internal/utils"
 	"tilokit/pkg/constants"
+
 	"github.com/pkg/errors"
 )
 
@@ -20,7 +21,6 @@ type SymfonyPlugin struct{}
 func NewPHPSymfonyPlugin() *SymfonyPlugin {
 	return &SymfonyPlugin{}
 }
-
 
 func (p *SymfonyPlugin) Name() string {
 	return "symfony-framework"
@@ -39,13 +39,21 @@ func (p *SymfonyPlugin) SupportedFrameworks() []string {
 }
 
 func (p *SymfonyPlugin) SupportedBuildTools() []string {
-	return []string{"composer", "webpack", "encore"}
+	return []string{}
 }
 
 func (p *SymfonyPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
 	// Set Symfony-specific variables
 	ctx.SetVariable("symfony_version", "^6.0")
 	ctx.SetVariable("php_version", ">=8.1")
+
+	// Generate random APP_SECRET for security
+	secret, err := utils.GenerateRandomSecret(32)
+	if err != nil {
+		return errors.Wrap(err, "failed to generate APP_SECRET")
+	}
+	ctx.SetVariable("app_secret", secret)
+
 	return nil
 }
 

@@ -65,7 +65,7 @@ Route::get('/health', [HomeController::class, 'health']);`
 
 	LaravelEnvExample = `APP_NAME="<<TILO:.project_name>>"
 APP_ENV=local
-APP_KEY=
+APP_KEY=<<TILO:.app_key>>
 APP_DEBUG=true
 APP_URL=http://localhost
 
@@ -91,6 +91,10 @@ SESSION_LIFETIME=120`
 <?php
 
 define('LARAVEL_START', microtime(true));
+
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
+}
 
 require __DIR__.'/vendor/autoload.php';
 
