@@ -37,4 +37,8 @@ const (
 	// C# specific - Note: These are patterns, not literal filenames
 	CsprojFilePattern = "*.csproj"
 	SlnFilePattern    = "*.sln"
+
+	// Expo app config
+	AppConfigFileName = "app.json"
+	ExpoEnvFileName   = "expo-env.d.ts"
 )
