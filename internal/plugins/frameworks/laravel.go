@@ -3,6 +3,7 @@ package frameworks
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/plugins/templates"
@@ -43,15 +44,18 @@ func (p *LaravelPlugin) SupportedBuildTools() []string {
 
 func (p *LaravelPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
 	// Set Laravel-specific variables
-	ctx.SetVariable("laravel_version", "^10.0")
-	ctx.SetVariable("php_version", ">=8.1")
+	if ctx.Variables == nil {
+		ctx.Variables = make(map[string]interface{})
+	}
+	ctx.Variables["laravel_version"] = "^10.0"
+	ctx.Variables["php_version"] = ">=8.1"
 
 	// Generate random APP_KEY for security (Laravel expects base64 format)
 	appKey, err := utils.GenerateBase64Secret(32)
 	if err != nil {
 		return errors.Wrap(err, "failed to generate APP_KEY")
 	}
-	ctx.SetVariable("app_key", appKey)
+	ctx.Variables["app_key"] = appKey
 
 	return nil
 }
@@ -72,6 +76,7 @@ func GenerateLaravel(ctx *tilocontext.ExecutionContext) error {
 		"app/Http/Controllers",
 		"app/Models",
 		"bootstrap",
+		"bootstrap/cache",
 		"config",
 		"database/migrations",
 		"database/seeders",
@@ -80,13 +85,26 @@ func GenerateLaravel(ctx *tilocontext.ExecutionContext) error {
 		"routes",
 		"storage/app",
 		"storage/framework",
+		"storage/framework/cache",
+		"storage/framework/sessions",
+		"storage/framework/views",
 		"storage/logs",
 		"tests/Feature",
 		"tests/Unit",
 	}
 
 	for _, dir := range dirs {
-		if err := os.MkdirAll(filepath.Join(ctx.ProjectPath, dir), 0750); err != nil {
+		full := filepath.Join(ctx.ProjectPath, dir)
+		mode := os.FileMode(0750)
+		switch {
+		case dir == "public":
+			mode = 0755
+		case strings.HasPrefix(dir, "bootstrap") || dir == "bootstrap/cache":
+			mode = 0770
+		case strings.HasPrefix(dir, "storage"):
+			mode = 0770
+		}
+		if err := os.MkdirAll(full, mode); err != nil {
 			return errors.Wrapf(err, "failed to create directory %s", dir)
 		}
 	}

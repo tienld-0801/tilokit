@@ -174,7 +174,7 @@ tilokit -i -n my-vue-app -f vue -b vite
 # Node.js Backend Frameworks
 tilokit -i -n my-express-api -f express
 tilokit -i -n my-fastify-api -f fastify
-tilokit -i -n my-nest-api -f nest
+tilokit -i -n my-nest-api -f nestjs
 
 # PHP Frameworks
 tilokit -i -n my-laravel-api -f laravel -b composer

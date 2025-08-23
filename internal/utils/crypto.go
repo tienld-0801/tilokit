@@ -2,6 +2,7 @@ package utils
 
 import (
 	"crypto/rand"
+	"encoding/base64"
 	"encoding/hex"
 )
 
@@ -22,6 +23,7 @@ func GenerateBase64Secret(byteLength int) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// Laravel expects base64 format with base64: prefix
-	return "base64:" + hex.EncodeToString(bytes), nil
+	// Laravel expects base64 format with base64: prefix with Base64-encoded random bytes
+	enc := base64.StdEncoding.EncodeToString(bytes)
+	return "base64:" + enc, nil
 }

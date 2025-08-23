@@ -44,8 +44,11 @@ func (p *CodeIgniterPlugin) SupportedBuildTools() []string {
 
 func (p *CodeIgniterPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
 	// Set CodeIgniter-specific variables
-	ctx.SetVariable("codeigniter_version", "^4.0")
-	ctx.SetVariable("php_version", ">=7.4")
+	if ctx.Variables == nil {
+		ctx.Variables = make(map[string]interface{})
+	}
+	ctx.Variables["codeigniter_version"] = "^4.0"
+	ctx.Variables["php_version"] = ">=7.4"
 	return nil
 }
 
@@ -112,6 +115,12 @@ func GenerateCodeIgniter(ctx *tilocontext.ExecutionContext) error {
 
 		if err := utils.WriteFile(fullPath, processedContent); err != nil {
 			return errors.Wrapf(err, "failed to write file %s", filePath)
+		}
+
+		// Make files world-readable for web server compatibility
+		// #nosec G302 - 0644 permissions are required for web server files
+		if err := os.Chmod(fullPath, 0644); err != nil {
+			return errors.Wrapf(err, "failed to set file permissions for %s", filePath)
 		}
 	}
 
