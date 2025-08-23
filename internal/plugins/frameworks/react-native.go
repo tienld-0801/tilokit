@@ -128,8 +128,8 @@ func (p *ReactNativePlugin) generateSourceFiles(ctx *tilocontext.ExecutionContex
 		"src/components": {
 			"Collapsible.tsx":        reactNative.ExpoCollapsible,
 			"ExternalLink.tsx":       reactNative.ExpoExternalLink,
-			"HapticTab.tsx":          reactNative.ExpoTabsMainFile,
-			"ParallaxScrollView.tsx": reactNative.ExpoParallaxScrollView,
+			"HapticTab.tsx":          reactNative.ExpoHapticTab,
+			"ParallaxScrollView.tsx": reactNative.ExpoHelloWave,
 			"ThemedText.tsx":         reactNative.ExpoThemedText,
 			"ThemedView.tsx":         reactNative.ExpoThemedView,
 		},
@@ -140,10 +140,11 @@ func (p *ReactNativePlugin) generateSourceFiles(ctx *tilocontext.ExecutionContex
 			"TabBarBackground.tsx":     reactNative.ExpoTabBarBackground,
 		},
 		"src/constants": {
-			"Colors.ts": reactNative.ExpoIconSymbolIos,
+			"Colors.ts": reactNative.ExpoColors,
 		},
 		"src/hooks": {
-			"useColorScheme.ts": reactNative.ExpoUseColorScheme,
+			"useColorScheme.ts":     reactNative.ExpoUseColorScheme,
+			"useColorScheme.web.ts": reactNative.ExpoUseColorSchemeWeb,
 		},
 		"src/scripts": {
 			"reset-project.js": reactNative.ExpoResetProject,
@@ -234,9 +235,8 @@ func (p *ReactNativePlugin) copyAssets(ctx *tilocontext.ExecutionContext) error 
 }
 
 func (p *ReactNativePlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
-	// Set React-specific variables
-	ctx.SetVariable("react_version", "^18.2.0")
-	ctx.SetVariable("react_dom_version", "^18.2.0")
+	// Ensure common variables are available to templates
+	ctx.SetVariable("project_name", ctx.Config.ProjectName)
 	ctx.SetVariable("typescript_support", true)
 
 	return nil

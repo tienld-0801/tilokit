@@ -121,8 +121,8 @@ func (m *Manager) RunProjectGenerationProcess() error {
 		logrus.Infof("ℹ️  Next steps:")
 		logrus.Infof("ℹ️     cd %s", m.ProjectName)
 		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
-		logrus.Infof("ℹ️     npm run dev")
-		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Nuxt.js app")
+		logrus.Infof("ℹ️     npx expo start")
+		logrus.Infof("ℹ️     Press i (iOS), a (Android), or w (Web) in the terminal, or scan the QR with Expo Go")
 	default:
 		logrus.Infof("ℹ️  Check the README.md for setup instructions")
 	}

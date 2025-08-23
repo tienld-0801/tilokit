@@ -68,10 +68,9 @@ module.exports = defineConfig([
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -86,8 +85,8 @@ module.exports = defineConfig([
 	AppConfig = `
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
+    "name": "<<TILO:.project_name>>",
+    "slug": "<<TILO:.project_name>>",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
