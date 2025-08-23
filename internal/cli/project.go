@@ -282,6 +282,7 @@ func (m *Manager) registerPlugins(eng *engine.Engine) error {
 		// JavaScript/TypeScript Frameworks
 		frameworks.NewReactPlugin(),
 		frameworks.NewVuePlugin(),
+		frameworks.NewSveltePlugin(),
 		frameworks.NewAngularPlugin(),
 		frameworks.NewNextjsPlugin(),
 		frameworks.NewNuxtjsPlugin(),
