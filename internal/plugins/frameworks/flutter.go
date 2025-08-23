@@ -5,55 +5,6 @@ import (
 	"tilokit/pkg/constants"
 )
 
-// ReactNativePlugin implements React Native framework support
-type ReactNativePlugin struct{}
-
-func NewReactNativePlugin() *ReactNativePlugin {
-	return &ReactNativePlugin{}
-}
-
-func (p *ReactNativePlugin) Name() string {
-	return "react-native"
-}
-
-func (p *ReactNativePlugin) Version() string {
-	return constants.VERSION
-}
-
-func (p *ReactNativePlugin) Description() string {
-	return "React Native mobile app framework"
-}
-
-func (p *ReactNativePlugin) SupportedFrameworks() []string {
-	return []string{"react-native", "rn"}
-}
-
-func (p *ReactNativePlugin) SupportedBuildTools() []string {
-	return []string{"metro", "expo"}
-}
-
-func (p *ReactNativePlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
-	// TODO: Implement React Native pre-generation logic
-	return nil
-}
-
-func (p *ReactNativePlugin) Generate(ctx *tilocontext.ExecutionContext) error {
-	// TODO: Implement React Native project generation
-	// - Create React Native project structure
-	// - Generate package.json with RN dependencies
-	// - Set up navigation (React Navigation)
-	// - Configure state management (Redux/Zustand)
-	// - Set up native modules
-	// - Configure build tools (Metro/Expo)
-	// - Set up testing (Jest, Detox)
-	return nil
-}
-
-func (p *ReactNativePlugin) PostGenerate(ctx *tilocontext.ExecutionContext) error {
-	// TODO: Implement React Native post-generation logic
-	return nil
-}
-
 // FlutterPlugin implements Flutter framework support
 type FlutterPlugin struct{}
 

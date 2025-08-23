@@ -117,6 +117,12 @@ func (m *Manager) RunProjectGenerationProcess() error {
 		logrus.Infof("ℹ️     cd %s", m.ProjectName)
 		logrus.Infof("ℹ️     python -m venv venv")
 		logrus.Infof("ℹ️     source venv/bin/activate")
+	case constants.ReactNativeFramework:
+		logrus.Infof("ℹ️  Next steps:")
+		logrus.Infof("ℹ️     cd %s", m.ProjectName)
+		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
+		logrus.Infof("ℹ️     npm run dev")
+		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Nuxt.js app")
 	default:
 		logrus.Infof("ℹ️  Check the README.md for setup instructions")
 	}
@@ -187,6 +193,7 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 			}
 		}
 	}
+
 	// Router type for Next.js
 	if m.RouterType == "" && m.Framework == "next" {
 		routers := []string{"app", "pages"}
@@ -231,6 +238,24 @@ func (m *Manager) promptForMissingValues(cfg *config.Config) error {
 			}
 		}
 	}
+
+	// React Native options
+	if m.Framework == "react-native" {
+		// Expo template selection
+		if m.Architecture == "" {
+			expoTemplates := []string{"expo"}
+			prompt := &survey.Select{
+				Message: "📱 Choose React Native template:",
+				Options: expoTemplates,
+				Default: "expo",
+				Help:    "Expo: Managed workflow with Expo SDK. Expo Router: File-based routing. Bare: Minimal React Native. TypeScript: TypeScript template.",
+			}
+			if err := survey.AskOne(prompt, &m.Architecture); err != nil {
+				return err
+			}
+		}
+	}
+
 	// Output directory
 	if m.OutputDir == "" {
 		m.OutputDir = "."
@@ -317,12 +342,13 @@ func (m *Manager) registerPlugins(eng *engine.Engine) error {
 }
 func (m *Manager) getBuildToolsForFramework(framework string) []string {
 	buildToolMap := map[string][]string{
-		"react":   {"vite", "webpack", "rollup"},
-		"vue":     {"vite", "webpack"},
-		"svelte":  {"vite", "rollup"},
-		"angular": {"angular-cli"},
-		"next":    {"next"},
-		"nuxt":    {"nuxt"},
+		"react":        {"vite", "webpack", "rollup"},
+		"vue":          {"vite", "webpack"},
+		"svelte":       {"vite", "rollup"},
+		"angular":      {"angular-cli"},
+		"react-native": {"expo"},
+		"next":         {"next"},
+		"nuxt":         {"nuxt"},
 	}
 	if tools, exists := buildToolMap[framework]; exists {
 		return tools

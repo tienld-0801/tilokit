@@ -23,6 +23,7 @@ var SupportedFrameworks = []string{
 	"nest", "express", "fastify",
 	"django", "flask", "fastapi",
 	"laravel", "symfony", "cakephp", "codeigniter",
+	"react-native", "flutter",
 	"spring-boot", "quarkus",
 	"gin", "echo", "fiber",
 	"rails",
@@ -42,28 +43,30 @@ const (
 
 // CLI FRAMEWORK
 const (
-	ReactFramework      = "react"
-	VueFramework        = "vue"
-	SvelteFramework     = "svelte"
-	AngularFramework    = "angular"
-	NextFramework       = "next"
-	NuxtFramework       = "nuxt"
-	NestFramework       = "nest"
-	ExpressFramework    = "express"
-	FastifyFramework    = "fastify"
-	DjangoFramework     = "django"
-	FlaskFramework      = "flask"
-	FastapiFramework    = "fastapi"
+	ReactFramework       = "react"
+	VueFramework         = "vue"
+	SvelteFramework      = "svelte"
+	AngularFramework     = "angular"
+	NextFramework        = "next"
+	NuxtFramework        = "nuxt"
+	NestFramework        = "nest"
+	ExpressFramework     = "express"
+	FastifyFramework     = "fastify"
+	DjangoFramework      = "django"
+	FlaskFramework       = "flask"
+	FastapiFramework     = "fastapi"
 	LaravelFramework     = "laravel"
 	SymfonyFramework     = "symfony"
 	CakePHPFramework     = "cakephp"
+	ReactNativeFramework = "react-native"
+	FlutterFramework     = "flutter"
 	CodeIgniterFramework = "codeigniter"
 	SpringBootFramework  = "spring-boot"
-	QuarkusFramework    = "quarkus"
-	GinFramework        = "gin"
-	EchoFramework       = "echo"
-	FiberFramework      = "fiber"
-	RailsFramework      = "rails"
+	QuarkusFramework     = "quarkus"
+	GinFramework         = "gin"
+	EchoFramework        = "echo"
+	FiberFramework       = "fiber"
+	RailsFramework       = "rails"
 )
 
 // CLI NextJS
