@@ -143,7 +143,7 @@ func (m *Manager) ListSupportedFrameworks() error {
 		"Rust":                  {"actix", "rocket", "axum"},
 		"C#":                    {"aspnetcore", "blazor"},
 		"Ruby":                  {"rails", "sinatra"},
-		"Node.js":               {"express", "nestjs", "fastify"},
+		"Node.js":               {"express", "nest", "fastify"},
 		"Mobile":                {"react-native", "flutter", "ionic"},
 		"Desktop":               {"electron", "tauri", "wails"},
 	}
