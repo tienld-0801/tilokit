@@ -1,115 +1,164 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Debug TiLoKit - Interactive Mode",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}",
-            "args": [
-                "-i"
-            ],
-            "env": {
-                "ENV": "development"
-            },
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "Debug TiLoKit - React Project",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}",
-            "args": [
-                "-n", "test-react",
-                "-f", "react",
-                "-b", "vite",
-                "-L", "js",
-                "-q"
-            ],
-            "env": {
-                "ENV": "development"
-            }
-        },
-        {
-            "name": "Debug TiLoKit - Vue Project",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}",
-            "args": [
-                "-n", "test-vue",
-                "-f", "vue",
-                "-b", "vite",
-                "-L", "js",
-                "-q"
-            ],
-            "env": {
-                "ENV": "development"
-            }
-        },
-        {
-            "name": "Debug TiLoKit - Next.js Project",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}",
-            "args": [
-                "-n", "test-nextjs",
-                "-f", "nextjs",
-                "-L", "js",
-                "-q"
-            ],
-            "env": {
-                "ENV": "development"
-            }
-        },
-        {
-            "name": "Debug TiLoKit - Version Check",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}",
-            "args": [
-                "-v"
-            ],
-            "env": {
-                "ENV": "development"
-            }
-        },
-        {
-            "name": "Debug TiLoKit - List Templates",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}",
-            "args": [
-                "-l"
-            ],
-            "env": {
-                "ENV": "development"
-            }
-        },
-        {
-            "name": "Debug Tests",
-            "type": "go",
-            "request": "launch",
-            "mode": "test",
-            "program": "${workspaceFolder}",
-            "env": {
-                "ENV": "test"
-            }
-        },
-        {
-            "name": "Debug Current Test",
-            "type": "go",
-            "request": "launch",
-            "mode": "test",
-            "program": "${fileDirname}",
-            "env": {
-                "ENV": "test"
-            }
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug TiLoKit - Interactive Mode",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "-i"
+      ],
+      "env": {
+        "ENV": "development"
+      },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug TiLoKit - React Project",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "-n",
+        "test-react",
+        "-f",
+        "react",
+        "-b",
+        "vite",
+        "-L",
+        "js",
+        "-q"
+      ],
+      "env": {
+        "ENV": "development"
+      }
+    },
+    {
+      "name": "Debug TiLoKit - Vue Project",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "-n",
+        "test-vue",
+        "-f",
+        "vue",
+        "-b",
+        "vite",
+        "-L",
+        "js",
+        "-q"
+      ],
+      "env": {
+        "ENV": "development"
+      }
+    },
+    {
+      "name": "Debug TiLoKit - Next.js Project",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "-n",
+        "test-nextjs",
+        "-f",
+        "nextjs",
+        "-L",
+        "js",
+        "-q"
+      ],
+      "env": {
+        "ENV": "development"
+      }
+    },
+    {
+      "name": "Debug TiLoKit - Version Check",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "-v"
+      ],
+      "env": {
+        "ENV": "development"
+      }
+    },
+    {
+      "name": "Debug TiLoKit - List Templates",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "-l"
+      ],
+      "env": {
+        "ENV": "development"
+      }
+    },
+    {
+      "name": "Debug Tests",
+      "type": "go",
+      "request": "launch",
+      "mode": "test",
+      "program": "${workspaceFolder}",
+      "env": {
+        "ENV": "test"
+      }
+    },
+    {
+      "name": "Debug Current Test",
+      "type": "go",
+      "request": "launch",
+      "mode": "test",
+      "program": "${fileDirname}",
+      "env": {
+        "ENV": "test"
+      }
+    },
+    {
+      "name": "Debug TiLoKit - Laravel Project",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "-n",
+        "test-laravel",
+        "-f",
+        "laravel",
+        "-b",
+        "composer",
+        "-q"
+      ],
+      "env": {
+        "ENV": "development"
+      }
+    },
+    {
+      "name": "Debug TiLoKit - Symfony Project",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "-n",
+        "test-symfony",
+        "-f",
+        "symfony",
+        "-b",
+        "composer",
+        "-q"
+      ],
+      "env": {
+        "ENV": "development"
+      }
+    }
+  ]
 }

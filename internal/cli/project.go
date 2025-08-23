@@ -269,6 +269,8 @@ func (m *Manager) registerPlugins(eng *engine.Engine) error {
 		// PHP
 		frameworks.NewPHPLaravelPlugin(),
 		frameworks.NewPHPSymfonyPlugin(),
+		frameworks.NewPHPCakePlugin(),
+		frameworks.NewPHPCodeIgniterPlugin(),
 		// Java
 		frameworks.NewJavaSpringBootPlugin(),
 		frameworks.NewJavaQuarkusPlugin(),

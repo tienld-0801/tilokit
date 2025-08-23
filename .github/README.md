@@ -47,6 +47,8 @@
 - 🐍 **FastAPI** - Modern Python API framework
 - 🐘 **Laravel** - PHP web framework
 - 🐘 **Symfony** - PHP enterprise framework
+- 🐘 **CakePHP** - PHP framework
+- 🐘 **CodeIgniter** - PHP lightweight framework
 - ☕ **Spring Boot** - Java enterprise framework
 - ☕ **Quarkus** - Cloud-native Java framework
 - 🐹 **Gin** - Go web framework
@@ -63,7 +65,7 @@
 - 💚 **Nuxt** - Vue-based full-stack *(Coming Soon)*
 
 #### **Backend Frameworks**
-- 🟢 **Node.js** - Express, Fastify, NestJS *(Coming Soon)*
+- 🟢 **Node.js** - Express, Fastify, NestJS
 - 🦀 **Rust** - Actix, Rocket, Axum *(Coming Soon)*
 - 🔷 **C#** - ASP.NET Core, Blazor *(Coming Soon)*
 
@@ -165,29 +167,37 @@ tilokit --help
 
 ### ⚡ **Quick Project Generation**
 ```bash
-# Create React project with Vite
+# Frontend Frameworks
 tilokit -i -n my-react-app -f react -b vite
-
-# Create Vue project
 tilokit -i -n my-vue-app -f vue -b vite
 
-# Create Next.js project
-tilokit -i -n my-nextjs-app -f next
+# Node.js Backend Frameworks
+tilokit -i -n my-express-api -f express
+tilokit -i -n my-fastify-api -f fastify
+tilokit -i -n my-nest-api -f nest
 
-# Create Nuxt.js project
-tilokit -i -n my-nuxtjs-app -f nuxt
+# PHP Frameworks
+tilokit -i -n my-laravel-api -f laravel -b composer
+tilokit -i -n my-symfony-api -f symfony -b composer
+tilokit -i -n my-cakephp-api -f cakephp -b composer
+tilokit -i -n my-codeigniter-api -f codeigniter -b composer
 
-# Create Laravel project
-tilokit -i -n my-api -f laravel -b composer
+# Python Frameworks
+tilokit -i -n my-django-api -f django -b pip
+tilokit -i -n my-flask-api -f flask -b pip
+tilokit -i -n my-fastapi-api -f fastapi -b pip
 
-# Create Django project
-tilokit -i -n my-python-api -f django -b pip
+# Java Frameworks
+tilokit -i -n my-springboot-api -f spring-boot -b maven
+tilokit -i -n my-quarkus-api -f quarkus -b maven
 
-# Create Spring Boot project
-tilokit -i -n my-java-api -f spring-boot -b maven
+# Go Frameworks
+tilokit -i -n my-gin-api -f gin -b go-modules
+tilokit -i -n my-echo-api -f echo -b go-modules
+tilokit -i -n my-fiber-api -f fiber -b go-modules
 
-# Create Go project with Gin
-tilokit -i -n my-go-api -f gin -b go-modules
+# Ruby Frameworks
+tilokit -i -n my-rails-api -f rails -b bundler
 ```
 
 ### 🎛️ **Available Flags**
@@ -216,7 +226,7 @@ TiLoKit uses a simple YAML configuration file located at:
 ### 🎯 **Supported Frameworks**
 Currently supported frameworks include:
 - **Frontend**: React, Vue, Svelte, Angular, Next.js, Nuxt
-- **Backend**: Django, Flask, FastAPI, Laravel, Symfony, Spring Boot, Quarkus
+- **Backend**: Django, Flask, FastAPI, Laravel, Symfony, CakePHP, CodeIgniter, Spring Boot, Quarkus
 - **Go**: Gin, Echo, Fiber
 - **Ruby**: Rails
 
@@ -235,7 +245,7 @@ TiLoKit is built with a modular architecture supporting multiple programming lan
 #### **Currently Supported**
 - 🟨 **JavaScript/TypeScript** - React, Vue, Svelte, Angular, Next.js, Nuxt
 - 🐍 **Python** - Django, Flask, FastAPI
-- 🐘 **PHP** - Laravel, Symfony
+- 🐘 **PHP** - Laravel, Symfony, CakePHP, CodeIgniter
 - ☕ **Java** - Spring Boot, Quarkus
 - 🐹 **Go** - Gin, Echo, Fiber
 - 💎 **Ruby** - Rails

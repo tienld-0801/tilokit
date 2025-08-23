@@ -22,7 +22,7 @@ var SupportedFrameworks = []string{
 	"react", "vue", "svelte", "angular", "next", "nuxt",
 	"nest", "express", "fastify",
 	"django", "flask", "fastapi",
-	"laravel", "symfony",
+	"laravel", "symfony", "cakephp", "codeigniter",
 	"spring-boot", "quarkus",
 	"gin", "echo", "fiber",
 	"rails",
@@ -54,9 +54,11 @@ const (
 	DjangoFramework     = "django"
 	FlaskFramework      = "flask"
 	FastapiFramework    = "fastapi"
-	LaravelFramework    = "laravel"
-	SymfonyFramework    = "symfony"
-	SpringBootFramework = "spring-boot"
+	LaravelFramework     = "laravel"
+	SymfonyFramework     = "symfony"
+	CakePHPFramework     = "cakephp"
+	CodeIgniterFramework = "codeigniter"
+	SpringBootFramework  = "spring-boot"
 	QuarkusFramework    = "quarkus"
 	GinFramework        = "gin"
 	EchoFramework       = "echo"

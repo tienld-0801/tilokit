@@ -33,17 +33,34 @@ func (p *NodeNestJSPlugin) Description() string {
 }
 
 func (p *NodeNestJSPlugin) SupportedFrameworks() []string {
-	return []string{"nestjs", "nest"}
+	return []string{"nest"}
 }
 
 func (p *NodeNestJSPlugin) SupportedBuildTools() []string {
-	return []string{} // Backend frameworks don't need build tools
+	return []string{}
 }
 
 func (p *NodeNestJSPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
-	// NestJS is always TypeScript
-	ctx.SetVariable("language", "ts")
-	ctx.SetVariable("nestjs_version", "^11.1.4")
+	if ctx.Variables == nil {
+		ctx.Variables = make(map[string]interface{})
+	}
+	// Default to TypeScript if not provided
+	if _, ok := ctx.Variables["language"]; !ok {
+		ctx.Variables["language"] = "ts"
+	}
+	// Don't override an explicitly provided version
+	if _, ok := ctx.Variables["nestjs_version"]; !ok {
+		ctx.Variables["nestjs_version"] = "^11.1.4"
+	}
+	// Common variables used across templates
+	if ctx.Config.ProjectName != "" {
+		ctx.Variables["project_name"] = ctx.Config.ProjectName
+	}
+	if ctx.Config.PackageManager != "" {
+		ctx.Variables["package_manager"] = ctx.Config.PackageManager
+	} else {
+		ctx.Variables["package_manager"] = "npm"
+	}
 	return nil
 }
 
