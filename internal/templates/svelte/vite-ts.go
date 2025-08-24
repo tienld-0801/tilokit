@@ -10,17 +10,17 @@ const (
     "build": "vite build",
     "dev": "vite dev --open",
     "preview": "vite preview",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.1.3",
     "@tsconfig/svelte": "^5.0.2",
-    "svelte": "^5.38.2",
+    "svelte": "<<TILO:.svelte_version>>",
     "svelte-check": "^3.6.0",
     "tslib": "^2.4.1",
     "typescript": "^5.0.0",
-    "vite": "^5.0.3"
+    "vite": "<<TILO:.vite_version>>"
   },
   "type": "module"
 }`
@@ -198,6 +198,22 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [svelte()],
+	server: {
+		port: 3000,
+		open: true,
+		host: true
+	},
+	build: {
+		outDir: 'dist',
+		sourcemap: true,
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					vendor: ['svelte']
+				}
+			}
+		}
+	}
 })`
 
 	ViteTsTsConfig = `{

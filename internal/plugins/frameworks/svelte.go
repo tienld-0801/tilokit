@@ -38,12 +38,12 @@ func (p *SveltePlugin) SupportedFrameworks() []string {
 }
 
 func (p *SveltePlugin) SupportedBuildTools() []string {
-	return []string{"vite", "rollup"}
+	return []string{"vite"}
 }
 
 func (p *SveltePlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
 	// Set Svelte-specific variables
-	ctx.SetVariable("svelte_version", "^4.2.7")
+	ctx.SetVariable("svelte_version", "^5.38.2")
 	ctx.SetVariable("vite_version", "^5.0.3")
 	ctx.SetVariable("typescript_support", true)
 
@@ -167,10 +167,12 @@ func (p *SveltePlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) er
 
 func (p *SveltePlugin) getJavaScriptTemplates() map[string]string {
 	return map[string]string{
-		"src/main.js":           svelte.ViteJsMainFile,
-		"src/App.svelte":        svelte.ViteJsAppFile,
-		"src/lib/Counter.svelte": svelte.ViteJsCounterComponent,
-		"src/app.css":           svelte.ViteJsAppCss,
+		"src/main.js":            svelte.ViteJsMainFile,
+		"src/App.svelte":         svelte.ViteJsAppFile,
+		"src/lib/Counter.svelte":  svelte.ViteJsCounterComponent,
+		"src/app.css":            svelte.ViteJsAppCss,
+		"src/assets/svelte.svg":  svelte.SvelteSvg,
+		"public/vite.svg":        svelte.ViteSvg,
 	}
 }
 
@@ -178,9 +180,11 @@ func (p *SveltePlugin) getTypeScriptTemplates() map[string]string {
 	return map[string]string{
 		"src/main.ts":            svelte.ViteTsMainFile,
 		"src/App.svelte":         svelte.ViteTsAppFile,
-		"src/lib/Counter.svelte": svelte.ViteTsCounterComponent,
+		"src/lib/Counter.svelte":  svelte.ViteTsCounterComponent,
 		"src/app.css":            svelte.ViteTsAppCss,
 		"src/app.d.ts":           svelte.ViteTsAppDTs,
+		"src/assets/svelte.svg":  svelte.SvelteSvg,
+		"public/vite.svg":        svelte.ViteSvg,
 	}
 }
 
@@ -200,6 +204,11 @@ func (p *SveltePlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) er
 	for relativePath, content := range configs {
 		fullPath := filepath.Join(ctx.ProjectPath, relativePath)
 
+		// Signal that Vite config already exists to avoid duplication by the Vite builder
+		if relativePath == "vite.config.js" || relativePath == "vite.config.ts" {
+			ctx.SetMetadata("vite_config_generated", true)
+		}
+
 		// Process template content with TILOKit delimiters
 		processedContent, err := templateEngine.ProcessTemplateWithDelims(content, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 		if err != nil {
@@ -216,7 +225,7 @@ func (p *SveltePlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) er
 
 func (p *SveltePlugin) getJavaScriptConfigs() map[string]string {
 	return map[string]string{
-		"index.html":    svelte.ViteJsIndexHtml,
+		"index.html":     svelte.ViteJsIndexHtml,
 		"vite.config.js": svelte.ViteJsViteConfig,
 	}
 }

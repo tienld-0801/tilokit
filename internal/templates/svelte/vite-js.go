@@ -13,8 +13,8 @@ const (
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.1.3",
-    "svelte": "^5.38.2",
-    "vite": "^5.0.3"
+    "svelte": "<<TILO:.svelte_version>>",
+    "vite": "<<TILO:.vite_version>>"
   },
   "type": "module"
 }`
@@ -192,5 +192,21 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [svelte()],
+	server: {
+		port: 3000,
+		open: true,
+		host: true
+	},
+	build: {
+		outDir: 'dist',
+		sourcemap: true,
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					vendor: ['svelte']
+				}
+			}
+		}
+	}
 })`
 )
