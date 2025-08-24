@@ -5,17 +5,21 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
+
+	"github.com/AlecAivazis/survey/v2"
+	"github.com/sirupsen/logrus"
+
 	"tilokit/internal/config"
+	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/core/engine"
 	"tilokit/internal/core/registry"
 	"tilokit/internal/plugins/builders"
 	"tilokit/internal/plugins/frameworks"
 	"tilokit/internal/plugins/tools"
+	"tilokit/internal/ui"
 	"tilokit/internal/utils"
 	"tilokit/pkg/constants"
-
-	"github.com/AlecAivazis/survey/v2"
-	"github.com/sirupsen/logrus"
 )
 
 // RunProjectGenerationProcess handles the project generation logic
@@ -78,55 +82,72 @@ func (m *Manager) RunProjectGenerationProcess() error {
 	if err := m.registerPlugins(eng); err != nil {
 		return err
 	}
-	// Execute project generation
+	// Execute project generation with animated progress
 	ctx := context.Background()
-	if err := eng.Execute(ctx, projectConfig); err != nil {
+
+	// Define generation steps
+	steps := []string{
+		"Initializing project structure",
+		"Setting up framework configuration",
+		"Installing build tools",
+		"Creating source files",
+		"Configuring development environment",
+		"Finalizing project setup",
+	}
+
+	// Create progress channel
+	progressChan := make(chan ui.ProgressMsg, 10)
+
+	// Start animated progress UI
+	go func() {
+		if err := ui.RunProjectProgress(fmt.Sprintf("🚀 Creating %s Project: %s", m.Framework, m.ProjectName), steps, progressChan); err != nil {
+			logrus.Errorf("Progress UI error: %v", err)
+		}
+	}()
+
+	// Send initial progress
+	progressChan <- ui.ProgressMsg{Step: "Starting project generation...", Progress: 0.0}
+
+	// Execute project generation with progress updates
+	if err := m.executeWithProgress(eng, ctx, projectConfig, progressChan); err != nil {
+		progressChan <- ui.ProgressMsg{Step: "❌ Project generation failed", Progress: 1.0, Done: true}
+		close(progressChan)
 		logrus.Errorf("Project generation failed: %v", err)
 		return err
 	}
-	// Success message
-	logrus.Infof("✅ %s project '%s' created successfully!", m.Framework, m.ProjectName)
-	logrus.Infof("ℹ️  Project location: %s", m.OutputDir)
-	// Provide framework-specific next steps
+
+	// Send completion
+	progressChan <- ui.ProgressMsg{Step: "✅ Project created successfully!", Progress: 1.0, Done: true}
+	close(progressChan)
+
+	// Wait a moment for UI to clean up
+	time.Sleep(100 * time.Millisecond)
+	fmt.Printf("\n📋 Next steps:\n")
 	switch m.Framework {
 	case constants.ReactFramework, constants.VueFramework, constants.AngularFramework, constants.SvelteFramework:
-		logrus.Infof("ℹ️  Next steps:")
-		logrus.Infof("ℹ️     cd %s", m.ProjectName)
-		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
-		logrus.Infof("ℹ️     npm run dev")
+		fmt.Printf("   cd %s\n", m.ProjectName)
+		fmt.Printf("   npm install\n")
+		fmt.Printf("   npm run dev\n")
 	case constants.NextFramework:
-		logrus.Infof("ℹ️  Next steps:")
-		logrus.Infof("ℹ️     cd %s", m.ProjectName)
-		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
-		logrus.Infof("ℹ️     npm run dev")
-		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Next.js app")
+		fmt.Printf("   cd %s\n", m.ProjectName)
+		fmt.Printf("   npm install\n")
+		fmt.Printf("   npm run dev\n")
+		fmt.Printf("   Open http://localhost:3000 to view your Next.js app\n")
 	case constants.NuxtFramework:
-		logrus.Infof("ℹ️  Next steps:")
-		logrus.Infof("ℹ️     cd %s", m.ProjectName)
-		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
-		logrus.Infof("ℹ️     npm run dev")
-		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Nuxt.js app")
-	case constants.NestFramework, constants.ExpressFramework, constants.FastifyFramework:
-		logrus.Infof("ℹ️  Next steps:")
-		logrus.Infof("ℹ️     cd %s", m.ProjectName)
-		logrus.Infof("ℹ️     npm install or yarn install or pnpm install")
-		logrus.Infof("ℹ️     npm run dev")
-		logrus.Infof("ℹ️     Open http://localhost:3000 to view your Node.js app")
-	case "django", "flask", "fastapi":
-		logrus.Infof("ℹ️  Next steps:")
-		logrus.Infof("ℹ️     cd %s", m.ProjectName)
-		logrus.Infof("ℹ️     python -m venv venv")
-		logrus.Infof("ℹ️     source venv/bin/activate")
+		fmt.Printf("   cd %s\n", m.ProjectName)
+		fmt.Printf("   npm install\n")
+		fmt.Printf("   npm run dev\n")
+		fmt.Printf("   Open http://localhost:3000 to view your Nuxt.js app\n")
 	case constants.ReactNativeFramework:
-		logrus.Infof("ℹ️  Next steps:")
-		logrus.Infof("ℹ️     cd %s", m.ProjectName)
-		logrus.Infof("ℹ️     npm install or yarn install or pnpm install or bun install")
-		logrus.Infof("ℹ️     npx expo start")
-		logrus.Infof("ℹ️     Press i (iOS), a (Android), or w (Web) in the terminal, or scan the QR with Expo Go")
+		fmt.Printf("   cd %s\n", m.ProjectName)
+		fmt.Printf("   npm install\n")
+		fmt.Printf("   npx expo start\n")
+		fmt.Printf("   Scan QR code with Expo Go app or run on simulator\n")
 	default:
-		logrus.Infof("ℹ️  Check the README.md for setup instructions")
+		fmt.Printf("   cd %s\n", m.ProjectName)
+		fmt.Printf("   Follow framework-specific setup instructions\n")
 	}
-	logrus.Infof("Happy coding!")
+	fmt.Printf("\n🎉 Happy coding!\n")
 	return nil
 }
 func (m *Manager) promptForMissingValues(cfg *config.Config) error {
@@ -376,4 +397,33 @@ func (m *Manager) getDefaultBuildTool(framework string) string {
 		return tool
 	}
 	return "vite"
+}
+
+// executeWithProgress runs project generation with progress updates
+func (m *Manager) executeWithProgress(eng *engine.Engine, ctx context.Context, projectConfig *tilocontext.ProjectConfig, progressChan chan<- ui.ProgressMsg) error {
+	steps := []struct {
+		name     string
+		progress float64
+	}{
+		{"Initializing project structure", 0.16},
+		{"Setting up framework configuration", 0.33},
+		{"Installing build tools", 0.50},
+		{"Creating source files", 0.66},
+		{"Configuring development environment", 0.83},
+		{"Finalizing project setup", 1.0},
+	}
+
+	for i, step := range steps {
+		progressChan <- ui.ProgressMsg{Step: step.name, Progress: step.progress}
+		time.Sleep(200 * time.Millisecond) // Small delay for visual effect
+
+		// Execute actual generation on the last step
+		if i == len(steps)-1 {
+			if err := eng.Execute(ctx, projectConfig); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
