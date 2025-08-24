@@ -5,9 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
 	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/utils"
+
+	"github.com/pkg/errors"
 )
 
 // VitePlugin implements Vite build tool integration
@@ -56,6 +57,13 @@ func (p *VitePlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
 }
 
 func (p *VitePlugin) Generate(ctx *tilocontext.ExecutionContext) error {
+	// Check if Vite config already exists to avoid duplication by framework plugins
+	if viteConfigMeta, exists := ctx.GetMetadata("vite_config_generated"); exists {
+		if viteConfigGenerated, ok := viteConfigMeta.(bool); ok && viteConfigGenerated {
+			return nil
+		}
+	}
+
 	// Generate vite.config.js based on framework
 	viteConfig, err := p.generateViteConfig(ctx)
 	if err != nil {

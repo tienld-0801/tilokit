@@ -282,6 +282,7 @@ func (m *Manager) registerPlugins(eng *engine.Engine) error {
 		// JavaScript/TypeScript Frameworks
 		frameworks.NewReactPlugin(),
 		frameworks.NewVuePlugin(),
+		frameworks.NewSveltePlugin(),
 		frameworks.NewAngularPlugin(),
 		frameworks.NewNextjsPlugin(),
 		frameworks.NewNuxtjsPlugin(),
@@ -344,7 +345,7 @@ func (m *Manager) getBuildToolsForFramework(framework string) []string {
 	buildToolMap := map[string][]string{
 		"react":        {"vite", "webpack", "rollup"},
 		"vue":          {"vite", "webpack"},
-		"svelte":       {"vite", "rollup"},
+		"svelte":       {"vite"},
 		"angular":      {"angular-cli"},
 		"react-native": {"expo"},
 		"next":         {"next"},

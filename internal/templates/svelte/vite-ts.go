@@ -1,30 +1,36 @@
 package svelte
 
 const (
-	// JavaScript Templates
-	ViteJsPackageJson = `{
+	// TypeScript Templates
+	ViteTsPackageJson = `{
   "name": "<<TILO:.project_name>>",
   "private": true,
   "version": "0.0.0",
   "scripts": {
     "build": "vite build",
     "dev": "vite dev --open",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.1.3",
+    "@tsconfig/svelte": "^5.0.2",
     "svelte": "<<TILO:.svelte_version>>",
+    "svelte-check": "^3.6.0",
+    "tslib": "^2.4.1",
+    "typescript": "^5.0.0",
     "vite": "<<TILO:.vite_version>>"
   },
   "type": "module"
 }`
 
-	ViteJsAppFile = `<script>
+	ViteTsAppFile = `<script lang="ts">
 	import svelteLogo from './assets/svelte.svg'
 	import viteLogo from '/vite.svg'
 	import Counter from './lib/Counter.svelte'
 
-	let name = '<<TILO:.project_name>>';
+	let name: string = '<<TILO:.project_name>>';
 </script>
 
 <main>
@@ -69,7 +75,7 @@ const (
 	}
 </style>`
 
-	ViteJsIndexHtml = `<!DOCTYPE html>
+	ViteTsIndexHtml = `<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -79,22 +85,22 @@ const (
 	</head>
 	<body>
 		<div id="app"></div>
-		<script type="module" src="/src/main.js"></script>
+		<script type="module" src="/src/main.ts"></script>
 	</body>
 </html>`
 
-	ViteJsMainFile = `import './app.css'
+	ViteTsMainFile = `import './app.css'
 import App from './App.svelte'
 
 const app = new App({
-	target: document.getElementById('app'),
+	target: document.getElementById('app')!,
 })
 
 export default app`
 
-	ViteJsCounterComponent = `<script>
-	let count = 0
-	const increment = () => {
+	ViteTsCounterComponent = `<script lang="ts">
+	let count: number = 0
+	const increment = (): void => {
 		count += 1
 	}
 </script>
@@ -125,7 +131,7 @@ export default app`
 	}
 </style>`
 
-	ViteJsAppCss = `:root {
+	ViteTsAppCss = `:root {
 	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 	line-height: 1.5;
 	font-weight: 400;
@@ -186,7 +192,7 @@ body {
 	}
 }`
 
-	ViteJsViteConfig = `import { defineConfig } from 'vite'
+	ViteTsViteConfig = `import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 
 // https://vitejs.dev/config/
@@ -209,4 +215,39 @@ export default defineConfig({
 		}
 	}
 })`
+
+	ViteTsTsConfig = `{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ES6"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}`
+
+	ViteTsTsConfigNode = `{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["vite.config.ts"]
+}`
+
+	ViteTsAppDTs = `/// <reference types="svelte" />
+/// <reference types="vite/client" />`
 )
