@@ -133,10 +133,10 @@ func (m ProgressModel) View() string {
 // that is closed when the TUI program exits. Callers can wait on it instead of sleeping.
 func RunProjectProgress(title string, steps []string, progressChan <-chan ProgressMsg) (<-chan struct{}, error) {
 	model := NewProgressModel(title, steps)
-	
+
 	p := tea.NewProgram(model)
 	done := make(chan struct{})
-	
+
 	go func() {
 		defer close(done)
 		if _, err := p.Run(); err != nil {
