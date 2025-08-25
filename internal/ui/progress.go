@@ -59,21 +59,39 @@ func (m ProgressModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case tea.WindowSizeMsg:
-		m.progress.Width = msg.Width - padding*2 - 4
-		if m.progress.Width > maxWidth {
-			m.progress.Width = maxWidth
+		w := msg.Width - padding*2 - 4
+		if w < 10 {
+			w = 10
 		}
+		if w > maxWidth {
+			w = maxWidth
+		}
+		m.progress.Width = w
 		return m, nil
 
 	case ProgressMsg:
 		m.status = msg.Step
+		// Advance current step based on the incoming label
+		for i, s := range m.steps {
+			if s == msg.Step {
+				if i >= m.current {
+					m.current = i
+				}
+				break
+			}
+		}
 		if msg.Done {
 			m.done = true
+			m.current = len(m.steps) // mark all as completed in the view
 			m.progress.SetPercent(1.0)
 			return m, tea.Quit
 		}
-
-		cmd := m.progress.SetPercent(msg.Progress)
+		// Keep below 100% until Done to avoid "stuck" full bar
+		percent := msg.Progress
+		if percent > 0.99 {
+			percent = 0.99
+		}
+		cmd := m.progress.SetPercent(percent)
 		return m, cmd
 
 	case progress.FrameMsg:
@@ -111,14 +129,16 @@ func (m ProgressModel) View() string {
 		stepsList.String())
 }
 
-// ProjectProgressRunner runs the animated progress for project generation
-func RunProjectProgress(title string, steps []string, progressChan <-chan ProgressMsg) error {
+// RunProjectProgress starts the animated progress UI and returns a done channel
+// that is closed when the TUI program exits. Callers can wait on it instead of sleeping.
+func RunProjectProgress(title string, steps []string, progressChan <-chan ProgressMsg) (<-chan struct{}, error) {
 	model := NewProgressModel(title, steps)
-
+	
 	p := tea.NewProgram(model)
-
-	// Start the program in a goroutine
+	done := make(chan struct{})
+	
 	go func() {
+		defer close(done)
 		if _, err := p.Run(); err != nil {
 			fmt.Printf("Error running progress: %v\n", err)
 		}
@@ -135,5 +155,5 @@ func RunProjectProgress(title string, steps []string, progressChan <-chan Progre
 		}
 	}()
 
-	return nil
+	return done, nil
 }

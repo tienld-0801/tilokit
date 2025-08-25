@@ -99,11 +99,11 @@ func (m *Manager) RunProjectGenerationProcess() error {
 	progressChan := make(chan ui.ProgressMsg, 10)
 
 	// Start animated progress UI
-	go func() {
-		if err := ui.RunProjectProgress(fmt.Sprintf("🚀 Creating %s Project: %s", m.Framework, m.ProjectName), steps, progressChan); err != nil {
-			logrus.Errorf("Progress UI error: %v", err)
-		}
-	}()
+	doneCh, err := ui.RunProjectProgress(fmt.Sprintf("🚀 Creating %s Project: %s", m.Framework, m.ProjectName), steps, progressChan)
+	if err != nil {
+		logrus.Errorf("Progress UI error: %v", err)
+		return err
+	}
 
 	// Send initial progress
 	progressChan <- ui.ProgressMsg{Step: "Starting project generation...", Progress: 0.0}
@@ -112,6 +112,7 @@ func (m *Manager) RunProjectGenerationProcess() error {
 	if err := m.executeWithProgress(eng, ctx, projectConfig, progressChan); err != nil {
 		progressChan <- ui.ProgressMsg{Step: "❌ Project generation failed", Progress: 1.0, Done: true}
 		close(progressChan)
+		<-doneCh
 		logrus.Errorf("Project generation failed: %v", err)
 		return err
 	}
@@ -120,8 +121,8 @@ func (m *Manager) RunProjectGenerationProcess() error {
 	progressChan <- ui.ProgressMsg{Step: "✅ Project created successfully!", Progress: 1.0, Done: true}
 	close(progressChan)
 
-	// Wait a moment for UI to clean up
-	time.Sleep(100 * time.Millisecond)
+	// Wait for UI to clean up
+	<-doneCh
 	fmt.Printf("\n📋 Next steps:\n")
 	switch m.Framework {
 	case constants.ReactFramework, constants.VueFramework, constants.AngularFramework, constants.SvelteFramework:
@@ -410,12 +411,12 @@ func (m *Manager) executeWithProgress(eng *engine.Engine, ctx context.Context, p
 		{"Installing build tools", 0.50},
 		{"Creating source files", 0.66},
 		{"Configuring development environment", 0.83},
-		{"Finalizing project setup", 1.0},
+		{"Finalizing project setup", 0.99},
 	}
 
 	for i, step := range steps {
 		progressChan <- ui.ProgressMsg{Step: step.name, Progress: step.progress}
-		time.Sleep(200 * time.Millisecond) // Small delay for visual effect
+		time.Sleep(350 * time.Millisecond)
 
 		// Execute actual generation on the last step
 		if i == len(steps)-1 {
