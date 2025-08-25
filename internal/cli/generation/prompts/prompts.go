@@ -180,7 +180,7 @@ func (p *PromptHandler) PromptForReactNativeTemplate(currentTemplate, framework 
 		Message: "📱 Choose React Native template:",
 		Options: expoTemplates,
 		Default: "expo",
-		Help:    "Expo: Managed workflow with Expo SDK. Expo Router: File-based routing. Bare: Minimal React Native. TypeScript: TypeScript template.",
+		Help:    "Expo: Managed workflow with Expo SDK. More templates coming soon.",
 	}
 	if err := survey.AskOne(prompt, &template); err != nil {
 		return "", err

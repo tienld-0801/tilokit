@@ -107,6 +107,18 @@ func (r *PluginRegistry) GetBuildToolsForFramework(framework string) []string {
 		"react-native": {"expo"},
 		"next":         {"next"},
 		"nuxt":         {"nuxt"},
+		// Backend frameworks
+		"django":       {"pip", "poetry", "pipenv"},
+		"flask":        {"pip", "poetry", "pipenv"},
+		"fastapi":      {"pip", "poetry", "pipenv"},
+		"rails":        {"bundler"},
+		"laravel":      {"composer"},
+		"symfony":      {"composer"},
+		"spring-boot":  {"maven", "gradle"},
+		"quarkus":      {"maven", "gradle"},
+		"gin":          {"go-modules"},
+		"echo":         {"go-modules"},
+		"fiber":        {"go-modules"},
 	}
 	if tools, exists := buildToolMap[framework]; exists {
 		return tools

@@ -65,6 +65,15 @@ func (o *Orchestrator) GenerateProject(projectConfig ProjectConfig) error {
 		return err
 	}
 
+	// Validate language and build tool compatibility
+	if err := o.validator.ValidateLanguage(projectConfig.Language, projectConfig.Framework); err != nil {
+		return err
+	}
+
+	if err := o.validator.ValidateBuildTool(projectConfig.BuildTool, projectConfig.Framework); err != nil {
+		return err
+	}
+
 	// Create project configuration
 	tilokitProjectConfig := config.CreateProjectConfig(projectConfig.ProjectName, projectConfig.Framework, projectConfig.BuildTool, projectConfig.OutputDir)
 
