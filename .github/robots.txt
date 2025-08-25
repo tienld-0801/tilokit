@@ -4,7 +4,7 @@
 User-agent: *
 Allow: /
 
-# Allow all search engines to crawl the site
+# Allow static assets and important files
 Allow: /install.sh
 Allow: /tilokit-*
 Allow: /*.html
@@ -16,20 +16,25 @@ Allow: /*.jpg
 Allow: /*.jpeg
 Allow: /*.gif
 Allow: /*.ico
+Allow: /*.woff
+Allow: /*.woff2
+Allow: /*.ttf
+Allow: /*.eot
 
-# Disallow sensitive files
+# Disallow sensitive files and directories
 Disallow: /*.sha256
 Disallow: /*.log
-Disallow: /.*
-Disallow: /_*
+Disallow: /.git
+Disallow: /.github/workflows/
+Disallow: /.github/scripts/
+Disallow: /node_modules/
+Disallow: /tmp/
+Disallow: /cache/
 
-# Sitemap location
+# Sitemap location (absolute URL as required by Lighthouse)
 Sitemap: https://tienld-0801.github.io/tilokit/sitemap.xml
 
-# Crawl delay (optional - be respectful to search engines)
-Crawl-delay: 1
-
-# Specific rules for major search engines
+# Optimized crawl settings for major search engines
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 0
@@ -42,7 +47,7 @@ User-agent: Slurp
 Allow: /
 Crawl-delay: 1
 
-# Block common bad bots
+# Block resource-intensive bots to improve performance
 User-agent: AhrefsBot
 Disallow: /
 
@@ -50,4 +55,7 @@ User-agent: MJ12bot
 Disallow: /
 
 User-agent: DotBot
+Disallow: /
+
+User-agent: SemrushBot
 Disallow: /
