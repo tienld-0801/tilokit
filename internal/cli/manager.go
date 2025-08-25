@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 
+	"tilokit/internal/cli/generation"
 	"tilokit/internal/utils"
 	"tilokit/pkg/constants"
 
@@ -182,5 +183,17 @@ func (m *Manager) ListSupportedBuildTools() error {
 }
 
 func (m *Manager) RunProjectGeneration() error {
-	return m.RunProjectGenerationProcess()
+	orchestrator := generation.NewOrchestrator()
+	config := generation.ProjectConfig{
+		ProjectName:   m.ProjectName,
+		Framework:     m.Framework,
+		BuildTool:     m.BuildTool,
+		Language:      m.Language,
+		RouterType:    m.RouterType,
+		RenderingMode: m.RenderingMode,
+		Architecture:  m.Architecture,
+		OutputDir:     m.OutputDir,
+		Force:         m.Force,
+	}
+	return orchestrator.GenerateProject(config)
 }
