@@ -95,3 +95,11 @@ const (
 	ARM64   = "arm64"
 	AMD64   = "amd64"
 )
+
+// Python Build Tools
+const (
+	BuildToolPip    = "pip"
+	BuildToolPoetry = "poetry"
+	BuildToolPipenv = "pipenv"
+	BuildToolConda  = "conda"
+)

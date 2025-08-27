@@ -31,9 +31,9 @@ func (r *PluginRegistry) RegisterAllPlugins(eng *engine.Engine) error {
 
 		// Backend Frameworks
 		// Python
-		frameworks.NewPythonDjangoPlugin(),
-		frameworks.NewPythonFlaskPlugin(),
-		frameworks.NewPythonFastAPIPlugin(),
+		frameworks.NewDjangoPlugin(),
+		frameworks.NewFlaskPlugin(),
+		frameworks.NewFastAPIPlugin(),
 
 		// PHP
 		frameworks.NewPHPLaravelPlugin(),
