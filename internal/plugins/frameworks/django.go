@@ -134,7 +134,7 @@ func (p *DjangoPlugin) generateDjangoProject(ctx *tilocontext.ExecutionContext, 
 	if err := utils.WriteFile(managePath, processedManage); err != nil {
 		return err
 	}
-	
+
 	// Set executable permissions for manage.py
 	if err := os.Chmod(managePath, 0o755); err != nil { //nolint:gosec // manage.py needs to be executable
 		return errors.Wrap(err, "chmod +x manage.py")
