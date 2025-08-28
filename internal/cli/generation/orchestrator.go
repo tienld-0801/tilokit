@@ -167,6 +167,9 @@ func (o *Orchestrator) setupProjectVariables(tilokitProjectConfig *tilocontext.P
 	}
 	tilokitProjectConfig.Variables["language"] = language
 
+	// Build tool
+	tilokitProjectConfig.Variables["BuildTool"] = projectConfig.BuildTool
+
 	// Framework-specific variables
 	switch projectConfig.Framework {
 	case "next":
