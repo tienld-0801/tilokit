@@ -2,6 +2,8 @@ package frameworks
 
 import (
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/plugins/templates"
@@ -55,6 +57,19 @@ func (p *FlaskPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
 
 	if _, ok := ctx.Variables["BuildTool"]; !ok {
 		ctx.SetVariable("BuildTool", "pip")
+	}
+
+	// Ensure valid Python package name for templates/imports
+	if _, ok := ctx.Variables["project_name"]; !ok {
+		name := ctx.Config.ProjectName
+		safe := strings.ToLower(name)
+		safe = strings.ReplaceAll(safe, "-", "_")
+		re := regexp.MustCompile(`[^a-z0-9_]+`)
+		safe = re.ReplaceAllString(safe, "_")
+		if len(safe) == 0 || safe[0] < 'a' || safe[0] > 'z' {
+			safe = "app_" + safe
+		}
+		ctx.SetVariable("project_name", safe)
 	}
 
 	return nil

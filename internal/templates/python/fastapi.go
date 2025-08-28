@@ -237,6 +237,7 @@ python = "^<<TILO:.python_version>>"
 fastapi = "^<<TILO:.fastapi_version>>"
 uvicorn = {extras = ["standard"], version = "^0.24.0"}
 pydantic = {extras = ["email"], version = "^2.5.0"}
+pydantic-settings = "^2.2.1"
 sqlalchemy = "^2.0.23"
 alembic = "^1.13.0"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
@@ -261,6 +262,7 @@ build-backend = "poetry.core.masonry.api"
 	FastAPIRequirementsTxt = `fastapi==<<TILO:.fastapi_version>>
 uvicorn[standard]==0.24.0
 pydantic[email]==2.5.0
+pydantic-settings==2.2.1
 sqlalchemy==2.0.23
 alembic==1.13.0
 python-jose[cryptography]==3.3.0
@@ -279,6 +281,7 @@ name = "pypi"
 fastapi = "<<TILO:.fastapi_version>>"
 uvicorn = {extras = ["standard"], version = "0.24.0"}
 pydantic = {extras = ["email"], version = "2.5.0"}
+pydantic-settings = "==2.2.1"
 sqlalchemy = "==2.0.23"
 alembic = "==1.13.0"
 python-jose = {extras = ["cryptography"], version = "3.3.0"}
@@ -306,6 +309,7 @@ dependencies:
     - fastapi==<<TILO:.fastapi_version>>
     - uvicorn[standard]==0.24.0
     - pydantic[email]==2.5.0
+    - pydantic-settings==2.2.1
     - sqlalchemy==2.0.23
     - alembic==1.13.0
     - python-jose[cryptography]==3.3.0

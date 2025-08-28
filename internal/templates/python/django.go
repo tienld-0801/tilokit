@@ -305,4 +305,22 @@ python manage.py runserver
 
 Visit http://localhost:8000 to see your application.
 `
+
+	// Django ASGI Template
+	DjangoAsgiPy = `import os
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', '<<TILO:.project_name>>.settings.development')
+
+application = get_asgi_application()
+`
+
+	// Django WSGI Template
+	DjangoWsgiPy = `import os
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', '<<TILO:.project_name>>.settings.development')
+
+application = get_wsgi_application()
+`
 )

@@ -1,7 +1,10 @@
 package frameworks
 
 import (
+	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/plugins/templates"
@@ -50,6 +53,19 @@ func (p *DjangoPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
 
 	if _, ok := ctx.Variables["BuildTool"]; !ok {
 		ctx.SetVariable("BuildTool", constants.BuildToolPip)
+	}
+
+	// Ensure valid Python package name for templates/imports
+	if _, ok := ctx.Variables["project_name"]; !ok {
+		name := ctx.Config.ProjectName
+		safe := strings.ToLower(name)
+		safe = strings.ReplaceAll(safe, "-", "_")
+		re := regexp.MustCompile(`[^a-z0-9_]+`)
+		safe = re.ReplaceAllString(safe, "_")
+		if len(safe) == 0 || safe[0] < 'a' || safe[0] > 'z' {
+			safe = "app_" + safe
+		}
+		ctx.SetVariable("project_name", safe)
 	}
 
 	return nil
@@ -114,8 +130,14 @@ func (p *DjangoPlugin) generateDjangoProject(ctx *tilocontext.ExecutionContext, 
 		return err
 	}
 
-	if err := utils.WriteFile(filepath.Join(projectPath, "manage.py"), processedManage); err != nil {
+	managePath := filepath.Join(projectPath, "manage.py")
+	if err := utils.WriteFile(managePath, processedManage); err != nil {
 		return err
+	}
+	
+	// Set executable permissions for manage.py
+	if err := os.Chmod(managePath, 0o755); err != nil { //nolint:gosec // manage.py needs to be executable
+		return errors.Wrap(err, "chmod +x manage.py")
 	}
 
 	// Main URLs
@@ -124,7 +146,27 @@ func (p *DjangoPlugin) generateDjangoProject(ctx *tilocontext.ExecutionContext, 
 		return err
 	}
 
-	return utils.WriteFile(filepath.Join(projectPath, projectName, "urls.py"), processedUrls)
+	if err := utils.WriteFile(filepath.Join(projectPath, projectName, "urls.py"), processedUrls); err != nil {
+		return err
+	}
+
+	// ASGI application
+	processedAsgi, err := engine.ProcessTemplateWithDelims(pythonTemplates.DjangoAsgiPy, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return err
+	}
+
+	if err := utils.WriteFile(filepath.Join(projectPath, projectName, "asgi.py"), processedAsgi); err != nil {
+		return err
+	}
+
+	// WSGI application
+	processedWsgi, err := engine.ProcessTemplateWithDelims(pythonTemplates.DjangoWsgiPy, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return err
+	}
+
+	return utils.WriteFile(filepath.Join(projectPath, projectName, "wsgi.py"), processedWsgi)
 }
 
 func (p *DjangoPlugin) generateSettings(ctx *tilocontext.ExecutionContext, projectPath, projectName string) error {
