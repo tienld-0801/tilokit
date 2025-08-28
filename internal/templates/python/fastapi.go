@@ -47,10 +47,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(case_sensitive=True)
-    
+
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
-    
+
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
@@ -63,7 +63,7 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     PROJECT_NAME: str = "<<TILO:.project_name>>"
-    
+
     SQLALCHEMY_DATABASE_URI: Optional[str] = "sqlite:///./sql_app.db"
 
 settings = Settings()
