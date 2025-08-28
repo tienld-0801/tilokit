@@ -36,7 +36,7 @@ func (p *DjangoPlugin) SupportedFrameworks() []string {
 }
 
 func (p *DjangoPlugin) SupportedBuildTools() []string {
-	return []string{"pip", "poetry", "pipenv"}
+	return []string{constants.BuildToolPip, constants.BuildToolPoetry, constants.BuildToolPipenv, constants.BuildToolConda}
 }
 
 func (p *DjangoPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
@@ -109,7 +109,7 @@ func (p *DjangoPlugin) generateDjangoProject(ctx *tilocontext.ExecutionContext, 
 	engine := templates.NewTemplateEngine()
 
 	// Main manage.py
-	processedManage, err := engine.ProcessTemplate(pythonTemplates.DjangoManagePy, ctx)
+	processedManage, err := engine.ProcessTemplateWithDelims(pythonTemplates.DjangoManagePy, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func (p *DjangoPlugin) generateDjangoProject(ctx *tilocontext.ExecutionContext, 
 	}
 
 	// Main URLs
-	processedUrls, err := engine.ProcessTemplate(pythonTemplates.DjangoUrlsPy, ctx)
+	processedUrls, err := engine.ProcessTemplateWithDelims(pythonTemplates.DjangoUrlsPy, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}
@@ -167,7 +167,7 @@ func (p *DjangoPlugin) generateApps(ctx *tilocontext.ExecutionContext, projectPa
 	engine := templates.NewTemplateEngine()
 
 	// Core app config
-	processedApps, err := engine.ProcessTemplate(pythonTemplates.DjangoCoreAppsPy, ctx)
+	processedApps, err := engine.ProcessTemplateWithDelims(pythonTemplates.DjangoCoreAppsPy, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func (p *DjangoPlugin) generateApps(ctx *tilocontext.ExecutionContext, projectPa
 	}
 
 	// Core models
-	processedModels, err := engine.ProcessTemplate(pythonTemplates.DjangoCoreModelsPy, ctx)
+	processedModels, err := engine.ProcessTemplateWithDelims(pythonTemplates.DjangoCoreModelsPy, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}
@@ -187,7 +187,7 @@ func (p *DjangoPlugin) generateApps(ctx *tilocontext.ExecutionContext, projectPa
 	}
 
 	// Core views
-	processedViews, err := engine.ProcessTemplate(pythonTemplates.DjangoCoreViewsPy, ctx)
+	processedViews, err := engine.ProcessTemplateWithDelims(pythonTemplates.DjangoCoreViewsPy, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}
@@ -197,7 +197,7 @@ func (p *DjangoPlugin) generateApps(ctx *tilocontext.ExecutionContext, projectPa
 	}
 
 	// Core URLs
-	processedUrls, err := engine.ProcessTemplate(pythonTemplates.DjangoCoreUrlsPy, ctx)
+	processedUrls, err := engine.ProcessTemplateWithDelims(pythonTemplates.DjangoCoreUrlsPy, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}
@@ -260,7 +260,7 @@ func (p *DjangoPlugin) generateMiscFiles(ctx *tilocontext.ExecutionContext, proj
 	engine := templates.NewTemplateEngine()
 
 	// Home template
-	processedHome, err := engine.ProcessTemplate(pythonTemplates.DjangoHomeHtml, ctx)
+	processedHome, err := engine.ProcessTemplateWithDelims(pythonTemplates.DjangoHomeHtml, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}
@@ -270,7 +270,7 @@ func (p *DjangoPlugin) generateMiscFiles(ctx *tilocontext.ExecutionContext, proj
 	}
 
 	// README.md
-	processedReadme, err := engine.ProcessTemplate(pythonTemplates.DjangoReadmeMd, ctx)
+	processedReadme, err := engine.ProcessTemplateWithDelims(pythonTemplates.DjangoReadmeMd, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}

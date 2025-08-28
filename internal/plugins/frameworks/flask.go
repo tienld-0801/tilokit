@@ -36,7 +36,12 @@ func (p *FlaskPlugin) SupportedFrameworks() []string {
 }
 
 func (p *FlaskPlugin) SupportedBuildTools() []string {
-	return []string{"pip", "poetry", "pipenv"}
+	return []string{
+		constants.BuildToolPip,
+		constants.BuildToolPoetry,
+		constants.BuildToolPipenv,
+		constants.BuildToolConda,
+	}
 }
 
 func (p *FlaskPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
@@ -108,7 +113,7 @@ func (p *FlaskPlugin) PostGenerate(ctx *tilocontext.ExecutionContext) error {
 func (p *FlaskPlugin) generateFlaskApp(ctx *tilocontext.ExecutionContext, projectPath, projectName string) error {
 	engine := templates.NewTemplateEngine()
 
-	processedApp, err := engine.ProcessTemplate(pythonTemplates.FlaskAppPy, ctx)
+	processedApp, err := engine.ProcessTemplateWithDelims(pythonTemplates.FlaskAppPy, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}
@@ -119,7 +124,7 @@ func (p *FlaskPlugin) generateFlaskApp(ctx *tilocontext.ExecutionContext, projec
 func (p *FlaskPlugin) generateConfig(ctx *tilocontext.ExecutionContext, projectPath string) error {
 	engine := templates.NewTemplateEngine()
 
-	processedConfig, err := engine.ProcessTemplate(pythonTemplates.FlaskConfigPy, ctx)
+	processedConfig, err := engine.ProcessTemplateWithDelims(pythonTemplates.FlaskConfigPy, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}
@@ -169,7 +174,7 @@ func (p *FlaskPlugin) generateTemplates(ctx *tilocontext.ExecutionContext, proje
 	engine := templates.NewTemplateEngine()
 
 	// Base template
-	processedBase, err := engine.ProcessTemplate(pythonTemplates.FlaskBaseHtml, ctx)
+	processedBase, err := engine.ProcessTemplateWithDelims(pythonTemplates.FlaskBaseHtml, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}
@@ -178,7 +183,7 @@ func (p *FlaskPlugin) generateTemplates(ctx *tilocontext.ExecutionContext, proje
 	}
 
 	// Index template
-	processedIndex, err := engine.ProcessTemplate(pythonTemplates.FlaskIndexHtml, ctx)
+	processedIndex, err := engine.ProcessTemplateWithDelims(pythonTemplates.FlaskIndexHtml, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}
@@ -188,7 +193,7 @@ func (p *FlaskPlugin) generateTemplates(ctx *tilocontext.ExecutionContext, proje
 func (p *FlaskPlugin) generateMiscFiles(ctx *tilocontext.ExecutionContext, projectPath, projectName string) error {
 	engine := templates.NewTemplateEngine()
 
-	processedReadme, err := engine.ProcessTemplate(pythonTemplates.FlaskReadmeMd, ctx)
+	processedReadme, err := engine.ProcessTemplateWithDelims(pythonTemplates.FlaskReadmeMd, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
 		return err
 	}

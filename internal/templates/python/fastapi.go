@@ -42,16 +42,19 @@ if __name__ == "__main__":
 	// FastAPI Config Template
 	FastAPIConfigPy = `import secrets
 from typing import Any, Dict, List, Optional, Union
-from pydantic import AnyHttpUrl, BaseSettings, validator
+from pydantic import AnyHttpUrl, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(case_sensitive=True)
+    
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
-
+    
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
-    @validator("BACKEND_CORS_ORIGINS", pre=True)
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
@@ -60,11 +63,8 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     PROJECT_NAME: str = "<<TILO:.project_name>>"
-
+    
     SQLALCHEMY_DATABASE_URI: Optional[str] = "sqlite:///./sql_app.db"
-
-    class Config:
-        case_sensitive = True
 
 settings = Settings()
 `
@@ -122,7 +122,7 @@ class User(Base):
 
 	// FastAPI Item Schema Template
 	FastAPIItemSchemaPy = `from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class ItemBase(BaseModel):
     title: Optional[str] = None
@@ -135,10 +135,8 @@ class ItemUpdate(ItemBase):
     pass
 
 class ItemInDBBase(ItemBase):
+    model_config = ConfigDict(from_attributes=True)
     id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
 
 class Item(ItemInDBBase):
     pass
@@ -146,7 +144,7 @@ class Item(ItemInDBBase):
 
 	// FastAPI User Schema Template
 	FastAPIUserSchemaPy = `from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 class UserBase(BaseModel):
     email: Optional[EmailStr] = None
@@ -160,10 +158,8 @@ class UserUpdate(UserBase):
     password: Optional[str] = None
 
 class UserInDBBase(UserBase):
+    model_config = ConfigDict(from_attributes=True)
     id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
 
 class User(UserInDBBase):
     pass
@@ -203,7 +199,7 @@ def create_item(
     db: Session = Depends(deps.get_db),
     item_in: ItemCreate,
 ) -> Any:
-    item = Item(**item_in.dict())
+    item = Item(**item_in.model_dump())
     db.add(item)
     db.commit()
     db.refresh(item)
@@ -283,12 +279,12 @@ name = "pypi"
 fastapi = "<<TILO:.fastapi_version>>"
 uvicorn = {extras = ["standard"], version = "0.24.0"}
 pydantic = {extras = ["email"], version = "2.5.0"}
-sqlalchemy = "2.0.23"
-alembic = "1.13.0"
+sqlalchemy = "==2.0.23"
+alembic = "==1.13.0"
 python-jose = {extras = ["cryptography"], version = "3.3.0"}
 passlib = {extras = ["bcrypt"], version = "1.7.4"}
-python-multipart = "0.0.6"
-psycopg2-binary = "2.9.9"
+python-multipart = "==0.0.6"
+psycopg2-binary = "==2.9.9"
 
 [dev-packages]
 pytest = "7.4.0"
@@ -333,14 +329,21 @@ python -m venv venv
 source venv/bin/activate
 ` + "```" + `
 
-2. Install dependencies:
+## 2. Install dependencies (choose one):
 ` + "```bash" + `
+# pip
 pip install -r requirements.txt
+# poetry
+poetry install
+# pipenv
+pipenv install
+# conda
+conda env create -f environment.yml && conda activate <<TILO:.project_name>>
 ` + "```" + `
 
-3. Run the application:
+## 3. Run the application:
 ` + "```bash" + `
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 ` + "```" + `
 
 Visit http://localhost:8000 to see your application.

@@ -6,7 +6,7 @@ const (
 from config.config import Config
 
 def create_app(config_class=Config):
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
     app.config.from_object(config_class)
 
     @app.route('/')
