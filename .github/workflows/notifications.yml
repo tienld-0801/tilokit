@@ -1,0 +1,152 @@
+name: Notifications
+
+on:
+  pull_request:
+    types: [opened, closed, reopened, synchronize]
+  workflow_run:
+    workflows: ["CI", "CodeQL", "Validate Commits", "Release"]
+    types: [completed]
+
+jobs:
+  pr-notifications:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR Opened Notification
+        if: github.event.action == 'opened'
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-title: "🔄 New Pull Request"
+          embed-description: |
+            **[${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})**
+
+            **Author:** ${{ github.event.pull_request.user.login }}
+            **Branch:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
+            **Repository:** ${{ github.repository }}
+
+            ${{ github.event.pull_request.body }}
+          embed-color: 3447003
+          embed-author-name: ${{ github.event.pull_request.user.login }}
+          embed-author-icon-url: ${{ github.event.pull_request.user.avatar_url }}
+          embed-footer-text: "TiLoKit • Pull Request"
+
+      - name: PR Merged Notification
+        if: github.event.action == 'closed' && github.event.pull_request.merged == true
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-title: "✅ Pull Request Merged"
+          embed-description: |
+            **[${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})**
+
+            **Author:** ${{ github.event.pull_request.user.login }}
+            **Merged by:** ${{ github.actor }}
+            **Branch:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
+            **Repository:** ${{ github.repository }}
+            **Commits:** ${{ github.event.pull_request.commits }}
+            **Files changed:** ${{ github.event.pull_request.changed_files }}
+          embed-color: 65280
+          embed-author-name: ${{ github.event.pull_request.user.login }}
+          embed-author-icon-url: ${{ github.event.pull_request.user.avatar_url }}
+          embed-footer-text: "TiLoKit • Pull Request Merged"
+
+      - name: PR Closed (Not Merged) Notification
+        if: github.event.action == 'closed' && github.event.pull_request.merged == false
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-title: "❌ Pull Request Closed"
+          embed-description: |
+            **[${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})**
+
+            **Author:** ${{ github.event.pull_request.user.login }}
+            **Closed by:** ${{ github.actor }}
+            **Branch:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
+            **Repository:** ${{ github.repository }}
+          embed-color: 16711680
+          embed-author-name: ${{ github.event.pull_request.user.login }}
+          embed-author-icon-url: ${{ github.event.pull_request.user.avatar_url }}
+          embed-footer-text: "TiLoKit • Pull Request Closed"
+
+      - name: PR Reopened Notification
+        if: github.event.action == 'reopened'
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-title: "🔄 Pull Request Reopened"
+          embed-description: |
+            **[${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})**
+
+            **Author:** ${{ github.event.pull_request.user.login }}
+            **Reopened by:** ${{ github.actor }}
+            **Branch:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
+            **Repository:** ${{ github.repository }}
+          embed-color: 3447003
+          embed-author-name: ${{ github.event.pull_request.user.login }}
+          embed-author-icon-url: ${{ github.event.pull_request.user.avatar_url }}
+          embed-footer-text: "TiLoKit • Pull Request Reopened"
+
+      - name: PR Updated Notification
+        if: github.event.action == 'synchronize'
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-title: "🔄 Pull Request Updated"
+          embed-description: |
+            **[${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})**
+
+            **Author:** ${{ github.event.pull_request.user.login }}
+            **Branch:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
+            **Repository:** ${{ github.repository }}
+            **New commits pushed**
+          embed-color: 16776960
+          embed-author-name: ${{ github.event.pull_request.user.login }}
+          embed-author-icon-url: ${{ github.event.pull_request.user.avatar_url }}
+          embed-footer-text: "TiLoKit • Pull Request Updated"
+
+  workflow-failure-notifications:
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - name: CI/CD Failure Notification
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-title: "🚨 Workflow Failed"
+          embed-description: |
+            **Workflow:** [${{ github.event.workflow_run.name }}](${{ github.event.workflow_run.html_url }})
+            **Repository:** ${{ github.repository }}
+            **Branch:** `${{ github.event.workflow_run.head_branch }}`
+            **Triggered by:** ${{ github.event.workflow_run.triggering_actor.login }}
+            **Run ID:** ${{ github.event.workflow_run.id }}
+
+            **Status:** ${{ github.event.workflow_run.conclusion }}
+            **Started:** ${{ github.event.workflow_run.created_at }}
+            **Duration:** ${{ github.event.workflow_run.updated_at }}
+          embed-color: 16711680
+          embed-author-name: ${{ github.event.workflow_run.triggering_actor.login }}
+          embed-author-icon-url: ${{ github.event.workflow_run.triggering_actor.avatar_url }}
+          embed-footer-text: "TiLoKit • CI/CD Failure"
+
+  workflow-success-notifications:
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.name == 'Release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release Success Notification
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-title: "🎉 Release Successful"
+          embed-description: |
+            **Workflow:** [${{ github.event.workflow_run.name }}](${{ github.event.workflow_run.html_url }})
+            **Repository:** ${{ github.repository }}
+            **Branch:** `${{ github.event.workflow_run.head_branch }}`
+            **Triggered by:** ${{ github.event.workflow_run.triggering_actor.login }}
+
+            **Status:** ${{ github.event.workflow_run.conclusion }}
+            **New release is now available! 🚀**
+          embed-color: 65280
+          embed-author-name: ${{ github.event.workflow_run.triggering_actor.login }}
+          embed-author-icon-url: ${{ github.event.workflow_run.triggering_actor.avatar_url }}
+          embed-footer-text: "TiLoKit • Release"
