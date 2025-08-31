@@ -321,6 +321,7 @@ By contributing to TiLoKit, you agree that your contributions will be licensed u
 
 > **Note**: Community features will be expanded as the project grows.
 
+- 💬 **Join our Discord**: [Discord](https://discord.gg/BqTqZ46uT9) - Get help, share projects, and connect with other developers
 - Join discussions in GitHub Issues
 - Follow the project for development updates
 - Star the repository to show support
