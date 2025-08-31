@@ -56,5 +56,9 @@ func ShowUsageTable() error {
 	fmt.Printf("  %s\n", utils.ColorizeString("tilokit --version", "green"))
 	fmt.Printf("  %s\n\n", utils.ColorizeString("tilokit --update", "green"))
 
+	fmt.Printf("%s\n", utils.ColorizeString("COMMUNITY", "yellow"))
+	fmt.Printf("  💬 Join our Discord: %s\n", utils.ColorizeString("https://discord.gg/BqTqZ46uT9", "cyan"))
+	fmt.Printf("  🤝 Get help, share projects, and connect with developers\n\n")
+
 	return nil
 }

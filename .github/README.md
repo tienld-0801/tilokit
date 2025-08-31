@@ -314,6 +314,8 @@ TiLoKit is optimized for developers searching for:
 ### 🌟 **How to Contribute**
 We welcome contributions from the developer community!
 
+💬 **Join our Discord community**: [Discord](https://discord.gg/BqTqZ46uT9) to discuss ideas, get help, and collaborate with other contributors.
+
 ```bash
 # Fork and clone the repository
 git clone https://github.com/tienld-0801/tilokit.git
@@ -355,6 +357,7 @@ go test ./...
 - 🐛 **Issues**: Community-driven bug reports and feature requests
 
 ### 🌐 **Community Links**
+- 💬 **Discord Community**: [Discord](https://discord.gg/BqTqZ46uT9) - Get help, share projects, and connect with other developers
 - 📖 **Documentation**: [GitHub Wiki](https://github.com/tienld-0801/tilokit/wiki)
 - 🐛 **Bug Reports**: [GitHub Issues](https://github.com/tienld-0801/tilokit/issues)
 - 💡 **Feature Requests**: [GitHub Discussions](https://github.com/tienld-0801/tilokit/discussions)
