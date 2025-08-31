@@ -1,4 +1,4 @@
-name: Discord Notifications
+name: Notifications
 
 on:
   pull_request:
@@ -20,11 +20,11 @@ jobs:
           embed-title: "🔄 New Pull Request"
           embed-description: |
             **[${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})**
-            
+
             **Author:** ${{ github.event.pull_request.user.login }}
             **Branch:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
             **Repository:** ${{ github.repository }}
-            
+
             ${{ github.event.pull_request.body }}
           embed-color: 3447003
           embed-author-name: ${{ github.event.pull_request.user.login }}
@@ -40,7 +40,7 @@ jobs:
           embed-title: "✅ Pull Request Merged"
           embed-description: |
             **[${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})**
-            
+
             **Author:** ${{ github.event.pull_request.user.login }}
             **Merged by:** ${{ github.actor }}
             **Branch:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
@@ -61,7 +61,7 @@ jobs:
           embed-title: "❌ Pull Request Closed"
           embed-description: |
             **[${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})**
-            
+
             **Author:** ${{ github.event.pull_request.user.login }}
             **Closed by:** ${{ github.actor }}
             **Branch:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
@@ -80,7 +80,7 @@ jobs:
           embed-title: "🔄 Pull Request Updated"
           embed-description: |
             **[${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})**
-            
+
             **Author:** ${{ github.event.pull_request.user.login }}
             **Branch:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
             **Repository:** ${{ github.repository }}
@@ -106,7 +106,7 @@ jobs:
             **Branch:** `${{ github.event.workflow_run.head_branch }}`
             **Triggered by:** ${{ github.event.workflow_run.triggering_actor.login }}
             **Run ID:** ${{ github.event.workflow_run.id }}
-            
+
             **Status:** ${{ github.event.workflow_run.conclusion }}
             **Started:** ${{ github.event.workflow_run.created_at }}
             **Duration:** ${{ github.event.workflow_run.updated_at }}
@@ -130,7 +130,7 @@ jobs:
             **Repository:** ${{ github.repository }}
             **Branch:** `${{ github.event.workflow_run.head_branch }}`
             **Triggered by:** ${{ github.event.workflow_run.triggering_actor.login }}
-            
+
             **Status:** ${{ github.event.workflow_run.conclusion }}
             **New release is now available! 🚀**
           embed-color: 65280
