@@ -30,7 +30,6 @@ jobs:
           embed-author-name: ${{ github.event.pull_request.user.login }}
           embed-author-icon-url: ${{ github.event.pull_request.user.avatar_url }}
           embed-footer-text: "TiLoKit • Pull Request"
-          embed-timestamp: "true"
 
       - name: PR Merged Notification
         if: github.event.action == 'closed' && github.event.pull_request.merged == true
@@ -51,7 +50,6 @@ jobs:
           embed-author-name: ${{ github.event.pull_request.user.login }}
           embed-author-icon-url: ${{ github.event.pull_request.user.avatar_url }}
           embed-footer-text: "TiLoKit • Pull Request Merged"
-          embed-timestamp: "true"
 
       - name: PR Closed (Not Merged) Notification
         if: github.event.action == 'closed' && github.event.pull_request.merged == false
@@ -70,7 +68,6 @@ jobs:
           embed-author-name: ${{ github.event.pull_request.user.login }}
           embed-author-icon-url: ${{ github.event.pull_request.user.avatar_url }}
           embed-footer-text: "TiLoKit • Pull Request Closed"
-          embed-timestamp: "true"
 
       - name: PR Updated Notification
         if: github.event.action == 'synchronize'
@@ -89,7 +86,6 @@ jobs:
           embed-author-name: ${{ github.event.pull_request.user.login }}
           embed-author-icon-url: ${{ github.event.pull_request.user.avatar_url }}
           embed-footer-text: "TiLoKit • Pull Request Updated"
-          embed-timestamp: "true"
 
   workflow-failure-notifications:
     if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'failure'
@@ -114,7 +110,6 @@ jobs:
           embed-author-name: ${{ github.event.workflow_run.triggering_actor.login }}
           embed-author-icon-url: ${{ github.event.workflow_run.triggering_actor.avatar_url }}
           embed-footer-text: "TiLoKit • CI/CD Failure"
-          embed-timestamp: "true"
 
   workflow-success-notifications:
     if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.name == 'Release'
@@ -137,4 +132,3 @@ jobs:
           embed-author-name: ${{ github.event.workflow_run.triggering_actor.login }}
           embed-author-icon-url: ${{ github.event.workflow_run.triggering_actor.avatar_url }}
           embed-footer-text: "TiLoKit • Release"
-          embed-timestamp: "true"
