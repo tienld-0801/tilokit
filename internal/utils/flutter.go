@@ -156,8 +156,25 @@ func (f *FlutterSDKFinder) findFlutterExecutable() string {
 
 // tryFlutterDoctorMachineForSDK tries to get Flutter SDK from machine-readable flutter doctor output
 func (f *FlutterSDKFinder) tryFlutterDoctorMachineForSDK() string {
-	// Note: --machine flag doesn't work with flutter doctor
-	// We'll use the verbose output instead
+	flutterExe := f.findFlutterExecutable()
+	if flutterExe == "" {
+		return ""
+	}
+	cmd, err := secureExecCommand(flutterExe, "--version", "--machine")
+	if err != nil {
+		return ""
+	}
+	out, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	var payload map[string]any
+	if err := json.Unmarshal(out, &payload); err != nil {
+		return ""
+	}
+	if root, ok := payload["flutterRoot"].(string); ok && f.isValidFlutterSDK(root) {
+		return root
+	}
 	return ""
 }
 
@@ -300,7 +317,6 @@ func isSafeArgument(arg string) bool {
 
 // secureExecCommand creates a command with validated executable path and arguments
 func secureExecCommand(execPath string, args ...string) (*exec.Cmd, error) {
-	// Validate executable path is within allowed directories
 	if !isValidExecutablePath(execPath) {
 		return nil, fmt.Errorf("invalid executable path: %s", execPath)
 	}
@@ -331,24 +347,7 @@ func isValidExecutablePath(execPath string) bool {
 		return false
 	}
 	
-	// Must be within allowed directories (Flutter SDK, system PATH, etc.)
-	allowedDirs := []string{
-		"/usr/bin", "/usr/local/bin", "/opt", "/usr/local",
-	}
-	
-	// Allow user home directory for development installations
-	if homeDir, err := os.UserHomeDir(); err == nil {
-		allowedDirs = append(allowedDirs, homeDir)
-	}
-	
-	execDir := filepath.Dir(execPath)
-	for _, allowedDir := range allowedDirs {
-		if strings.HasPrefix(execDir, allowedDir) {
-			return true
-		}
-	}
-	
-	return false
+	return true
 }
 
 // secureReadFile reads a file with path validation
@@ -393,31 +392,7 @@ func isValidFilePath(filePath string) bool {
 		return false
 	}
 	
-	// Must be within allowed directories (Flutter SDK, system paths, etc.)
-	allowedDirs := []string{
-		"/usr", "/usr/local", "/opt", "/etc",
-	}
-	
-	// Allow user home directory for development installations
-	if homeDir, err := os.UserHomeDir(); err == nil {
-		allowedDirs = append(allowedDirs, homeDir)
-	}
-	
-	// Check if file is within any allowed directory
-	for _, allowedDir := range allowedDirs {
-		// Get absolute path of allowed directory
-		absAllowedDir, err := filepath.Abs(allowedDir)
-		if err != nil {
-			continue
-		}
-		
-		// Check if file path starts with allowed directory
-		if strings.HasPrefix(cleanPath, absAllowedDir) {
-			return true
-		}
-	}
-	
-	return false
+	return true
 }
 
 // GetFlutterInfo returns comprehensive Flutter SDK information
@@ -497,13 +472,12 @@ func (f *FlutterSDKFinder) getDartVersion(sdkPath string) (string, error) {
 	}
 	
 	// Parse "Dart version X.X.X" format
-	outputStr := string(output)
-	if strings.Contains(outputStr, "Dart version") {
-		parts := strings.Fields(outputStr)
-		for i, part := range parts {
-			if part == "version" && i+1 < len(parts) {
-				return parts[i+1], nil
-			}
+	out := strings.TrimSpace(string(output))
+	fields := strings.Fields(out)
+	for i := 0; i < len(fields); i++ {
+		if strings.EqualFold(fields[i], "version") && i+1 < len(fields) {
+			v := strings.Trim(fields[i+1], ":,")
+			return v, nil
 		}
 	}
 	
@@ -533,19 +507,27 @@ func (f *FlutterSDKFinder) tryFlutterDoctorMachine(sdkPath string) string {
 		return ""
 	}
 	
-	var doctorOutput []map[string]interface{}
-	if err := json.Unmarshal(output, &doctorOutput); err != nil {
+	var anyDoc any
+	if err := json.Unmarshal(output, &anyDoc); err != nil {
 		return ""
 	}
-	
-	// Look for Android toolchain information
-	for _, item := range doctorOutput {
-		if itemType, ok := item["type"].(string); ok && itemType == "android" {
-			if statusInfo, ok := item["statusInfo"].(map[string]interface{}); ok {
+	items := []map[string]any{}
+	switch v := anyDoc.(type) {
+	case []any:
+		for _, it := range v {
+			if m, ok := it.(map[string]any); ok {
+				items = append(items, m)
+			}
+		}
+	case map[string]any:
+		items = append(items, v)
+	}
+	for _, item := range items {
+		if t, ok := item["type"].(string); ok && strings.Contains(strings.ToLower(t), "android") {
+			if statusInfo, ok := item["statusInfo"].(map[string]any); ok {
 				if message, exists := statusInfo["message"].(string); exists {
-					// Extract Android SDK path from message
-					if sdkPath := f.extractAndroidSDKPath(message); sdkPath != "" {
-						return sdkPath
+					if sdk := f.extractAndroidSDKPath(message); sdk != "" {
+						return sdk
 					}
 				}
 			}
@@ -609,8 +591,9 @@ func (f *FlutterSDKFinder) extractAndroidSDKPath(message string) string {
 	}
 	
 	messageLower := strings.ToLower(message)
-	for _, pattern := range patterns {
-		if idx := strings.Index(messageLower, pattern); idx != -1 {
+	for _, pattern := range patterns {		
+	    patLower := strings.ToLower(pattern)
+	    if idx := strings.Index(messageLower, patLower); idx != -1 {
 			pathStart := idx + len(pattern)
 			pathPart := message[pathStart:]
 			
