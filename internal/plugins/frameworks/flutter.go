@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/plugins/templates"
@@ -15,6 +16,79 @@ import (
 
 	"github.com/pkg/errors"
 )
+
+// secureExecCommand creates a command with validated executable path and arguments
+func secureExecCommand(execPath string, args ...string) (*exec.Cmd, error) {
+	// Validate executable path is within allowed directories
+	if !isValidExecutablePath(execPath) {
+		return nil, fmt.Errorf("invalid executable path: %s", execPath)
+	}
+	
+	// Validate all arguments are safe
+	for _, arg := range args {
+		if !isSafeArgument(arg) {
+			return nil, fmt.Errorf("unsafe argument: %s", arg)
+		}
+	}
+	
+	return exec.Command(execPath, args...), nil
+}
+
+// isValidExecutablePath checks if the executable path is safe to execute
+func isValidExecutablePath(execPath string) bool {
+	if execPath == "" {
+		return false
+	}
+	
+	// Must be absolute path
+	if !filepath.IsAbs(execPath) {
+		return false
+	}
+	
+	// Must exist and be a file
+	if info, err := os.Stat(execPath); err != nil || info.IsDir() {
+		return false
+	}
+	
+	// Must be within allowed directories (Flutter SDK, system PATH, etc.)
+	allowedDirs := []string{
+		"/usr/bin", "/usr/local/bin", "/opt", "/usr/local",
+	}
+	
+	// Allow user home directory for development installations
+	if homeDir, err := os.UserHomeDir(); err == nil {
+		allowedDirs = append(allowedDirs, homeDir)
+	}
+	
+	execDir := filepath.Dir(execPath)
+	for _, allowedDir := range allowedDirs {
+		if strings.HasPrefix(execDir, allowedDir) {
+			return true
+		}
+	}
+	
+	return false
+}
+
+// isSafeArgument checks if a command argument is safe to pass
+func isSafeArgument(arg string) bool {
+	if arg == "" {
+		return true
+	}
+	
+	// Check for potentially dangerous patterns
+	dangerousPatterns := []string{
+		"..", "~", "&&", "||", ";", "|", ">", "<", "$", "`",
+	}
+	
+	for _, pattern := range dangerousPatterns {
+		if strings.Contains(arg, pattern) {
+			return false
+		}
+	}
+	
+	return true
+}
 
 // FlutterPlugin implements Flutter framework support
 type FlutterPlugin struct {
@@ -45,7 +119,7 @@ func (p *FlutterPlugin) SupportedFrameworks() []string {
 }
 
 func (p *FlutterPlugin) SupportedBuildTools() []string {
-	return []string{"flutter-cli", "dart"}
+	return []string{}
 }
 
 // ensureFlutterSDK finds and validates Flutter SDK before generating files
@@ -129,8 +203,10 @@ func (p *FlutterPlugin) runFlutterCommand(ctx *tilocontext.ExecutionContext, arg
 	}
 
 	flutterExe := p.GetFlutterExecutable()
-	// nolint:gosec // Flutter executable path is validated and controlled
-	cmd := exec.Command(flutterExe, args...)
+	cmd, err := secureExecCommand(flutterExe, args...)
+	if err != nil {
+		return fmt.Errorf("invalid flutter command: %w", err)
+	}
 	cmd.Dir = ctx.ProjectPath
 	
 	// Set environment variables

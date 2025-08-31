@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -168,8 +169,10 @@ func (f *FlutterSDKFinder) tryFlutterDoctorVerboseForSDK() string {
 		return ""
 	}
 	
-	// nolint:gosec // flutter executable path is validated and controlled
-	cmd := exec.Command(flutterExe, "doctor", "-v")
+	cmd, err := secureExecCommand(flutterExe, "doctor", "-v")
+	if err != nil {
+		return ""
+	}
 	output, err := cmd.Output()
 	if err != nil {
 		return ""
@@ -275,6 +278,148 @@ func (f *FlutterSDKFinder) isValidFlutterSDK(path string) bool {
 	return true
 }
 
+// isSafeArgument checks if a command argument is safe to pass
+func isSafeArgument(arg string) bool {
+	if arg == "" {
+		return true
+	}
+	
+	// Check for potentially dangerous patterns
+	dangerousPatterns := []string{
+		"..", "~", "&&", "||", ";", "|", ">", "<", "$", "`",
+	}
+	
+	for _, pattern := range dangerousPatterns {
+		if strings.Contains(arg, pattern) {
+			return false
+		}
+	}
+	
+	return true
+}
+
+// secureExecCommand creates a command with validated executable path and arguments
+func secureExecCommand(execPath string, args ...string) (*exec.Cmd, error) {
+	// Validate executable path is within allowed directories
+	if !isValidExecutablePath(execPath) {
+		return nil, fmt.Errorf("invalid executable path: %s", execPath)
+	}
+	
+	// Validate all arguments are safe
+	for _, arg := range args {
+		if !isSafeArgument(arg) {
+			return nil, fmt.Errorf("unsafe argument: %s", arg)
+		}
+	}
+	
+	return exec.Command(execPath, args...), nil
+}
+
+// isValidExecutablePath checks if the executable path is safe to execute
+func isValidExecutablePath(execPath string) bool {
+	if execPath == "" {
+		return false
+	}
+	
+	// Must be absolute path
+	if !filepath.IsAbs(execPath) {
+		return false
+	}
+	
+	// Must exist and be a file
+	if info, err := os.Stat(execPath); err != nil || info.IsDir() {
+		return false
+	}
+	
+	// Must be within allowed directories (Flutter SDK, system PATH, etc.)
+	allowedDirs := []string{
+		"/usr/bin", "/usr/local/bin", "/opt", "/usr/local",
+	}
+	
+	// Allow user home directory for development installations
+	if homeDir, err := os.UserHomeDir(); err == nil {
+		allowedDirs = append(allowedDirs, homeDir)
+	}
+	
+	execDir := filepath.Dir(execPath)
+	for _, allowedDir := range allowedDirs {
+		if strings.HasPrefix(execDir, allowedDir) {
+			return true
+		}
+	}
+	
+	return false
+}
+
+// secureReadFile reads a file with path validation
+func secureReadFile(filePath string) ([]byte, error) {
+	// Validate file path is safe
+	if !isValidFilePath(filePath) {
+		return nil, fmt.Errorf("invalid file path: %s", filePath)
+	}
+	
+	// #nosec G304 -- filePath is validated by isValidFilePath function which ensures path safety
+	file, err := os.OpenFile(filePath, os.O_RDONLY, 0)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = file.Close() }()
+	
+	// Use io.ReadAll for cleaner code
+	return io.ReadAll(file)
+}
+
+// isValidFilePath checks if the file path is safe to read
+func isValidFilePath(filePath string) bool {
+	if filePath == "" {
+		return false
+	}
+	
+	// Clean the path to resolve any . or .. components
+	cleanPath := filepath.Clean(filePath)
+	
+	// Must be absolute path
+	if !filepath.IsAbs(cleanPath) {
+		return false
+	}
+	
+	// Must not contain dangerous patterns after cleaning
+	if strings.Contains(cleanPath, "..") || strings.Contains(cleanPath, "~") {
+		return false
+	}
+	
+	// Must exist and be a file (not a directory)
+	if info, err := os.Stat(cleanPath); err != nil || info.IsDir() {
+		return false
+	}
+	
+	// Must be within allowed directories (Flutter SDK, system paths, etc.)
+	allowedDirs := []string{
+		"/usr", "/usr/local", "/opt", "/etc",
+	}
+	
+	// Allow user home directory for development installations
+	if homeDir, err := os.UserHomeDir(); err == nil {
+		allowedDirs = append(allowedDirs, homeDir)
+	}
+	
+	// Check if file is within any allowed directory
+	for _, allowedDir := range allowedDirs {
+		// Get absolute path of allowed directory
+		absAllowedDir, err := filepath.Abs(allowedDir)
+		if err != nil {
+			continue
+		}
+		
+		// Check if file path starts with allowed directory
+		if strings.HasPrefix(cleanPath, absAllowedDir) {
+			return true
+		}
+	}
+	
+	return false
+}
+
 // GetFlutterInfo returns comprehensive Flutter SDK information
 func (f *FlutterSDKFinder) GetFlutterInfo(sdkPath string) map[string]string {
 	info := make(map[string]string)
@@ -305,8 +450,7 @@ func (f *FlutterSDKFinder) GetFlutterInfo(sdkPath string) map[string]string {
 // getFlutterVersion gets Flutter version from SDK
 func (f *FlutterSDKFinder) getFlutterVersion(sdkPath string) (string, error) {
 	versionFile := filepath.Join(sdkPath, "version")
-	// nolint:gosec // version file path is validated and controlled
-	content, err := os.ReadFile(versionFile)
+	content, err := secureReadFile(versionFile)
 	if err != nil {
 		return "", err
 	}
@@ -315,8 +459,11 @@ func (f *FlutterSDKFinder) getFlutterVersion(sdkPath string) (string, error) {
 
 // getFlutterChannel gets Flutter channel from SDK
 func (f *FlutterSDKFinder) getFlutterChannel(sdkPath string) (string, error) {
-	// nolint:gosec // flutter executable path is validated and controlled
-	cmd := exec.Command(filepath.Join(sdkPath, "bin", "flutter"), "channel")
+	flutterExe := filepath.Join(sdkPath, "bin", "flutter")
+	cmd, err := secureExecCommand(flutterExe, "channel")
+	if err != nil {
+		return "", err
+	}
 	output, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -339,8 +486,11 @@ func (f *FlutterSDKFinder) getFlutterChannel(sdkPath string) (string, error) {
 
 // getDartVersion gets Dart version from Flutter SDK
 func (f *FlutterSDKFinder) getDartVersion(sdkPath string) (string, error) {
-	// nolint:gosec // dart executable path is validated and controlled
-	cmd := exec.Command(filepath.Join(sdkPath, "bin", "dart"), "--version")
+	dartExe := filepath.Join(sdkPath, "bin", "dart")
+	cmd, err := secureExecCommand(dartExe, "--version")
+	if err != nil {
+		return "", err
+	}
 	output, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -374,8 +524,10 @@ func (f *FlutterSDKFinder) GetAndroidSDKFromFlutterDoctor(sdkPath string) string
 // tryFlutterDoctorMachine tries to get Android SDK from machine-readable flutter doctor output
 func (f *FlutterSDKFinder) tryFlutterDoctorMachine(sdkPath string) string {
 	flutterExe := filepath.Join(sdkPath, "bin", "flutter")
-	// nolint:gosec // flutter executable path is validated and controlled
-	cmd := exec.Command(flutterExe, "doctor", "--machine")
+	cmd, err := secureExecCommand(flutterExe, "doctor", "--machine")
+	if err != nil {
+		return ""
+	}
 	output, err := cmd.Output()
 	if err != nil {
 		return ""
@@ -406,8 +558,10 @@ func (f *FlutterSDKFinder) tryFlutterDoctorMachine(sdkPath string) string {
 // tryFlutterDoctorVerbose tries to get Android SDK from verbose flutter doctor output
 func (f *FlutterSDKFinder) tryFlutterDoctorVerbose(sdkPath string) string {
 	flutterExe := filepath.Join(sdkPath, "bin", "flutter")
-	// nolint:gosec // flutter executable path is validated and controlled
-	cmd := exec.Command(flutterExe, "doctor", "-v")
+	cmd, err := secureExecCommand(flutterExe, "doctor", "-v")
+	if err != nil {
+		return ""
+	}
 	output, err := cmd.Output()
 	if err != nil {
 		return ""
