@@ -8,21 +8,23 @@ Optimized CI workflows to run different checks based on context:
 
 ### For Pull Requests (Full Validation)
 - ✅ **test** - Unit tests with coverage
-- ✅ **lint** - Code quality checks
+- ✅ **lint** - Code quality checks with golangci-lint
 - ✅ **build** - Binary compilation
-- ✅ **security** - Security scanning
+- ✅ **security** - Security scanning with gosec
 - ✅ **integration-test** - End-to-end testing
 - ✅ **markdownlint** - Documentation quality
-- ✅ **validate-commits** - Commit message format
+- ✅ **validate-commits** - Commit message format with emoji validation
+- ✅ **discord-notifications** - Discord webhook notifications
 
 ### For Develop Branch Merges (Essential Only)
 - ✅ **test** - Unit tests (catch any bypass attempts)
-- ✅ **lint** - Code quality (catch any bypass attempts)
+- ✅ **lint** - Code quality with golangci-lint (catch any bypass attempts)
 - ✅ **build** - Binary compilation (ensure buildability)
-- ✅ **security** - Security scanning (catch any bypass attempts)
+- ✅ **security** - Security scanning with gosec (catch any bypass attempts)
 - ❌ **integration-test** - Skip (already verified in PR)
 - ❌ **markdownlint** - Skip (already verified in PR)
 - ❌ **validate-commits** - Skip (enforced by pre-commit hooks)
+- ✅ **discord-notifications** - Notify about merge events
 
 ## 🚀 Benefits
 
@@ -30,6 +32,7 @@ Optimized CI workflows to run different checks based on context:
 - **Before**: ~15-20 minutes for full CI suite on develop
 - **After**: ~8-12 minutes for essential checks only
 - **Improvement**: ~40-50% faster CI on develop merges
+- **Security**: gosec scanning integrated but can run separately with `make security-check`
 
 ### Resource Efficiency
 - Reduced GitHub Actions minutes usage
@@ -38,8 +41,10 @@ Optimized CI workflows to run different checks based on context:
 
 ### Security
 - Still catches bypass attempts with core checks (test, lint, build, security)
-- Pre-commit hooks enforce commit validation locally
+- Pre-commit hooks enforce commit validation locally with emoji validation
 - PR process ensures quality before merge
+- gosec security scanning can run separately: `make security-check` or `make security-report`
+- Discord notifications for all CI events and security issues
 
 ## 📋 Implementation Details
 
@@ -48,6 +53,7 @@ Optimized CI workflows to run different checks based on context:
 1. **`.github/workflows/ci.yml`**
    - Added conditional `if: github.event_name == 'pull_request'` to integration-test job
    - Integration tests only run on PRs, not on develop pushes
+   - Security scanning with gosec integrated
 
 2. **`.github/workflows/markdown.yml`**
    - Removed `push: branches: [develop]` trigger
@@ -56,11 +62,26 @@ Optimized CI workflows to run different checks based on context:
 3. **`.github/workflows/validate-commits.yml`**
    - Removed `push: branches: [main, develop]` trigger
    - Only runs on pull requests
-   - Commits are validated by pre-commit hooks anyway
+   - Commits are validated by pre-commit hooks with emoji validation
+
+4. **`.github/workflows/discord-notifications.yml`**
+   - Discord webhook notifications for PR events
+   - CI/CD failure notifications
+   - Release success notifications
+
+### Local Development Tools
+
+**Makefile targets:**
+- `make run` - Development mode with test, lint, markdown-lint
+- `make security-check` - Quick security scan with gosec
+- `make security-report` - Detailed JSON security report
+- `make install-hooks` - Setup Git hooks for commit validation
 
 ### Unchanged (Always Run)
 - **test**, **lint**, **build**, **security** jobs run on both PRs and develop pushes
+- **discord-notifications** run on all events
 - These catch any attempts to bypass pre-commit hooks or PR process
+- Security scanning with gosec can run locally with `make security-check`
 
 ## 🔧 Usage
 

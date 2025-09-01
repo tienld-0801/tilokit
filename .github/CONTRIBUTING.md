@@ -24,51 +24,69 @@ Thank you for your interest in contributing to TiLoKit! This document provides p
    cd tilokit
    ```
 
-2. **Install dependencies**
+2. **Install dependencies and setup hooks**
    ```bash
-   make deps
-   # or
    go mod download && go mod tidy
+   make install-hooks  # Install Git hooks for commit validation
    ```
 
 3. **Build the project**
    ```bash
    make build
-   # or
-   go build -o tilokit .
    ```
 
-4. **Run tests**
+4. **Run development mode**
    ```bash
-   make test
+   make run  # Run with full validation (test, lint, markdown-lint)
    # or
-   go test -v ./...
+   make dev  # Run help mode only
+   ```
+
+5. **Run security checks**
+   ```bash
+   make security-check      # Quick security scan
+   make security-report     # Detailed JSON report
    ```
 
 ## 🏗️ Project Structure
 
 ```
 tilokit/
-├── cmd/                    # CLI commands
-│   ├── root.go            # Main command
-│   ├── list.go            # List command
-│   └── version.go         # Version command
+├── cmd/                    # CLI commands and entry points
+│   └── root.go            # Main command configuration
 ├── internal/
+│   ├── cli/               # CLI logic and handlers
+│   │   ├── generation/    # Project generation orchestration
+│   │   │   ├── orchestrator.go    # Main workflow coordinator
+│   │   │   ├── prompts/           # Interactive user input handling
+│   │   │   ├── validator/         # Input validation logic
+│   │   │   ├── registry/          # Plugin registry management
+│   │   │   └── progress/          # Animated progress UI
+│   │   ├── handlers.go    # CLI command handlers
+│   │   ├── manager.go     # Project management logic
+│   │   ├── update.go      # Self-update functionality
+│   │   └── validation.go  # Input validation
 │   ├── core/              # Core engine and registry
-│   │   ├── engine/        # Execution engine
-│   │   ├── registry/      # Plugin registry
-│   │   └── context/       # Execution context
+│   │   ├── engine/        # Template execution engine
+│   │   ├── registry/      # Plugin registry system
+│   │   └── context/       # Execution context management
 │   ├── plugins/           # Plugin implementations
-│   │   ├── frameworks/    # Framework plugins (React, Vue, etc.)
+│   │   ├── frameworks/    # Framework plugins (40+ frameworks)
 │   │   ├── builders/      # Build tool plugins (Vite, Webpack, etc.)
-│   │   ├── tools/         # Tool plugins (Git, etc.)
-│   │   └── templates/     # Template processing
-│   ├── config/            # Configuration management
-│   └── utils/             # Utility functions
-├── .github/               # GitHub workflows
+│   │   └── templates/     # Template processing plugins
+│   ├── templates/         # Template definitions for frameworks
+│   ├── ui/                # User interface components (Bubble Tea)
+│   ├── utils/             # Utility functions
+│   └── config/            # Configuration management
+├── .github/               # GitHub workflows and templates
+├── .husky/                # Git hooks for commit validation
+├── assets/                # Static assets (logos, icons)
+├── config/                # Configuration files
+├── docs/                  # Documentation
+├── scripts/               # Build and deployment scripts
 ├── Dockerfile            # Container configuration
-├── Makefile              # Build automation
-└── README.md             # Project documentation
+├── Makefile              # Build automation with security checks
+└── main.go               # Application entry point
 ```
 
 ## 🔌 Plugin Development
@@ -153,31 +171,40 @@ func (p *MyBuilderPlugin) SupportedBuildTools() []string {
 
 ### Commit Messages
 
-Use conventional commit format:
+**IMPORTANT**: TiLoKit requires emojis in commit messages!
 
+Required format:
 ```
-type(scope): description
+🎯 type: description
 
 [optional body]
 
 [optional footer]
 ```
 
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
+**Valid emoji mappings:**
+- ✨ `feat` - new features
+- 🐛 `fix` - bug fixes
+- 📚 `docs` - documentation changes
+- ♻️ `refactor` - code refactoring
+- ⚡ `perf` - performance improvements
+- 🧪 `test` - adding or updating tests
+- 🛠️ `build` - build system changes
+- 🔄 `ci` - CI/CD changes
+- 🧹 `chore` - maintenance tasks
+- 🎨 `style` - code style changes
+- ⏪ `revert` - reverting previous commits
+- 🚀 `release` - version releases
 
 Examples:
 ```
-feat(plugins): add Svelte framework support
-fix(vite): resolve configuration path issue
-docs(readme): update installation instructions
+✨ feat: add Svelte framework support
+🐛 fix: resolve Vite configuration path issue
+📚 docs: update installation instructions
+🔒 feat: add gosec security analysis
 ```
+
+**Git hooks will automatically validate commit messages!**
 
 ## 🧪 Testing
 
@@ -251,14 +278,14 @@ func TestMyFunction(t *testing.T) {
 3. **Test your changes**
    ```bash
    make test
-   make test-all
+   make security-check
    make lint
    ```
 
 4. **Commit your changes**
    ```bash
    git add .
-   git commit -m "feat: add my new feature"
+   git commit -m "✨ feat: add my new feature"
    ```
 
 5. **Push to your fork**
@@ -342,27 +369,35 @@ If you need help:
 
 ## 🚧 Development Roadmap
 
-### Phase 1: Core Architecture *(In Progress)*
+### Phase 1: Core Architecture *(Completed)*
 - ✅ Plugin system foundation
-- ✅ CLI structure
-- 🔄 Configuration system
-- 🔄 Template engine
+- ✅ CLI structure với Bubble Tea UI
+- ✅ Configuration system
+- ✅ Template engine với custom delimiters
+- ✅ Modular generation orchestration
 
-### Phase 2: JavaScript Ecosystem *(Current)*
-- 🔄 React, Vue, Svelte support
-- 🔄 Build tool integrations
-- 📋 Testing frameworks
+### Phase 2: Multi-Framework Support *(Completed)*
+- ✅ JavaScript/TypeScript: React, Vue, Svelte, Angular, Next.js, Nuxt
+- ✅ Node.js: Express, Fastify, NestJS
+- ✅ Python: Django, Flask, FastAPI
+- ✅ PHP: Laravel, Symfony, CakePHP, CodeIgniter
+- ✅ Java/Kotlin: Spring Boot
+- ✅ Go: Gin, Echo, Fiber
+- ✅ Ruby: Rails
+- ✅ C#: ASP.NET Core
 
-### Phase 3: Multi-Language Support *(Planned)*
-- 📋 Python (Django, Flask, FastAPI)
-- 📋 PHP (Laravel, Symfony)
-- 📋 Java (Spring Boot)
-- 📋 Go, Rust, Ruby, C#
+### Phase 3: Mobile & Desktop *(Completed)*
+- ✅ Mobile: React Native (Expo), Flutter
+- ✅ Desktop: Electron
+- 📋 iOS: Swift, SwiftUI
+- 📋 Android: Kotlin, Jetpack Compose
 
-### Phase 4: Advanced Features *(Future)*
-- 📋 Mobile frameworks
-- 📋 Desktop applications
+### Phase 4: Advanced Features *(In Progress)*
+- ✅ Security scanning với gosec
+- ✅ Discord CI notifications
+- ✅ Animated progress bars
 - 📋 Plugin marketplace
 - 📋 Custom templates
+- 📋 IDE integrations
 
 Thank you for your interest in contributing to TiLoKit! 🚀

@@ -54,6 +54,9 @@ TiLoKit implements several security measures:
 - **Local Templates**: All project templates are embedded in the binary
 - **Minimal Permissions**: Requires only file system access for project generation
 - **Open Source**: Full source code is available for security review
+- **Automated Security Scanning**: gosec integration for continuous security analysis
+- **CI/CD Security**: Security checks in all pull requests and releases
+- **Local Security Tools**: `make security-check` and `make security-report` commands
 
 ### Security Updates
 
