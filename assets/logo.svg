@@ -12,10 +12,10 @@
   </defs>
   
   <!-- Rocket Emoji as Text -->
-  <text x="256" y="320" font-family="Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif" 
-        font-size="200" text-anchor="middle" fill="white">🚀</text>
+  <text x="256" y="210" font-family="Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif" 
+        font-size="200" text-anchor="middle" dominant-baseline="central" fill="white">🚀</text>
   
   <!-- TiLoKit Text -->
-  <text x="256" y="420" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
-        font-size="48" font-weight="bold" text-anchor="middle" fill="white">TiLoKit</text>
+  <text x="256" y="340" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+        font-size="64" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="white">TiLoKit</text>
 </svg>
