@@ -1,4 +1,4 @@
-.PHONY: help build test clean install dev lint docker hooks install-hooks uninstall-hooks
+.PHONY: help build test clean install dev lint security-check security-report docker hooks install-hooks uninstall-hooks
 
 # Build configurations
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
@@ -43,6 +43,25 @@ build: ## Build the project
 lint: ## Run linter
 	@echo "Running linter..."
 	golangci-lint run
+
+security-check: ## Run security analysis with gosec
+	@echo "🔒 Running security analysis with gosec..."
+	@if command -v gosec >/dev/null 2>&1; then \
+		gosec -fmt=colored -stdout -verbose=text ./...; \
+	else \
+		echo "❌ gosec not found. Install with: go install github.com/securego/gosec/v2/cmd/gosec@latest"; \
+		exit 1; \
+	fi
+
+security-report: ## Generate detailed security report (JSON format)
+	@echo "📊 Generating detailed security report..."
+	@if command -v gosec >/dev/null 2>&1; then \
+		gosec -fmt=json -out=security-report.json ./... && \
+		echo "✅ Security report saved to security-report.json"; \
+	else \
+		echo "❌ gosec not found. Install with: go install github.com/securego/gosec/v2/cmd/gosec@latest"; \
+		exit 1; \
+	fi
 
 test: ## Run tests
 	@echo "Running tests..."
