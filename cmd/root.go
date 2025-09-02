@@ -10,7 +10,6 @@ import (
 )
 
 var (
-	// CLI manager instance
 	cliManager = cli.NewManager()
 )
 
@@ -23,7 +22,6 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-// Execute runs the root command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
@@ -31,13 +29,10 @@ func Execute() {
 }
 
 func init() {
-	// Set up flags using CLI manager
 	cliManager.SetupFlags(rootCmd)
 
-	// Disable default completion command
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
-	// Custom help template
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.SetUsageTemplate("")
 }
