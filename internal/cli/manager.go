@@ -10,9 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Manager handles all CLI operations
 type Manager struct {
-	// CLI flags
 	ProjectName    string
 	Framework      string
 	BuildTool      string
@@ -30,12 +28,10 @@ type Manager struct {
 	InitProject    bool
 }
 
-// NewManager creates a new CLI manager
 func NewManager() *Manager {
 	return &Manager{}
 }
 
-// HasAnyFlags checks if any flags are provided
 func (m *Manager) HasAnyFlags(cmd *cobra.Command) bool {
 	return m.ProjectName != "" || m.Framework != "" || m.BuildTool != "" ||
 		m.Language != "" || m.RouterType != "" || m.RenderingMode != "" || m.Architecture != "" ||
@@ -43,24 +39,19 @@ func (m *Manager) HasAnyFlags(cmd *cobra.Command) bool {
 		m.Force || m.ShowVersion || m.InitProject
 }
 
-// HandleCommand processes the main command logic
 func (m *Manager) HandleCommand(cmd *cobra.Command, args []string) error {
-	// Reject any arguments without - or -- prefix
 	if len(args) > 0 {
 		return fmt.Errorf(constants.InvalidCommandMsg, args[0])
 	}
 
-	// Handle version flag first
 	if m.ShowVersion {
 		return ShowVersionInfo()
 	}
 
-	// Handle update flag
 	if m.Update {
 		return m.RunUpdate()
 	}
 
-	// Handle list flags
 	if m.ListFrameworks {
 		return m.ListSupportedFrameworks()
 	}
@@ -69,17 +60,14 @@ func (m *Manager) HandleCommand(cmd *cobra.Command, args []string) error {
 		return m.ListSupportedBuildTools()
 	}
 
-	// Handle init flag (with banner)
 	if m.InitProject {
 		return m.RunGenerateWithBanner()
 	}
 
-	// If project creation flags provided, run generation without banner
 	if m.ProjectName != "" || m.Framework != "" {
 		return m.RunGenerate()
 	}
 
-	// If no flags provided, show usage
 	if !m.HasAnyFlags(cmd) {
 		return ShowUsageTable()
 	}
@@ -87,22 +75,17 @@ func (m *Manager) HandleCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// RunGenerateWithBanner runs project generation with banner (only for -i/--init)
 func (m *Manager) RunGenerateWithBanner() error {
-	// Print banner and run full project generation flow
 	utils.PrintBanner()
 	utils.SetQuiet(m.Quiet)
 	return m.RunProjectGeneration()
 }
 
-// RunGenerate runs project generation without banner
 func (m *Manager) RunGenerate() error {
-	// No banner for direct flag usage
 	utils.SetQuiet(m.Quiet)
 	return m.RunProjectGeneration()
 }
 
-// SetupFlags configures all CLI flags on the root command
 func (m *Manager) SetupFlags(cmd *cobra.Command) {
 	// Project creation flags
 	cmd.Flags().StringVarP(&m.ProjectName, "name", "n", "", "Project name (required)")
@@ -128,7 +111,6 @@ func (m *Manager) SetupFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolVarP(&m.Update, "update", "u", false, "Update TiLoKit to the latest version")
 }
 
-// Placeholder methods - these will delegate to existing logic
 func (m *Manager) RunUpdate() error {
 	return RunUpdateProcess()
 }

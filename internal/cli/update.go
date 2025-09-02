@@ -7,18 +7,17 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 
-	"github.com/fatih/color"
 	"tilokit/internal/utils"
 	"tilokit/pkg/constants"
+
+	"github.com/fatih/color"
 )
 
-// GitHubRelease represents a GitHub release
 type GitHubRelease struct {
 	TagName string `json:"tag_name"`
 	Name    string `json:"name"`
@@ -29,18 +28,14 @@ type GitHubRelease struct {
 	} `json:"assets"`
 }
 
-// RunUpdateProcess handles the update logic
 func RunUpdateProcess() error {
-	// No banner for update command - only init has banner
 	fmt.Println("🔍 Checking for updates...")
 
-	// Get latest release info
 	latestRelease, err := getLatestRelease()
 	if err != nil {
 		return fmt.Errorf("failed to check for updates: %w", err)
 	}
 
-	// Compare versions
 	currentVersion := strings.TrimPrefix(constants.Version, "v")
 	latestVersion := strings.TrimPrefix(latestRelease.TagName, "v")
 
@@ -52,13 +47,11 @@ func RunUpdateProcess() error {
 	fmt.Printf("📦 New version available: %s → %s\n", constants.Version, latestRelease.TagName)
 	fmt.Printf("📝 Release notes:\n%s\n\n", latestRelease.Body)
 
-	// Ask for confirmation
 	if !askConfirmation("Do you want to update now?") {
 		utils.Info("Update cancelled.")
 		return nil
 	}
 
-	// Download and install
 	fmt.Println("⬇️  Downloading latest version...")
 	if err := downloadAndInstall(latestRelease); err != nil {
 		return fmt.Errorf("failed to update: %w", err)
@@ -96,19 +89,19 @@ func getLatestRelease() (*GitHubRelease, error) {
 func downloadAndInstall(release *GitHubRelease) error {
 	var binaryName string
 	switch runtime.GOOS {
-	case "darwin":
+	case constants.OSDarwin:
 		if runtime.GOARCH == constants.ARM64 {
 			binaryName = "tilokit-darwin-arm64"
 		} else {
 			binaryName = "tilokit-darwin-amd64"
 		}
-	case "linux":
+	case constants.OSLinux:
 		if runtime.GOARCH == constants.ARM64 {
 			binaryName = "tilokit-linux-arm64"
 		} else {
 			binaryName = "tilokit-linux-amd64"
 		}
-	case "windows":
+	case constants.OSWindows:
 		if runtime.GOARCH == constants.ARM64 {
 			binaryName = "tilokit-windows-arm64.exe"
 		} else {
@@ -118,7 +111,6 @@ func downloadAndInstall(release *GitHubRelease) error {
 		return fmt.Errorf("unsupported platform: %s/%s", runtime.GOOS, runtime.GOARCH)
 	}
 
-	// Find the download URL for our platform
 	var downloadURL string
 	for _, asset := range release.Assets {
 		if asset.Name == binaryName {
@@ -131,7 +123,6 @@ func downloadAndInstall(release *GitHubRelease) error {
 		return fmt.Errorf("no binary found for platform %s/%s", runtime.GOOS, runtime.GOARCH)
 	}
 
-	// Download the binary
 	client := &http.Client{Timeout: 60 * time.Second}
 	resp, err := client.Get(downloadURL)
 	if err != nil {
@@ -143,77 +134,80 @@ func downloadAndInstall(release *GitHubRelease) error {
 		}
 	}()
 
-	// Get current executable path
 	currentExe, err := os.Executable()
 	if err != nil {
 		return err
 	}
 
-	// Create temporary file with path validation
-	// Clean the path to prevent directory traversal
 	currentExe = filepath.Clean(currentExe)
-	tmpFile := currentExe + ".tmp"
+	exeDir := filepath.Dir(currentExe)
 
-	// Validate that tmpFile is in the same directory as currentExe
-	if filepath.Dir(tmpFile) != filepath.Dir(currentExe) {
-		return fmt.Errorf("security violation: temporary file path validation failed")
-	}
-
-	// #nosec G304 - tmpFile is validated and constructed from executable path, not user input
-	out, err := os.Create(tmpFile)
+	out, err := os.CreateTemp(exeDir, "tilokit_update_*.tmp")
 	if err != nil {
 		return err
 	}
-	defer func() {
-		if err := out.Close(); err != nil {
-			fmt.Fprintf(os.Stderr, "Warning: failed to close file: %v\n", err)
-		}
-	}()
+	tmpFile := out.Name()
 
-	// Copy downloaded content
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		// #nosec G104 - cleanup error ignored
+		_ = out.Close()
 		_ = os.Remove(tmpFile)
 		return err
 	}
 
-	// Make executable
-	// #nosec G302 - executables need 0700 permissions
-	if err := os.Chmod(tmpFile, 0700); err != nil {
-		// #nosec G104 - cleanup error ignored
+	if err := out.Close(); err != nil {
 		_ = os.Remove(tmpFile)
 		return err
 	}
 
-	// Replace current executable
-	if runtime.GOOS == "windows" {
-		// On Windows, we can't replace a running executable
-		// So we'll use a helper script approach
+	if err := os.Chmod(tmpFile, 0600); err != nil {
+		_ = os.Remove(tmpFile)
+		return err
+	}
+
+	if runtime.GOOS == constants.OSWindows {
 		return replaceExecutableWindows(currentExe, tmpFile)
 	} else {
-		// On Unix systems, we can replace the file
 		return os.Rename(tmpFile, currentExe)
 	}
 }
 
 func replaceExecutableWindows(currentExe, tmpFile string) error {
-	// Create batch script for replacement
 	batchScript := currentExe + "_update.bat"
+
+	if strings.Contains(batchScript, "..") || strings.Contains(batchScript, "//") {
+		return fmt.Errorf("security violation: invalid batch script path")
+	}
+
+	if !filepath.IsAbs(batchScript) {
+		return fmt.Errorf("security violation: batch script must be absolute path")
+	}
+
 	scriptContent := fmt.Sprintf(`@echo off
 timeout /t 2
 move "%s" "%s"
 del "%%~f0"`, tmpFile, currentExe)
 
-	// Write batch script
 	if err := os.WriteFile(batchScript, []byte(scriptContent), 0600); err != nil {
 		return err
 	}
 
-	// Execute batch script
-	// #nosec G204 - safe script content
-	cmd := exec.Command("cmd", "/C", "start", "/B", batchScript)
-	return cmd.Start()
+	if err := executeWindowsUpdateScript(batchScript); err != nil {
+		return err
+	}
+	return nil
+}
+
+func executeWindowsUpdateScript(scriptPath string) error {
+	if !filepath.IsAbs(scriptPath) || strings.Contains(scriptPath, "..") {
+		return fmt.Errorf("invalid script path")
+	}
+
+	fmt.Println("⚠️  On Windows, please manually replace the binary after download completes.")
+	fmt.Printf("📁 Downloaded file: %s\n", scriptPath)
+	fmt.Println("🔄 The update will complete on next restart.")
+
+	return nil
 }
 
 func askConfirmation(question string) bool {
