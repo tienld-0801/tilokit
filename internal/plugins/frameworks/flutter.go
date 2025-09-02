@@ -1,12 +1,7 @@
 package frameworks
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
-	"runtime"
-	"strings"
 
 	tilocontext "tilokit/internal/core/context"
 	"tilokit/internal/plugins/templates"
@@ -17,83 +12,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// secureExecCommand creates a command with validated executable path and arguments
-func secureExecCommand(execPath string, args ...string) (*exec.Cmd, error) {
-	// Validate executable path is within allowed directories
-	if !isValidExecutablePath(execPath) {
-		return nil, fmt.Errorf("invalid executable path: %s", execPath)
-	}
-	
-	// Validate all arguments are safe
-	for _, arg := range args {
-		if !isSafeArgument(arg) {
-			return nil, fmt.Errorf("unsafe argument: %s", arg)
-		}
-	}
-	
-	return exec.Command(execPath, args...), nil
-}
-
-// isValidExecutablePath checks if the executable path is safe to execute
-func isValidExecutablePath(execPath string) bool {
-	if execPath == "" {
-		return false
-	}
-	
-	// Must be absolute path
-	if !filepath.IsAbs(execPath) {
-		return false
-	}
-	
-	// Must exist and be a file
-	if info, err := os.Stat(execPath); err != nil || info.IsDir() {
-		return false
-	}
-	
-	// Must be within allowed directories (Flutter SDK, system PATH, etc.)
-	allowedDirs := []string{
-		"/usr/bin", "/usr/local/bin", "/opt", "/usr/local",
-	}
-	
-	// Allow user home directory for development installations
-	if homeDir, err := os.UserHomeDir(); err == nil {
-		allowedDirs = append(allowedDirs, homeDir)
-	}
-	
-	execDir := filepath.Dir(execPath)
-	for _, allowedDir := range allowedDirs {
-		if strings.HasPrefix(execDir, allowedDir) {
-			return true
-		}
-	}
-	
-	return false
-}
-
-// isSafeArgument checks if a command argument is safe to pass
-func isSafeArgument(arg string) bool {
-	if arg == "" {
-		return true
-	}
-	
-	// Check for potentially dangerous patterns
-	dangerousPatterns := []string{
-		"..", "~", "&&", "||", ";", "|", ">", "<", "$", "`",
-	}
-	
-	for _, pattern := range dangerousPatterns {
-		if strings.Contains(arg, pattern) {
-			return false
-		}
-	}
-	
-	return true
-}
-
-// FlutterPlugin implements Flutter framework support
 type FlutterPlugin struct {
 	sdkFinder *utils.FlutterSDKFinder
-	sdkPath   string
 }
 
 func NewFlutterPlugin() *FlutterPlugin {
@@ -120,107 +40,6 @@ func (p *FlutterPlugin) SupportedFrameworks() []string {
 
 func (p *FlutterPlugin) SupportedBuildTools() []string {
 	return []string{}
-}
-
-// ensureFlutterSDK finds and validates Flutter SDK before generating files
-func (p *FlutterPlugin) ensureFlutterSDK(ctx *tilocontext.ExecutionContext) error {
-	if p.sdkPath != "" {
-		// SDK already found and cached
-		return nil
-	}
-
-	sdkPath, err := p.sdkFinder.FindFlutterSDK()
-	if err != nil {
-		return fmt.Errorf("flutter SDK detection failed: %w\n\nPlease ensure Flutter is properly installed and either:\n1. Add Flutter to your PATH\n2. Set FLUTTER_ROOT environment variable\n3. Install Flutter in a standard location", err)
-	}
-
-	p.sdkPath = sdkPath
-	
-	// Add Flutter SDK path to context variables for template processing
-	ctx.SetVariable("flutter_sdk_path", sdkPath)
-	
-	// Get Flutter info and add to context
-	info := p.sdkFinder.GetFlutterInfo(sdkPath)
-	if version := info["version"]; version != "" {
-		ctx.SetVariable("flutter_version", version)
-	}
-	if channel := info["channel"]; channel != "" {
-		ctx.SetVariable("flutter_channel", channel)
-	}
-	if dartVersion := info["dart_version"]; dartVersion != "" {
-		ctx.SetVariable("dart_version", dartVersion)
-	}
-	
-	// Try to get Android SDK path using flutter doctor
-	if androidSDK := p.sdkFinder.GetAndroidSDKFromFlutterDoctor(sdkPath); androidSDK != "" {
-		ctx.SetVariable("android_sdk_path", androidSDK)
-	} else {
-		// Fallback to environment variables
-		p.detectAndroidSDKFromEnv(ctx)
-	}
-
-	return nil
-}
-
-// GetFlutterBinPath returns the path to Flutter bin directory
-func (p *FlutterPlugin) GetFlutterBinPath() string {
-	if p.sdkPath == "" {
-		return ""
-	}
-	return filepath.Join(p.sdkPath, "bin")
-}
-
-// GetFlutterExecutable returns the full path to Flutter executable
-func (p *FlutterPlugin) GetFlutterExecutable() string {
-	binPath := p.GetFlutterBinPath()
-	if binPath == "" {
-		return ""
-	}
-	
-	flutterExe := "flutter"
-	if runtime.GOOS == "windows" {
-		flutterExe = "flutter.bat"
-	}
-	
-	return filepath.Join(binPath, flutterExe)
-}
-
-// Define allowed Flutter commands
-var allowedFlutterCommands = map[string]bool{
-	"run": true, "build": true, "test": true, "pub": true, 
-	"doctor": true, "clean": true, "analyze": true,
-}
-
-// runFlutterCommand executes a Flutter command with proper SDK path
-func (p *FlutterPlugin) runFlutterCommand(ctx *tilocontext.ExecutionContext, args ...string) error {
-	if err := p.ensureFlutterSDK(ctx); err != nil {
-		return err
-	}
-
-	// Validate command
-	if len(args) > 0 && !allowedFlutterCommands[args[0]] {
-		return fmt.Errorf("disallowed flutter command: %s", args[0])
-	}
-
-	flutterExe := p.GetFlutterExecutable()
-	cmd, err := secureExecCommand(flutterExe, args...)
-	if err != nil {
-		return fmt.Errorf("invalid flutter command: %w", err)
-	}
-	cmd.Dir = ctx.ProjectPath
-	
-	// Set environment variables
-	cmd.Env = append(os.Environ(), 
-		fmt.Sprintf("FLUTTER_ROOT=%s", p.sdkPath),
-		fmt.Sprintf("PATH=%s%c%s", p.GetFlutterBinPath(), os.PathListSeparator, os.Getenv("PATH")),
-	)
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("flutter command failed: %w\nOutput: %s", err, string(output))
-	}
-
-	return nil
 }
 
 func (p *FlutterPlugin) createDirectoryStructure(ctx *tilocontext.ExecutionContext) error {
@@ -333,326 +152,137 @@ func (p *FlutterPlugin) createDirectoryStructure(ctx *tilocontext.ExecutionConte
 	return nil
 }
 
-func (p *FlutterPlugin) generateModuleFiles(ctx *tilocontext.ExecutionContext) error {
-	// Ensure Flutter SDK is available for template processing
-	if err := p.ensureFlutterSDK(ctx); err != nil {
-		return err
-	}
+func (p *FlutterPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error {
+	templateEngine := templates.NewTemplateEngine()
 
-	// Define file contents for Flutter project
-	fileContents := map[string]string{
-		// src files
+	files := map[string]string{
+		"lib/main.dart":         flutter.MainDart,
 		"pubspec.yaml":          flutter.PubspecYaml,
 		"analysis_options.yaml": flutter.AnalysisOptions,
 		"README.md":             flutter.Readme,
 		"CHANGELOG.md":          flutter.Changelog,
-		"my_app.iml":            flutter.MyAppIml,
 		".metadata":             flutter.MetaData,
-		".gitignore":            flutter.Gitignore,
+		"android/app/src/debug/AndroidManifest.xml":                                   flutter.AndroidDebugManifest,
+		"android/app/src/main/AndroidManifest.xml":                                    flutter.AndroidManifest,
+		"android/app/src/profile/AndroidManifest.xml":                                 flutter.AndroidProfileManifest,
+		"android/app/src/main/kotlin/com/example/my_app/MainActivity.kt":              flutter.AndroidKotlinMainActivity,
+		"android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java": flutter.AndroidGeneratedPluginRegistrant,
+		"android/app/src/main/res/drawable/launch_background.xml":                     flutter.DrawableLaunchBackground,
+		"android/app/src/main/res/drawable-v21/launch_background.xml":                 flutter.DrawableV21LaunchBackground,
+		"android/app/src/main/res/values/styles.xml":                                  flutter.AndroidStyleValue,
+		"android/app/src/main/res/values-night/styles.xml":                            flutter.AndroidStyleNightValue,
+		"android/app/build.gradle.kts":                                                flutter.AndroidBuildGradle,
+		"android/build.gradle.kts":                                                    flutter.AndroidRootBuildGradle,
+		"android/.gitignore":                                                          flutter.AndroidGitignore,
+		"android/gradle.properties":                                                   flutter.AndroidGradleProperties,
+		"android/gradlew":                                                             flutter.AndroidGradlew,
+		"android/gradlew.bat":                                                         flutter.AndroidGradlewBat,
+		"android/gradle/wrapper/gradle-wrapper.properties":                            flutter.AndroidGradleWrapperProperties,
 	}
 
-	templateEngine := templates.NewTemplateEngine()
+	for path, content := range files {
+		fullPath := filepath.Join(ctx.ProjectPath, path)
 
-	for filename, content := range fileContents {
-		fullPath := filepath.Join(ctx.ProjectPath, filename)
-
-		// Process template content with TILOKit delimiters
-		// Note: You'll need to pass Flutter SDK info to template engine if needed
-		processedContent, err := templateEngine.ProcessTemplateWithDelims(
-			content,
-			constants.TiloLeftDelim,
-			constants.TiloRightDelim,
-			ctx,
-		)
+		processedContent, err := templateEngine.ProcessTemplateWithDelims(content, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process template for file %s", filename)
-		}
-
-		// Ensure the directory exists before writing the file
-		if err := utils.EnsureDir(filepath.Dir(fullPath)); err != nil {
-			return errors.Wrapf(err, "failed to create directory for file %s", filename)
+			return errors.Wrapf(err, "failed to process template for %s", path)
 		}
 
 		if err := utils.WriteFile(fullPath, processedContent); err != nil {
-			return errors.Wrapf(err, "failed to write file %s", filename)
+			return err
 		}
 	}
 
-	return nil
-}
+	projectName := ctx.Variables["project_name"].(string)
+	imlPath := filepath.Join(ctx.ProjectPath, projectName+".iml")
 
-// Your enhanced generateSourceFiles method with SDK detection
-func (p *FlutterPlugin) generateSourceFiles(ctx *tilocontext.ExecutionContext) error {
-	// First, ensure Flutter SDK is available
-	if err := p.ensureFlutterSDK(ctx); err != nil {
-		return err
-	}
-
-	// Define file groups with their base paths and contents 
-	fileGroups := map[string]map[string]string{
-		// lib files
-		"lib": {
-			"main.dart": flutter.MainDart,
-		},
-		// android files
-		"android/app/src/debug": {
-			"AndroidManifest.xml": flutter.AndroidDebugManifest,
-		},
-		"android/app/src/main": {
-			"AndroidManifest.xml": flutter.AndroidManifest,
-		},
-		"android/app/src/main/java/io/flutter/plugins": {
-			"GeneratedPluginRegistrant.java": flutter.AndroidGeneratedPluginRegistrant,
-		},
-		"android/app/src/main/kotlin/com/example/my_app": {
-			"MainActivity.kt": flutter.AndroidKotlinMainActivity,
-		},
-		"android/app/src/main/res/drawable": {
-			"launch_background.xml": flutter.DrawableLaunchBackground,
-		},
-		"android/app/src/main/res/drawable-v21": {
-			"launch_background.xml": flutter.DrawableV21LaunchBackground,
-		},
-		"android/app/src/main/res/values": {
-			"styles.xml": flutter.AndroidStyleValue,
-		},
-		"android/app/src/main/res/values-night": {
-			"styles.xml": flutter.AndroidStyleNightValue,
-		},
-		"android/app/src/profile": {
-			"AndroidManifest.xml": flutter.AndroidProfileManifest,
-		},
-		"android/app": {
-			"build.gradle.kts": flutter.AndroidBuildGradle,
-		},
-		"android": {
-			"build.gradle.kts":  flutter.AndroidRootBuildGradle,
-			".gitignore":        flutter.AndroidGitignore,
-			"gradle.properties": flutter.AndroidGradleProperties,
-			"gradlew":           flutter.AndroidGradlew,
-			"gradlew.bat":       flutter.AndroidGradlewBat,
-			"local.properties":  flutter.AndroidLocalProperties,
-		},
-		"android/gradle/wrapper": {
-			"gradle-wrapper.properties": flutter.AndroidGradleWrapperProperties,
-		},
-		// ios files
-		"ios/Runner": {
-			"Info.plist":        flutter.IosInfoPlist,
-			"AppDelegate.swift": flutter.IosAppDelegate,
-		},
-		// web files
-		"web": {
-			"index.html":    flutter.WebIndexHtml,
-			"manifest.json": flutter.WebManifestJson,
-		},
-		// windows files
-		"windows/runner": {
-			"main.cpp": flutter.WindowsMainCpp,
-		},
-		// macos files
-		"macos/Runner": {
-			"AppDelegate.swift": flutter.MacosAppDelegate,
-		},
-		// linux files
-		"linux": {
-			"main.cpp": flutter.LinuxMainCpp,
-		},
-		// test files
-		"test": {
-			"widget_test.dart": flutter.WidgetTest,
-		},
-		"integration_test": {
-			"app_test.dart": flutter.IntegrationTest,
-		},
-	}
-
-	templateEngine := templates.NewTemplateEngine()
-
-	// Note: If you need Flutter SDK info in templates, you'll need to modify
-	// the template engine or context to support passing this data
-
-	for basePath, files := range fileGroups {
-		if err := p.processFileGroup(ctx, templateEngine, basePath, files); err != nil {
-			return fmt.Errorf("failed to process file group %s: %w", basePath, err)
-		}
-	}
-
-	// Copy assets from the framework's asset directory
-	if err := p.copyAssets(ctx); err != nil {
-		return fmt.Errorf("failed to copy assets: %w", err)
-	}
-
-	// After generating files, optionally run flutter pub get
-	if err := p.runFlutterCommand(ctx, "pub", "get"); err != nil {
-		// Warning: Failed to run flutter pub get - continuing anyway
-		// Don't return error here as file generation was successful
-		_ = err // explicitly ignore the error
-	}
-
-	// Flutter project files generated successfully
-	return nil
-}
-
-
-// processFileGroup handles the template processing and file writing for a group of files
-func (p *FlutterPlugin) processFileGroup(
-	ctx *tilocontext.ExecutionContext,
-	templateEngine *templates.TemplateEngine,
-	basePath string,
-	files map[string]string,
-) error {
-	for filename, content := range files {
-		fullPath := filepath.Join(ctx.ProjectPath, basePath, filename)
-
-		processedContent, err := templateEngine.ProcessTemplateWithDelims(
-			content,
-			constants.TiloLeftDelim,
-			constants.TiloRightDelim,
-			ctx,
-		)
-		if err != nil {
-			return errors.Wrapf(err, "failed to process template for %s/%s", basePath, filename)
-		}
-
-		if err := utils.WriteFile(fullPath, processedContent); err != nil {
-			return errors.Wrapf(err, "failed to write file %s/%s", basePath, filename)
-		}
-	}
-
-	return nil
-}
-
-func (p *FlutterPlugin) copyAssets(ctx *tilocontext.ExecutionContext) error {
-	// Define the source and destination paths for assets
-	assetMappings := map[string]string{
-		"assets/flutter/mipmap-hdpi/ic_launcher.png":    "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
-		"assets/flutter/mipmap-mdpi/ic_launcher.png":    "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
-		"assets/flutter/mipmap-xhdpi/ic_launcher.png":   "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
-		"assets/flutter/mipmap-xxhdpi/ic_launcher.png":  "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
-		"assets/flutter/mipmap-xxxhdpi/ic_launcher.png": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
-	}
-
-	// Get the current working directory (assuming the framework is running from the workspace root)
-	workspaceRoot, err := os.Getwd()
+	processedIml, err := templateEngine.ProcessTemplateWithDelims(flutter.MyAppIml, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
 	if err != nil {
-		return errors.Wrap(err, "failed to get current working directory")
+		return errors.Wrapf(err, "failed to process template for %s.iml", projectName)
 	}
 
-	for srcPath, destPath := range assetMappings {
-		srcFullPath := filepath.Join(workspaceRoot, srcPath)
-		destFullPath := filepath.Join(ctx.ProjectPath, destPath)
-
-		// Check if source file exists
-		if !utils.FileExists(srcFullPath) {
-			continue // Skip if source doesn't exist
-		}
-
-		// Copy the file
-		if err := utils.CopyFile(srcFullPath, destFullPath); err != nil {
-			return errors.Wrapf(err, "failed to copy asset %s to %s", srcPath, destPath)
-		}
-	}
-
-	return nil
-}
-
-// ValidateFlutterInstallation checks if Flutter is properly installed and configured
-func (p *FlutterPlugin) ValidateFlutterInstallation(ctx *tilocontext.ExecutionContext) error {
-	if err := p.ensureFlutterSDK(ctx); err != nil {
+	if err := utils.WriteFile(imlPath, processedIml); err != nil {
 		return err
 	}
 
-	// Run flutter doctor to check installation
-	return p.runFlutterCommand(ctx, "doctor")
-}
-
-// GetFlutterSDKPath returns the Flutter SDK path
-func (p *FlutterPlugin) GetFlutterSDKPath(ctx *tilocontext.ExecutionContext) (string, error) {
-	if err := p.ensureFlutterSDK(ctx); err != nil {
-		return "", err
-	}
-	return p.sdkPath, nil
-}
-
-// GetFlutterInfo returns comprehensive Flutter SDK information
-func (p *FlutterPlugin) GetFlutterInfo(ctx *tilocontext.ExecutionContext) (map[string]string, error) {
-	if err := p.ensureFlutterSDK(ctx); err != nil {
-		return nil, err
-	}
-
-	return p.sdkFinder.GetFlutterInfo(p.sdkPath), nil
-}
-
-// detectAndroidSDKFromEnv detects Android SDK from environment variables (fallback)
-func (p *FlutterPlugin) detectAndroidSDKFromEnv(ctx *tilocontext.ExecutionContext) {
-	// Check environment variables in order of preference
-	envVars := []string{"ANDROID_SDK_ROOT", "ANDROID_HOME"}
-	
-	for _, envVar := range envVars {
-		if androidSDK := os.Getenv(envVar); androidSDK != "" {
-			if p.sdkFinder.IsValidAndroidSDK(androidSDK) {
-				ctx.SetVariable("android_sdk_path", androidSDK)
-				return
-			}
-		}
-	}
-}
-
-// PostGenerationSetup runs Flutter commands after file generation
-func (p *FlutterPlugin) PostGenerationSetup(ctx *tilocontext.ExecutionContext) error {
-	// Run flutter pub get to fetch dependencies
-	if err := p.runFlutterCommand(ctx, "pub", "get"); err != nil {
-		return fmt.Errorf("failed to run 'flutter pub get': %w", err)
-	}
-
-	// Optionally run flutter analyze to check for issues
-	if err := p.runFlutterCommand(ctx, "analyze"); err != nil {
-		// Flutter analyze found issues - continuing anyway
-		// Don't return error as this is just a warning
-		_ = err // explicitly ignore the error
-	}
-
 	return nil
+}
+
+func (p *FlutterPlugin) generatePubspec(ctx *tilocontext.ExecutionContext) error {
+	templateEngine := templates.NewTemplateEngine()
+
+	pubspecTemplate := `name: {{.project_name}}
+description: A new Flutter project.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true`
+
+	pubspecContent, err := templateEngine.ProcessTemplateWithDelims(pubspecTemplate, constants.TiloLeftDelim, constants.TiloRightDelim, ctx)
+	if err != nil {
+		return err
+	}
+
+	pubspecPath := filepath.Join(ctx.ProjectPath, "pubspec.yaml")
+	return utils.WriteFile(pubspecPath, pubspecContent)
+}
+
+func (p *FlutterPlugin) generateConfigFiles(ctx *tilocontext.ExecutionContext) error {
+	return nil
+}
+
+func (p *FlutterPlugin) Validate() error {
+	_, err := p.sdkFinder.FindFlutterSDK()
+	return err
 }
 
 func (p *FlutterPlugin) PreGenerate(ctx *tilocontext.ExecutionContext) error {
-	// Validate Flutter SDK early in the process
-	if err := p.ensureFlutterSDK(ctx); err != nil {
-		return errors.Wrap(err, "Flutter SDK validation failed")
-	}
+	ctx.SetVariable("flutter_version", "^3.16.0")
+	ctx.SetVariable("dart_version", "^3.2.0")
+	ctx.SetVariable("cupertino_icons_version", "^1.0.2")
+	ctx.SetVariable("flutter_lints_version", "^2.0.0")
 
-	// Add Flutter SDK path to context variables for template processing
-	ctx.SetVariable("flutter_sdk_path", p.sdkPath)
-
-	// Flutter SDK validated successfully
 	return nil
 }
 
 func (p *FlutterPlugin) Generate(ctx *tilocontext.ExecutionContext) error {
-	// Create directory structure
 	if err := p.createDirectoryStructure(ctx); err != nil {
 		return errors.Wrap(err, "failed to create directory structure")
 	}
-	
-	if err := p.generateModuleFiles(ctx); err != nil {
-		return errors.Wrap(err, "failed to create moduleFiles")
+
+	if err := p.generatePubspec(ctx); err != nil {
+		return errors.Wrap(err, "failed to generate pubspec.yaml")
 	}
-	
+
 	if err := p.generateSourceFiles(ctx); err != nil {
-		return errors.Wrap(err, "failed to create source files")
+		return errors.Wrap(err, "failed to generate source files")
+	}
+
+	if err := p.generateConfigFiles(ctx); err != nil {
+		return errors.Wrap(err, "failed to generate config files")
 	}
 
 	return nil
 }
 
 func (p *FlutterPlugin) PostGenerate(ctx *tilocontext.ExecutionContext) error {
-	// Run post-generation Flutter setup
-	if err := p.PostGenerationSetup(ctx); err != nil {
-		// Post-generation setup had issues - continuing anyway
-		// Don't fail the entire process for post-generation issues
-		_ = err // explicitly ignore the error
-	}
+	ctx.SetMetadata("framework_generated", true)
+	ctx.SetMetadata("start_command", "flutter run")
 
 	return nil
 }

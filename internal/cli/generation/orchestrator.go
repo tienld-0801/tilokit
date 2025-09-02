@@ -15,7 +15,6 @@ import (
 	"tilokit/pkg/constants"
 )
 
-// Orchestrator coordinates the entire project generation process
 type Orchestrator struct {
 	promptHandler   *prompts.PromptHandler
 	validator       *validator.Validator
@@ -23,7 +22,6 @@ type Orchestrator struct {
 	progressHandler *progress.ProgressHandler
 }
 
-// NewOrchestrator creates a new Orchestrator instance
 func NewOrchestrator() *Orchestrator {
 	return &Orchestrator{
 		promptHandler:   prompts.NewPromptHandler(),
@@ -33,7 +31,6 @@ func NewOrchestrator() *Orchestrator {
 	}
 }
 
-// ProjectConfig holds all project generation parameters
 type ProjectConfig struct {
 	ProjectName   string
 	Framework     string
@@ -46,26 +43,21 @@ type ProjectConfig struct {
 	Force         bool
 }
 
-// GenerateProject handles the complete project generation workflow
 func (o *Orchestrator) GenerateProject(projectConfig ProjectConfig) error {
-	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		utils.Info("No config file found, using defaults")
 		cfg = &config.Config{}
 	}
 
-	// Interactive prompts for missing values
 	if err := o.promptForMissingValues(cfg, &projectConfig); err != nil {
 		return err
 	}
 
-	// Validate inputs
 	if err := o.validator.ValidateProjectInputs(projectConfig.ProjectName, projectConfig.OutputDir, projectConfig.Force); err != nil {
 		return err
 	}
 
-	// Validate language and build tool compatibility
 	if err := o.validator.ValidateLanguage(projectConfig.Language, projectConfig.Framework); err != nil {
 		return err
 	}
@@ -114,31 +106,26 @@ func (o *Orchestrator) promptForMissingValues(cfg *config.Config, projectConfig 
 		return err
 	}
 
-	// Build tool
 	projectConfig.BuildTool, err = o.promptHandler.PromptForBuildTool(projectConfig.BuildTool, projectConfig.Framework)
 	if err != nil {
 		return err
 	}
 
-	// Language
 	projectConfig.Language, err = o.promptHandler.PromptForLanguage(projectConfig.Language, projectConfig.Framework)
 	if err != nil {
 		return err
 	}
 
-	// Next.js router
 	projectConfig.RouterType, err = o.promptHandler.PromptForNextJSRouter(projectConfig.RouterType, projectConfig.Framework)
 	if err != nil {
 		return err
 	}
 
-	// Angular options
 	projectConfig.RenderingMode, projectConfig.Architecture, err = o.promptHandler.PromptForAngularOptions(projectConfig.RenderingMode, projectConfig.Architecture, projectConfig.Framework)
 	if err != nil {
 		return err
 	}
 
-	// React Native template
 	if projectConfig.Framework == "react-native" {
 		projectConfig.Architecture, err = o.promptHandler.PromptForReactNativeTemplate(projectConfig.Architecture, projectConfig.Framework)
 		if err != nil {
@@ -146,7 +133,6 @@ func (o *Orchestrator) promptForMissingValues(cfg *config.Config, projectConfig 
 		}
 	}
 
-	// Output directory
 	if projectConfig.OutputDir == "" {
 		projectConfig.OutputDir = "."
 	}
@@ -154,23 +140,19 @@ func (o *Orchestrator) promptForMissingValues(cfg *config.Config, projectConfig 
 	return nil
 }
 
-// setupProjectVariables configures project variables based on framework and options
 func (o *Orchestrator) setupProjectVariables(tilokitProjectConfig *tilocontext.ProjectConfig, projectConfig ProjectConfig) {
 	if tilokitProjectConfig.Variables == nil {
 		tilokitProjectConfig.Variables = make(map[string]interface{})
 	}
 
-	// Language selection (default ts)
 	language := projectConfig.Language
 	if language == "" {
 		language = "ts"
 	}
 	tilokitProjectConfig.Variables["language"] = language
 
-	// Build tool
 	tilokitProjectConfig.Variables["BuildTool"] = projectConfig.BuildTool
 
-	// Framework-specific variables
 	switch projectConfig.Framework {
 	case "next":
 		routerType := projectConfig.RouterType
@@ -194,7 +176,6 @@ func (o *Orchestrator) setupProjectVariables(tilokitProjectConfig *tilocontext.P
 	}
 }
 
-// displayNextSteps shows framework-specific next steps to the user
 func (o *Orchestrator) displayNextSteps(projectName, framework string) {
 	fmt.Printf("\n📋 Next steps:\n")
 	switch framework {
@@ -217,6 +198,10 @@ func (o *Orchestrator) displayNextSteps(projectName, framework string) {
 		fmt.Printf("   npm install\n")
 		fmt.Printf("   npx expo start\n")
 		fmt.Printf("   Scan QR code with Expo Go app or run on simulator\n")
+	case constants.FlutterFramework:
+		fmt.Printf("   cd %s\n", projectName)
+		fmt.Printf("   flutter pub get\n")
+		fmt.Printf("   flutter run\n")
 	default:
 		fmt.Printf("   cd %s\n", projectName)
 		fmt.Printf("   Follow framework-specific setup instructions\n")

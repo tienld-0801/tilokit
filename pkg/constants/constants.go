@@ -103,3 +103,10 @@ const (
 	BuildToolPipenv = "pipenv"
 	BuildToolConda  = "conda"
 )
+
+// CLI OS Tracking
+const (
+	OSDarwin  = "darwin"
+	OSLinux   = "linux"
+	OSWindows = "windows"
+)
