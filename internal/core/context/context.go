@@ -3,12 +3,10 @@ package tilocontext
 import (
 	"os"
 	"path/filepath"
-	"time"
-
 	"tilokit/internal/utils"
+	"time"
 )
 
-// ProjectConfig holds the configuration for project generation
 type ProjectConfig struct {
 	ProjectName    string                 `yaml:"project_name" mapstructure:"project_name"`
 	Framework      string                 `yaml:"framework" mapstructure:"framework"`
@@ -21,7 +19,6 @@ type ProjectConfig struct {
 	GitInit        bool                   `yaml:"git_init" mapstructure:"git_init"`
 }
 
-// ExecutionContext provides runtime context for plugin execution
 type ExecutionContext struct {
 	Config      *ProjectConfig
 	ProjectPath string
@@ -31,7 +28,6 @@ type ExecutionContext struct {
 	Metadata    map[string]interface{}
 }
 
-// NewExecutionContext creates a new execution context
 func NewExecutionContext(config *ProjectConfig) *ExecutionContext {
 	projectPath := filepath.Join(config.OutputDir, config.ProjectName)
 
@@ -43,7 +39,6 @@ func NewExecutionContext(config *ProjectConfig) *ExecutionContext {
 		Metadata:    make(map[string]interface{}),
 	}
 
-	// Set default variables
 	ctx.Variables["project_name"] = config.ProjectName
 	ctx.Variables["framework"] = config.Framework
 	ctx.Variables["build_tool"] = config.BuildTool
@@ -51,16 +46,13 @@ func NewExecutionContext(config *ProjectConfig) *ExecutionContext {
 	ctx.Variables["timestamp"] = ctx.StartTime.Format("2006-01-02 15:04:05")
 	ctx.Variables["welcome_message"] = config.ProjectName
 
-	// Load all environment variables
 	envConfig := utils.LoadEnvConfig()
 	envVars := envConfig.ToVariables()
 
-	// Merge environment variables into context
 	for k, v := range envVars {
 		ctx.Variables[k] = v
 	}
 
-	// Merge user variables
 	for k, v := range config.Variables {
 		ctx.Variables[k] = v
 	}
@@ -68,35 +60,31 @@ func NewExecutionContext(config *ProjectConfig) *ExecutionContext {
 	return ctx
 }
 
-// SetVariable sets a variable in the execution context
 func (ctx *ExecutionContext) SetVariable(key string, value interface{}) {
 	ctx.Variables[key] = value
 }
 
-// GetVariable gets a variable from the execution context
 func (ctx *ExecutionContext) GetVariable(key string) (interface{}, bool) {
 	value, exists := ctx.Variables[key]
 	return value, exists
 }
 
-// SetMetadata sets metadata in the execution context
 func (ctx *ExecutionContext) SetMetadata(key string, value interface{}) {
 	ctx.Metadata[key] = value
 }
 
-// GetMetadata gets metadata from the execution context
 func (ctx *ExecutionContext) GetMetadata(key string) (interface{}, bool) {
 	value, exists := ctx.Metadata[key]
 	return value, exists
 }
 
-// EnsureProjectDir creates the project directory if it doesn't exist
 func (ctx *ExecutionContext) EnsureProjectDir() error {
-	// Use more restrictive permissions (0750 instead of 0755)
-	return os.MkdirAll(ctx.ProjectPath, 0750)
+	if ctx.ProjectPath == "" {
+		return os.MkdirAll(ctx.ProjectPath, 0750)
+	}
+	return nil
 }
 
-// CreateTempDir creates a temporary directory for processing
 func (ctx *ExecutionContext) CreateTempDir() error {
 	tempDir, err := os.MkdirTemp("", "tilokit-*")
 	if err != nil {
@@ -106,7 +94,6 @@ func (ctx *ExecutionContext) CreateTempDir() error {
 	return nil
 }
 
-// Cleanup removes temporary resources
 func (ctx *ExecutionContext) Cleanup() error {
 	if ctx.TempDir != "" {
 		return os.RemoveAll(ctx.TempDir)
