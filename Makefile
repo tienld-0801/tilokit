@@ -1,50 +1,46 @@
 .PHONY: help build test clean install dev lint security-check security-report docker hooks install-hooks uninstall-hooks
 
-# Build configurations
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 LDFLAGS := -X main.Version=$(VERSION) -X main.BuildDate=$(BUILD_DATE) -X main.GitCommit=$(GIT_COMMIT)
 
-# Binary name
 BINARY_NAME := tilokit
 
-# Default target
 default: help build
 
-help: ## Show this help message
+help:
 	@echo "TiLoKit - Modern Multi-Framework Project Generator"
 	@echo ""
 	@echo "Available commands:"
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 ##@ Development
-
-dev: ## Run in development mode
+dev:
 	@./.husky/check-hooks.sh 2>/dev/null || true
 	go run . --help
 
-run: test lint markdown-lint ## Run interactive mode for development (with full validation)
+run: test lint markdown-lint
 	@./.husky/check-hooks.sh 2>/dev/null || true
 	@echo "🚀 Starting TiLoKit in interactive mode..."
 	go run . -i
 
-demo: ## Quick demo - create a React project
+demo:
 	@./.husky/check-hooks.sh 2>/dev/null || true
 	@echo "🎯 Creating demo React project..."
 	go run . -n demo-react -f react -b vite -L js -q
 
-build: ## Build the project
+build:
 	@./.husky/check-hooks.sh 2>/dev/null || true
 	@echo "Building $(BINARY_NAME)..."
 	go build -ldflags "$(LDFLAGS)" -o $(BINARY_NAME) .
 	@echo "✅ Build completed: ./$(BINARY_NAME)"
 
-lint: ## Run linter
+lint:
 	@echo "Running linter..."
 	golangci-lint run
 
-security-check: ## Run security analysis with gosec
+security-check:
 	@echo "🔒 Running security analysis with gosec..."
 	@if command -v gosec >/dev/null 2>&1; then \
 		gosec -fmt=colored -stdout -verbose=text ./...; \
@@ -53,7 +49,8 @@ security-check: ## Run security analysis with gosec
 		exit 1; \
 	fi
 
-security-report: ## Generate detailed security report (JSON format)
+##@ Security
+security-report:
 	@echo "📊 Generating detailed security report..."
 	@if command -v gosec >/dev/null 2>&1; then \
 		gosec -fmt=json -out=security-report.json ./... && \
@@ -63,11 +60,23 @@ security-report: ## Generate detailed security report (JSON format)
 		exit 1; \
 	fi
 
-test: ## Run tests
+##@ Installation
+install: build
+	@echo "Installing $(BINARY_NAME) to /usr/local/bin..."
+	sudo cp $(BINARY_NAME) /usr/local/bin/
+	@echo "✅ $(BINARY_NAME) installed successfully"
+
+uninstall:
+	@echo "Uninstalling $(BINARY_NAME)..."
+	sudo rm -f /usr/local/bin/$(BINARY_NAME)
+	@echo "✅ $(BINARY_NAME) uninstalled"
+
+##@ Testing & Examples
+test:
 	@echo "Running tests..."
 	go test -v ./...
 
-markdown-lint: ## Run markdownlint on all .md files
+markdown-lint:
 	@echo "Running markdownlint..."
 	@if command -v markdownlint-cli2 >/dev/null 2>&1; then \
 		markdownlint-cli2 "**/*.md" "#vendor"; \
@@ -78,36 +87,21 @@ markdown-lint: ## Run markdownlint on all .md files
 		exit 1; \
 	fi
 
-##@ Installation
-
-install: build ## Install the binary to /usr/local/bin
-	@echo "Installing $(BINARY_NAME) to /usr/local/bin..."
-	sudo cp $(BINARY_NAME) /usr/local/bin/
-	@echo "✅ $(BINARY_NAME) installed successfully"
-
-uninstall: ## Uninstall the binary
-	@echo "Uninstalling $(BINARY_NAME)..."
-	sudo rm -f /usr/local/bin/$(BINARY_NAME)
-	@echo "✅ $(BINARY_NAME) uninstalled"
-
-##@ Testing & Examples
-
-test-react: build ## Test React project generation
+test-react: build
 	@echo "Testing React project generation..."
 	./$(BINARY_NAME) --name example-react --framework react --build-tool vite --output ./examples --force --quiet
 	@echo "✅ React project generated in ./examples/example-react"
 
-test-vue: build ## Test Vue project generation
+test-vue: build
 	@echo "Testing Vue project generation..."
 	./$(BINARY_NAME) --name example-vue --framework vue --build-tool vite --output ./examples --force --quiet
 	@echo "✅ Vue project generated in ./examples/example-vue"
 
-test-all: test-react test-vue ## Test all framework generations
+test-all: test-react test-vue
 	@echo "✅ All framework tests completed"
 
 ##@ Cleanup
-
-clean: ## Clean build artifacts
+clean:
 	@echo "Cleaning build artifacts..."
 	rm -f $(BINARY_NAME)
 	rm -rf dist/
@@ -115,27 +109,25 @@ clean: ## Clean build artifacts
 	rm -rf test-*-app/
 	@echo "✅ Cleanup complete"
 
-clean-examples: ## Clean only example projects
+clean-examples:
 	@echo "Cleaning example projects..."
 	rm -rf examples/
 	rm -rf test-*-app/
 	@echo "✅ Example projects cleaned"
 
 ##@ Docker
-
-docker: ## Build Docker image
+docker:
 	@echo "Building Docker image..."
 	docker build -t tilokit:$(VERSION) .
 	@echo "✅ Docker image built: tilokit:$(VERSION)"
 
 ##@ Release Management
-
-init-branches: ## Initialize Git branch structure
+init-branches:
 	@echo "Initializing branch structure..."
 	@chmod +x scripts/init-branches.sh
 	./scripts/init-branches.sh
 
-release: ## Create a new release (usage: make release VERSION=v0.1.0)
+release:
 	@if [ -z "$(VERSION)" ]; then \
 		echo "❌ VERSION is required. Usage: make release VERSION=v0.1.0"; \
 		exit 1; \
@@ -150,18 +142,18 @@ release: ## Create a new release (usage: make release VERSION=v0.1.0)
 	@./.github/scripts/release.sh $(VERSION)
 	@echo "✨ Release $(VERSION) completed!"
 
-quick-release: ## Quick release with automatic version bump (dev releases)
+quick-release:
 	@echo "⚡ Quick release process..."
 	@NEXT_VERSION=$$(date +"v0.1.%s-dev"); \
 	echo "🚀 Creating quick release: $$NEXT_VERSION"; \
 	$(MAKE) release VERSION=$$NEXT_VERSION
 
-dev-release: ## Create development release (usage: make dev-release)
+dev-release:
 	@NEXT_VERSION="v0.1.$$(date +%s)-dev"; \
 	echo "🔧 Creating dev release: $$NEXT_VERSION"; \
 	$(MAKE) release VERSION=$$NEXT_VERSION
 
-hotfix: ## Create a hotfix (usage: make hotfix VERSION=v0.1.1)
+hotfix:
 	@if [ -z "$(VERSION)" ]; then \
 		echo "❌ VERSION is required. Usage: make hotfix VERSION=v0.1.1"; \
 		exit 1; \
@@ -169,7 +161,7 @@ hotfix: ## Create a hotfix (usage: make hotfix VERSION=v0.1.1)
 	@chmod +x scripts/hotfix.sh
 	./scripts/hotfix.sh $(VERSION)
 
-revert-release: ## Revert version to previous tag in constants.go
+revert-release:
 	@echo "🔄 Reverting to previous version..."
 	@PREV_VERSION=$$(git tag --sort=-version:refname | head -1 2>/dev/null || echo "v0.0.0-dev"); \
 	if [ "$$PREV_VERSION" = "v0.0.0-dev" ]; then \
@@ -185,9 +177,7 @@ revert-release: ## Revert version to previous tag in constants.go
 	echo "✅ Version reverted to $$PREV_VERSION in pkg/constants/constants.go"; \
 	echo "💡 You can now commit this change: git add pkg/constants/constants.go && git commit -m '⏪ revert: version to $$PREV_VERSION'"
 
-# Changelog is now auto-generated by GitHub Releases
-
-check-release: ## Check if ready for release
+check-release:
 	@echo "🔍 Checking release readiness..."
 	@echo "Current branch: $$(git branch --show-current)"
 	@echo "Working directory status:"
@@ -204,7 +194,7 @@ check-release: ## Check if ready for release
 	@echo "Unreleased commits:"
 	@git log --oneline $$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")..HEAD | head -10
 
-release-status: ## Show current release status
+release-status:
 	@echo "📋 Release Status"
 	@echo "==============="
 	@echo "Current branch: $$(git branch --show-current)"
@@ -213,14 +203,14 @@ release-status: ## Show current release status
 	@echo "Version in code: $$(grep 'Version =' cmd/version.go | cut -d'"' -f2)"
 	@echo "Working directory: $$(if [ -n "$$(git status --porcelain)" ]; then echo 'dirty'; else echo 'clean'; fi)"
 
-validate-release: ## Validate release readiness with tests
+validate-release:
 	@echo "⚙️ Validating release readiness..."
 	@$(MAKE) lint
 	@$(MAKE) test
 	@$(MAKE) build
 	@echo "✅ Release validation passed!"
 
-version-info: ## Show current version information
+version-info:
 	@echo "📋 Version Information"
 	@echo "Current Version: $(VERSION)"
 	@echo "Build Date: $(BUILD_DATE)"
@@ -234,15 +224,14 @@ version-info: ## Show current version information
 	fi
 
 ##@ Git Hooks
+hooks: install-hooks
 
-hooks: install-hooks ## Alias for install-hooks
-
-install-hooks: ## Install Git hooks for commit message validation
+install-hooks:
 	@echo "🔧 Installing Git hooks from .husky..."
 	@chmod +x .husky/hooks/install-hooks.sh
 	@./.husky/hooks/install-hooks.sh
 
-uninstall-hooks: ## Uninstall Git hooks
+uninstall-hooks:
 	@echo "🗑️ Uninstalling Git hooks..."
 	@if [ -f ".git/hooks/commit-msg" ]; then \
 		rm .git/hooks/commit-msg && echo "✅ Removed commit-msg hook"; \
@@ -256,15 +245,15 @@ uninstall-hooks: ## Uninstall Git hooks
 	fi
 	@echo "🎉 Git hooks uninstalled!"
 
-check-hooks: ## Check if Git hooks are installed
+check-hooks:
 	@./.husky/check-hooks.sh
 
-validate-commits: ## Validate recent commit messages
+validate-commits:
 	@echo "🔍 Validating commit messages..."
 	@chmod +x .husky/ci-check-commits.sh
 	@./.husky/ci-check-commits.sh
 
-test-emoji: ## Test emoji validation system
+test-emoji:
 	@echo "🧪 Testing emoji validation system..."
 	@chmod +x scripts/test-emoji-validation.sh
 	@./scripts/test-emoji-validation.sh
