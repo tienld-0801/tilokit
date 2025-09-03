@@ -81,7 +81,7 @@ func PrintBanner() {
 ║                                                              ║
 ║         🚀 Multi-Framework Project Generator 🚀              ║
 ║                                                              ║
-║    💬 Join our Discord: https://discord.gg/BqTqZ46uT9        ║
+║    💬 Join our Discord: https://discord.gg/BzNmrJ5xnC        ║
 ║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
 `
