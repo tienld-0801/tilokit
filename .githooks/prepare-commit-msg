@@ -1,0 +1,153 @@
+#!/bin/bash
+
+# TiLoKit Auto Emoji Hook
+# Automatically adds appropriate emoji to commit messages based on type
+# This hook runs before commit-msg validation
+
+# ANSI color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Get commit message file and message
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+COMMIT_SHA=$3
+
+# Read the current commit message
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Skip if it's a merge commit or already has emoji
+if [[ $COMMIT_SOURCE == "merge" ]] || [[ $COMMIT_SOURCE == "squash" ]] || [[ $COMMIT_SOURCE == "cherry-pick" ]]; then
+    exit 0
+fi
+
+# Skip if message already has emoji (starts with emoji)
+if echo "$COMMIT_MSG" | grep -qE '^[^[:space:]]+ [a-z]+:'; then
+    echo -e "${BLUE}ℹ️  Commit message already has emoji, skipping auto-add${NC}"
+    exit 0
+fi
+
+# Skip if it's an empty message or just whitespace
+if [[ -z "$COMMIT_MSG" ]] || [[ "$COMMIT_MSG" =~ ^[[:space:]]*$ ]]; then
+    exit 0
+fi
+
+# Check if message already has a valid type format (type: description)
+# We want to add emoji even if it has type format
+
+# Emoji mapping function
+get_emoji_for_type() {
+    case "$1" in
+        "feat") echo "✨" ;;
+        "fix") echo "🐛" ;;
+        "docs") echo "📚" ;;
+        "refactor") echo "♻️" ;;
+        "perf") echo "⚡" ;;
+        "test") echo "🧪" ;;
+        "build") echo "🛠️" ;;
+        "ci") echo "🔄" ;;
+        "chore") echo "🧹" ;;
+        "style") echo "🎨" ;;
+        "revert") echo "⏪" ;;
+        "release") echo "🚀" ;;
+        *) echo "" ;;
+    esac
+}
+
+# Auto-detect commit type from message content
+detect_commit_type() {
+    local msg="$1"
+    local lower_msg=$(echo "$msg" | tr '[:upper:]' '[:lower:]')
+    
+    # Check for explicit type prefix (type: message)
+    if [[ $msg =~ ^([a-z]+): ]]; then
+        echo "${BASH_REMATCH[1]}"
+        return
+    fi
+    
+    # Auto-detect based on keywords in the message
+    if [[ $lower_msg =~ (add|new|feature|implement|create|introduce) ]]; then
+        echo "feat"
+    elif [[ $lower_msg =~ (fix|bug|issue|resolve|correct|repair) ]]; then
+        echo "fix"
+    elif [[ $lower_msg =~ (doc|readme|guide|manual|comment) ]]; then
+        echo "docs"
+    elif [[ $lower_msg =~ (refactor|restructure|reorganize|clean) ]]; then
+        echo "refactor"
+    elif [[ $lower_msg =~ (perf|performance|optimize|speed|fast) ]]; then
+        echo "perf"
+    elif [[ $lower_msg =~ (test|spec|testing|coverage) ]]; then
+        echo "test"
+    elif [[ $lower_msg =~ (build|compile|make|makefile) ]]; then
+        echo "build"
+    elif [[ $lower_msg =~ (ci|github|workflow|action|pipeline) ]]; then
+        echo "ci"
+    elif [[ $lower_msg =~ (style|format|lint|prettier) ]]; then
+        echo "style"
+    elif [[ $lower_msg =~ (revert|undo|rollback) ]]; then
+        echo "revert"
+    elif [[ $lower_msg =~ (release|version|v[0-9]) ]]; then
+        echo "release"
+    elif [[ $lower_msg =~ (chore|maintenance|update|upgrade|deps) ]]; then
+        echo "chore"
+    else
+        echo "chore"  # Default fallback
+    fi
+}
+
+# STRICT TAG MODE: Only allow explicit tags, auto-add emoji after tag
+# Check if message already has emoji format
+if echo "$COMMIT_MSG" | grep -qE '^[^[:space:]]+ [a-z]+: .+'; then
+    echo -e "${BLUE}ℹ️  Commit message already has emoji, skipping auto-add${NC}"
+    exit 0
+fi
+
+# Check if message has valid type format (type: description)
+if echo "$COMMIT_MSG" | grep -qE '^[a-z]+: .+'; then
+    # Extract the type
+    COMMIT_TYPE=$(echo "$COMMIT_MSG" | sed -E 's/^([a-z]+): .*/\1/')
+    
+    # Check if it's a valid type
+    VALID_TYPES=("feat" "fix" "docs" "refactor" "perf" "test" "build" "ci" "chore" "style" "revert" "release")
+    VALID_TYPE=false
+    for type in "${VALID_TYPES[@]}"; do
+        if [[ "$COMMIT_TYPE" == "$type" ]]; then
+            VALID_TYPE=true
+            break
+        fi
+    done
+    
+    if [[ "$VALID_TYPE" == true ]]; then
+        # Get emoji for the type
+        EMOJI=$(get_emoji_for_type "$COMMIT_TYPE")
+        
+        if [[ -n "$EMOJI" ]]; then
+            # Format: emoji type: original message
+            NEW_MSG="$EMOJI $COMMIT_MSG"
+            
+            # Write the new message back to the file
+            echo "$NEW_MSG" > "$COMMIT_MSG_FILE"
+            
+            echo -e "${GREEN}🎨 Auto-added emoji:${NC} ${EMOJI} ${COMMIT_TYPE}"
+            echo -e "${BLUE}📝 New message:${NC} $NEW_MSG"
+        else
+            echo -e "${YELLOW}⚠️  Could not get emoji for type: ${COMMIT_TYPE}${NC}"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  Invalid commit type: ${COMMIT_TYPE}${NC}"
+        echo -e "${YELLOW}📋 Valid types:${NC} ${VALID_TYPES[*]}"
+        echo -e "${YELLOW}💡 Use:${NC} ${BLUE}git emoji interactive${NC} for guided commit creation"
+        exit 1
+    fi
+else
+    echo -e "${YELLOW}⚠️  No valid tag found, manual tag required${NC}"
+    echo -e "${YELLOW}📋 Required format:${NC} ${BLUE}type: description${NC}"
+    echo -e "${YELLOW}📋 Valid types:${NC} feat, fix, docs, refactor, perf, test, build, ci, chore, style, revert, release"
+    echo -e "${YELLOW}💡 Use:${NC} ${BLUE}git emoji interactive${NC} for guided commit creation"
+    exit 1
+fi
+
+exit 0
