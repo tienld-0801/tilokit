@@ -8,40 +8,40 @@ TiLoKit automatically adds appropriate emojis to your commit messages based on t
 
 ## ✨ Features
 
-- **Automatic Detection**: Analyzes commit message content to determine the appropriate type and emoji
-- **Manual Override**: Use explicit type prefixes (e.g., `fix: message`) for precise control
-- **Validation**: Ensures emojis match the commit type
+- **Strict Validation**: Rejects commits without proper type format
+- **Manual Type Required**: All commits must use explicit type format (`type: message` or `emoji type: message`)
+- **Validation**: Ensures emojis match the commit type when present
 - **Helper Tools**: Command-line utilities for emoji management
+- **Guided Creation**: Interactive mode for creating proper commit messages
 
 ## 🛠️ How It Works
 
-### 1. Automatic Emoji Addition
+### 1. Strict Type Requirement
 
-When you commit with a message like:
+**ALL commits must have a proper type format. Commits without types are automatically rejected.**
 
-```bash
-git commit -m "add new authentication feature"
-```
-
-The system automatically converts it to:
-
-```
-✨ feat: add new authentication feature
-```
-
-### 2. Manual Type Specification
-
-You can also specify the type explicitly:
+✅ **Valid formats:**
 
 ```bash
-git commit -m "fix: resolve memory leak issue"
+git commit -m "feat: add new authentication feature"        # Type only
+git commit -m "✨ feat: add new authentication feature"     # With emoji
+git commit -m "fix: resolve memory leak issue"              # Type only
+git commit -m "🐛 fix: resolve memory leak issue"           # With emoji
 ```
 
-This becomes:
+❌ **Invalid formats (will be rejected):**
 
+```bash
+git commit -m "add new authentication feature"              # No type
+git commit -m "Fixed bug"                                   # No type
+git commit -m "Updated code"                                # No type
+git commit -m "FEAT: add feature"                           # Uppercase type
+git commit -m "feat:add feature"                            # Missing space
 ```
-🐛 fix: resolve memory leak issue
-```
+
+### 2. Auto-Emoji Addition (Disabled in Strict Mode)
+
+The system no longer automatically adds emojis. You must specify the type explicitly.
 
 ## 📋 Supported Commit Types
 
@@ -62,26 +62,29 @@ This becomes:
 
 ## 🎯 Usage Examples
 
-### Basic Usage
+### Required Type Format
 
 ```bash
-# Auto-detected as feat
-git commit -m "add user authentication"
+# Type only (recommended)
+git commit -m "feat: add user authentication"
+git commit -m "fix: resolve login bug"
+git commit -m "docs: update installation guide"
 
-# Auto-detected as fix
-git commit -m "fix login bug"
-
-# Auto-detected as docs
-git commit -m "update installation guide"
+# With emoji (optional)
+git commit -m "✨ feat: add new dashboard"
+git commit -m "🐛 fix: resolve memory leak"
+git commit -m "📚 docs: update API documentation"
 ```
 
-### Manual Type Specification
+### What Gets Rejected
 
 ```bash
-# Explicit type specification
-git commit -m "feat: add new dashboard"
-git commit -m "fix: resolve memory leak"
-git commit -m "docs: update API documentation"
+# These will be REJECTED
+git commit -m "add user authentication"        # No type
+git commit -m "Fixed bug"                      # No type
+git commit -m "Updated docs"                   # No type
+git commit -m "FEAT: add feature"              # Uppercase
+git commit -m "feat:add feature"               # Missing space
 ```
 
 ### Using the Helper Script
