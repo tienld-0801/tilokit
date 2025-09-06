@@ -339,13 +339,6 @@
         "dateModified": "{{BUILD_DATE}}",
         "license": "https://github.com/tienld-0801/tilokit/blob/develop/LICENSE",
         "isAccessibleForFree": true,
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "5",
-          "bestRating": "5",
-          "worstRating": "1",
-          "ratingCount": "1"
-        },
         "softwareRequirements": "No dependencies required",
         "memoryRequirements": "Minimal",
         "storageRequirements": "< 50MB",
@@ -644,6 +637,11 @@
       }
       .command-line:hover::after {
         opacity: 1;
+      }
+      .command-line.copied::after {
+        content: "Copied! ✅";
+        opacity: 1;
+        color: #68d391;
       }
       .copy-btn {
         position: absolute;
@@ -1030,7 +1028,7 @@
           >
           <button
             class="copy-btn"
-            onclick="copyInstallCommand('curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash')"
+            onclick="copyInstallCommand(event, 'curl -fsSL https://tienld-0801.github.io/tilokit/install.sh | bash')"
             aria-label="Copy installation command to clipboard"
           >
             Copy
@@ -1375,10 +1373,8 @@
     </main>
 
     <script>
-      // Enhanced copy functionality with better animations
       function copyToClipboard(text, btn) {
         if (!navigator.clipboard) {
-          // Fallback for older browsers
           const textArea = document.createElement("textarea");
           textArea.value = text;
           document.body.appendChild(textArea);
@@ -1399,29 +1395,26 @@
           });
       }
 
-      function showCopyFeedback(btn) {
-        const originalText = btn.textContent;
-        const originalBg = btn.style.background;
-
-        // Add copied class for animation
-        btn.classList.add("copied");
-        btn.textContent = "Copied!";
-
-        // Remove animation and restore original state
+      function showCopyFeedback(el) {
+        if (el.classList && el.classList.contains("command-line")) {
+          el.classList.add("copied");
+          setTimeout(() => el.classList.remove("copied"), 1500);
+          return;
+        }
+        const originalText = el.textContent;
+        el.classList.add("copied");
+        el.textContent = "Copied!";
         setTimeout(() => {
-          btn.classList.remove("copied");
-          btn.textContent = originalText;
-          btn.style.background = originalBg;
-        }, 2000);
+          el.classList.remove("copied");
+          el.textContent = originalText;
+        }, 1500);
       }
 
-      // Copy command from command-line elements
       function copyCommand(element) {
         const command = element.getAttribute("data-command");
         if (command) {
           copyToClipboard(command, element);
 
-          // Visual feedback for command line
           const originalBg = element.style.background;
           element.style.background = "#2d3748";
           element.style.transform = "translateY(-2px)";
@@ -1433,7 +1426,6 @@
         }
       }
 
-      // Handle keyboard events for accessibility
       function handleKeyDown(event, element) {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
@@ -1441,13 +1433,11 @@
         }
       }
 
-      // Enhanced copy button functionality
-      function copyInstallCommand(text) {
-        const btn = event.target;
+      function copyInstallCommand(ev, text) {
+        const btn = ev.currentTarget;
         copyToClipboard(text, btn);
       }
 
-      // Add focus styles for better accessibility
       document.addEventListener("DOMContentLoaded", function () {
         const commandLines = document.querySelectorAll(".command-line");
         commandLines.forEach((cmd) => {
@@ -1462,7 +1452,6 @@
           });
         });
 
-        // Performance optimization: Lazy load non-critical content
         if ("IntersectionObserver" in window) {
           const observer = new IntersectionObserver(
             (entries) => {
@@ -1475,13 +1464,11 @@
             { threshold: 0.1 }
           );
 
-          // Observe feature items for animation
           document.querySelectorAll(".feature-item").forEach((item) => {
             observer.observe(item);
           });
         }
 
-        // Preload critical resources
         const criticalResources = ["./logo.svg", "./manifest.json"];
 
         criticalResources.forEach((resource) => {
