@@ -214,4 +214,4 @@ export GIT_DEBUG=1
 
 ---
 
-**Happy Committing! 🎉**
+## Happy Committing! 🎉
