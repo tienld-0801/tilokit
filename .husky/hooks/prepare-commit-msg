@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# TiLoKit Prepare-commit-msg Hook
+# Auto-inserts the correct emoji based on conventional commit type
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+COMMIT_MSG_FILE="$1"
+COMMIT_SOURCE="$2"    # message, commit, merge, template, squash
+
+# Do not modify merge, squash, or template generated messages
+case "$COMMIT_SOURCE" in
+  merge|squash|template)
+    exit 0
+    ;;
+esac
+
+# Read first line only
+FIRST_LINE=$(head -n1 "$COMMIT_MSG_FILE")
+
+# Trim leading/trailing whitespace
+TRIMMED=$(echo "$FIRST_LINE" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+# If already starts with an emoji then do nothing
+if echo "$TRIMMED" | grep -qE '^[^[:space:]]+ [a-z]+: '; then
+  exit 0
+fi
+
+# If doesn't match type: description, try to detect and prepend
+if echo "$TRIMMED" | grep -qE '^[a-z]+: .+'; then
+  TYPE=$(echo "$TRIMMED" | sed -E 's/^([a-z]+): .*/\1/')
+
+  case "$TYPE" in
+    feat) EMOJI="✨" ;;
+    fix) EMOJI="🐛" ;;
+    docs) EMOJI="📚" ;;
+    refactor) EMOJI="♻️" ;;
+    perf) EMOJI="⚡" ;;
+    test) EMOJI="🧪" ;;
+    build) EMOJI="🛠️" ;;
+    ci) EMOJI="🔄" ;;
+    chore) EMOJI="🧹" ;;
+    style) EMOJI="🎨" ;;
+    revert) EMOJI="⏪" ;;
+    release) EMOJI="🚀" ;;
+    *) EMOJI="" ;;
+  esac
+
+  if [ -n "$EMOJI" ]; then
+    NEW_LINE="$EMOJI $TRIMMED"
+    # Replace first line, keep the rest
+    {
+      echo "$NEW_LINE"
+      tail -n +2 "$COMMIT_MSG_FILE"
+    } > "$COMMIT_MSG_FILE.tmp"
+    mv "$COMMIT_MSG_FILE.tmp" "$COMMIT_MSG_FILE"
+    echo -e "${GREEN}✅ Auto-inserted emoji:${NC} $NEW_LINE"
+    exit 0
+  fi
+fi
+
+exit 0

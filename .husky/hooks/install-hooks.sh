@@ -35,6 +35,7 @@ echo
 HOOKS=(
     "commit-msg:Validates commit message format (conventional commits)"
     "pre-commit:Runs pre-commit checks (syntax, large files, etc.)"
+    "prepare-commit-msg:Auto-inserts emoji based on commit type"
 )
 
 # Function to install a hook
